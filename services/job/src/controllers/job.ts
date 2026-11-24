@@ -161,8 +161,23 @@ export const createJob = TryCatch(async (req: AuthenticatedRequest, res) => {
     openings,
   } = req.body;
 
-  if (!title || !description || !salary || !location || !role || !openings) {
+  if (
+    typeof title !== "string" ||
+    typeof description !== "string" ||
+    typeof location !== "string" ||
+    typeof role !== "string" ||
+    !title.trim() ||
+    !description.trim() ||
+    !location.trim() ||
+    !role.trim() ||
+    salary === undefined ||
+    openings === undefined
+  ) {
     throw new ErrorHandler(400, "All the fields required");
+  }
+
+  if (title.trim().length > 255 || location.trim().length > 255) {
+    throw new ErrorHandler(400, "Job title and location must be 255 characters or fewer");
   }
 
   if (!JOB_TYPES.includes(job_type)) {
@@ -176,8 +191,13 @@ export const createJob = TryCatch(async (req: AuthenticatedRequest, res) => {
     );
   }
 
-  if (!(Number(salary) > 0)) {
-    throw new ErrorHandler(400, "Salary must be a positive number");
+  const salaryAmount = Number(salary);
+  if (
+    !Number.isFinite(salaryAmount) ||
+    salaryAmount <= 0 ||
+    salaryAmount > 99_999_999.99
+  ) {
+    throw new ErrorHandler(400, "Salary must be a positive amount below 100,000,000");
   }
 
   if (!Number.isInteger(Number(openings)) || Number(openings) < 1) {
@@ -192,7 +212,7 @@ export const createJob = TryCatch(async (req: AuthenticatedRequest, res) => {
   }
 
   const [newJob] =
-    await sql`INSERT INTO jobs (title, description, salary, location, role, job_type, work_location, company_id, posted_by_recuriter_id, openings) VALUES (${title}, ${description}, ${salary}, ${location}, ${role}, ${job_type}, ${work_location}, ${company_id}, ${user.user_id}, ${openings}) RETURNING *`;
+    await sql`INSERT INTO jobs (title, description, salary, location, role, job_type, work_location, company_id, posted_by_recuriter_id, openings) VALUES (${title.trim()}, ${description.trim()}, ${salaryAmount}, ${location.trim()}, ${role.trim()}, ${job_type}, ${work_location}, ${company_id}, ${user.user_id}, ${openings}) RETURNING *`;
 
   res.json({
     message: "Job posted successfully",
