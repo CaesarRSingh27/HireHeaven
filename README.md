@@ -60,6 +60,10 @@ Start order is enforced by healthchecks: `kafka, redis, utils -> auth -> job -> 
 
 `NEXT_PUBLIC_*` frontend variables are baked in at **build** time - rebuild the frontend image after changing them.
 
+### Resume PDF delivery (Cloudinary)
+
+Cloudinary Free product environments block PDF and ZIP delivery by default. To make uploaded resumes viewable, open **Product environment settings → Security** in the Cloudinary Console and enable **Allow delivery of PDF and ZIP files**. Resume links are public Cloudinary URLs, so anyone who obtains a link can view that resume. Save the setting; if a previously blocked URL still returns an error, allow time for the CDN's cached denial to expire or invalidate the asset.
+
 ## Payments (Razorpay)
 
 1. Put the key id/secret in `.env`.
