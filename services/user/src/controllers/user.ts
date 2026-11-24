@@ -9,6 +9,20 @@ const internalHeaders = () => ({
   headers: { "x-internal-key": process.env.INTERNAL_API_KEY as string },
 });
 
+const removeOldUpload = (publicId: string | null | undefined) => {
+  if (!publicId) return;
+
+  axios
+    .post(
+      `${process.env.UPLOAD_SERVICE}/api/utils/delete`,
+      { public_id: publicId },
+      internalHeaders()
+    )
+    .catch((error) =>
+      console.error("Failed to remove replaced upload", error.message)
+    );
+};
+
 export const myProfile = TryCatch(
   async (req: AuthenticatedRequest, res, next) => {
     const user = req.user;
@@ -137,7 +151,6 @@ export const updateProfilePic = TryCatch(
       `${process.env.UPLOAD_SERVICE}/api/utils/upload`,
       {
         buffer: fileBuffer.content,
-        public_id: oldPublicId,
       },
       internalHeaders()
     );
@@ -145,6 +158,8 @@ export const updateProfilePic = TryCatch(
     const [updatedUser] = await sql`
     UPDATE users SET profile_pic = ${uploadResult.url}, profile_pic_public_id = ${uploadResult.public_id} WHERE user_id = ${user.user_id} RETURNING user_id, name, profile_pic;
     `;
+
+    if (oldPublicId !== uploadResult.public_id) removeOldUpload(oldPublicId);
 
     res.json({
       message: "profile pic updated",
@@ -178,7 +193,6 @@ export const updateResume = TryCatch(async (req: AuthenticatedRequest, res) => {
     `${process.env.UPLOAD_SERVICE}/api/utils/upload`,
     {
       buffer: fileBuffer.content,
-      public_id: oldPublicId,
     },
     internalHeaders()
   );
@@ -186,6 +200,8 @@ export const updateResume = TryCatch(async (req: AuthenticatedRequest, res) => {
   const [updatedUser] = await sql`
     UPDATE users SET resume = ${uploadResult.url}, resume_public_id = ${uploadResult.public_id} WHERE user_id = ${user.user_id} RETURNING user_id, name, resume;
     `;
+
+  if (oldPublicId !== uploadResult.public_id) removeOldUpload(oldPublicId);
 
   res.json({
     message: "Resume updated",

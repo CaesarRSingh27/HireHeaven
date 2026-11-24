@@ -38,7 +38,7 @@ const ALLOWED_DATA_URI = /^data:(application\/pdf|image\/(png|jpeg|webp));base64
 
 router.post("/upload", requireInternalKey, async (req, res) => {
   try {
-    const { buffer, public_id } = req.body;
+    const { buffer } = req.body;
 
     if (typeof buffer !== "string" || !ALLOWED_DATA_URI.test(buffer)) {
       return res
@@ -46,10 +46,8 @@ router.post("/upload", requireInternalKey, async (req, res) => {
         .json({ message: "buffer must be a PDF/PNG/JPEG/WEBP data URI" });
     }
 
-    if (public_id) {
-      await cloudinary.v2.uploader.destroy(public_id);
-    }
-
+    // Callers replace their database reference before asking /delete to remove
+    // the old asset, so a failed upload cannot break the current profile file.
     const cloud = await cloudinary.v2.uploader.upload(buffer);
 
     res.json({
