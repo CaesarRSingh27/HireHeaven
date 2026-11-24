@@ -124,7 +124,7 @@
   body {
     @apply bg-background text-foreground;
     min-height: 100vh;
-    font-family: "Segoe UI Variable", "Aptos", "Inter", system-ui, sans-serif;
+    font-family: var(--font-ui), "Segoe UI Variable", "Aptos", system-ui, sans-serif;
     font-feature-settings: "ss01" on, "cv11" on;
     -webkit-font-smoothing: antialiased;
     background-image: radial-gradient(
@@ -145,9 +145,10 @@
   h4,
   h5,
   h6 {
-    font-family: "Segoe UI Variable Display", "Aptos Display", "Manrope",
+    font-family: var(--font-display), "Segoe UI Variable Display", "Aptos Display",
       "Segoe UI", sans-serif;
     letter-spacing: -0.035em;
+    text-transform: capitalize;
   }
 
   ::selection {
@@ -162,6 +163,7 @@
   letter-spacing: -0.01em;
   box-shadow: 0 1px 2px color-mix(in oklch, var(--foreground) 8%, transparent);
   transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+  text-transform: capitalize;
 }
 
 [data-slot="button"]:not(:disabled):hover {
@@ -200,6 +202,15 @@ select:focus-visible {
   box-shadow: 0 0 0 4px color-mix(in oklch, var(--ring) 18%, transparent);
 }
 
+label,
+[data-slot="label"],
+.mobile-nav-panel a,
+.mobile-nav-panel button,
+.site-avatar-name,
+.loading-caption {
+  text-transform: capitalize;
+}
+
 .icon-style {
   @apply absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 opacity-50;
 }
@@ -232,6 +243,7 @@ select:focus-visible {
   font-weight: 800;
   letter-spacing: -0.055em;
   white-space: nowrap;
+  text-transform: capitalize;
 }
 
 .site-brand > span:last-child > span {
@@ -268,6 +280,7 @@ select:focus-visible {
   font-size: 0.9rem;
   font-weight: 650;
   transition: color 160ms ease, background 160ms ease;
+  text-transform: capitalize;
 }
 
 .site-nav-link:hover,
@@ -290,6 +303,7 @@ select:focus-visible {
   color: var(--foreground);
   font-size: 0.9rem;
   font-weight: 650;
+  text-transform: capitalize;
 }
 
 .nav-join-button {
@@ -481,6 +495,7 @@ select:focus-visible {
   box-shadow: 0 6px 22px color-mix(in oklch, var(--foreground) 5%, transparent);
   font-size: 0.82rem;
   font-weight: 700;
+  text-transform: capitalize;
 }
 
 .hero-kicker-mark {
@@ -538,6 +553,7 @@ select:focus-visible {
   color: var(--muted-foreground);
   font-size: 0.85rem;
   font-weight: 600;
+  text-transform: capitalize;
 }
 
 .hero-proof-item {
@@ -641,12 +657,14 @@ select:focus-visible {
 .floating-card strong {
   font-size: 0.9rem;
   font-weight: 750;
+  text-transform: capitalize;
 }
 
 .floating-card span {
   margin-top: 0.15rem;
   color: var(--muted-foreground);
   font-size: 0.72rem;
+  text-transform: capitalize;
 }
 
 @keyframes character-float {

@@ -47,13 +47,13 @@ function TalentIllustration() {
           <path d="M254 231h53v49c0 17-12 30-27 30s-26-13-26-30z" fill="#d99170" />
 
           {/* hair behind the face */}
-          <path d="M211 178c0-49 28-78 71-78 46 0 73 31 73 82v55c0 42-28 68-73 68-43 0-71-27-71-69z" fill="#302851" />
+          <path d="M211 180c0-51 28-80 71-80 46 0 73 31 73 82v20c0 9-5 16-12 19v-43c0-34-23-59-61-59s-59 25-59 59v43c-7-3-12-10-12-19z" fill="#302851" />
 
           {/* ears and face */}
           <ellipse cx="218" cy="203" rx="13" ry="19" fill="#e4a17d" />
           <ellipse cx="348" cy="203" rx="13" ry="19" fill="#e4a17d" />
           <path d="M224 173c0-34 22-56 58-56 38 0 60 23 60 58v44c0 40-26 66-60 66-34 0-58-26-58-66z" fill="#f0b28d" />
-          <path d="M221 181c-8-44 13-76 48-83 34-7 65 8 78 37-19-9-42-13-62-11-12 13-36 20-63 18z" fill="#302851" />
+          <path d="M221 177c-7-43 13-74 48-82 34-8 66 8 78 38-16-15-32-22-50-23-21 20-45 29-73 27z" fill="#302851" />
 
           {/* expressive features */}
           <path d="M246 202c7-6 15-6 22 0M300 202c7-6 15-6 22 0" fill="none" stroke="#493652" strokeWidth="4" strokeLinecap="round" />
@@ -62,6 +62,8 @@ function TalentIllustration() {
           <path d="M270 242c8 7 18 7 26 0" fill="none" stroke="#a95550" strokeWidth="4" strokeLinecap="round" />
           <ellipse cx="241" cy="232" rx="10" ry="5" fill="#ef8d7c" opacity=".38" />
           <ellipse cx="328" cy="232" rx="10" ry="5" fill="#ef8d7c" opacity=".38" />
+          <path d="M265 251c5-4 10-4 15-1 5-3 11-3 16 1-2 5-7 7-15 5-8 2-14 0-16-5z" fill="#795044" />
+          <path d="M263 263c7 4 16 5 25 1" fill="none" stroke="#795044" strokeWidth="3" strokeLinecap="round" opacity=".72" />
 
           {/* one arm holding a bright opportunity card */}
           <path d="M378 312c22-5 40 1 52 19l36 54-29 19-48-43-32-17z" fill="#6659e5" />

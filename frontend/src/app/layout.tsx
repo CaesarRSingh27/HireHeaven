@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Manrope, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -10,6 +11,13 @@ export const metadata: Metadata = {
     "Discover roles, meet ambitious teams, and use thoughtful AI tools to make your next career move.",
 };
 
+const manrope = Manrope({ subsets: ["latin"], variable: "--font-ui", display: "swap" });
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+});
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -17,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
+      <body className={`${manrope.variable} ${spaceGrotesk.variable}`}>
         <AppProvider>
           <ThemeProvider
             attribute="class"
