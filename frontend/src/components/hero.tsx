@@ -15,8 +15,12 @@ function TalentIllustration() {
         >
           <defs>
             <linearGradient id="jacket" x1="0" x2="1" y1="0" y2="1">
-              <stop offset="0" stopColor="#8174ff" />
-              <stop offset="1" stopColor="#5144d6" />
+              <stop offset="0" stopColor="#7663e9" />
+              <stop offset="1" stopColor="#42349f" />
+            </linearGradient>
+            <linearGradient id="jacketShadow" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stopColor="#392e83" />
+              <stop offset="1" stopColor="#282354" />
             </linearGradient>
             <linearGradient id="paper" x1="0" x2="1" y1="0" y2="1">
               <stop offset="0" stopColor="#ffffff" />
@@ -34,36 +38,39 @@ function TalentIllustration() {
           <circle cx="444" cy="132" r="7" fill="#9ce3cc" />
           <circle cx="112" cy="264" r="5" fill="#9b8dff" />
 
-          {/* shoulders and jacket */}
+          {/* tailored jacket and open-collar shirt */}
           <path d="M148 420c8-84 38-135 100-151h75c63 16 94 67 102 151v25H148z" fill="url(#jacket)" />
-          <path d="M236 270l46 56 46-56 22 15-34 135h-68l-34-135z" fill="#f8f6ff" />
-          <path d="M236 270l46 56-31 21-35-62zM328 270l-46 56 31 21 35-62z" fill="#ded9ff" />
-          <path d="M276 343l6-2 8 13-8 60-10-60 8-13z" fill="#ff9c77" />
-          <path d="M280 412v34" stroke="#4038a8" strokeWidth="4" strokeLinecap="round" />
+          <path d="M236 270l46 56 46-56 22 15-34 135h-68l-34-135z" fill="#fffdf8" />
+          <path d="M236 270l46 56-31 21-35-62zM328 270l-46 56 31 21 35-62z" fill="url(#jacketShadow)" />
+          <path d="m269 329 13 12 13-12-7 28 8 74h-28l8-74z" fill="#e5dcff" />
+          <path d="M280 412v34" stroke="#302967" strokeWidth="4" strokeLinecap="round" />
           <circle cx="280" cy="378" r="4" fill="#fff" opacity=".9" />
           <circle cx="280" cy="401" r="4" fill="#fff" opacity=".9" />
 
           {/* neck */}
           <path d="M254 231h53v49c0 17-12 30-27 30s-26-13-26-30z" fill="#d99170" />
 
-          {/* hair behind the face */}
-          <path d="M211 180c0-51 28-80 71-80 46 0 73 31 73 82v20c0 9-5 16-12 19v-43c0-34-23-59-61-59s-59 25-59 59v43c-7-3-12-10-12-19z" fill="#302851" />
+          {/* neat swept-back quiff */}
+          <path d="M221 190c-9-36-1-73 22-91 13-25 43-35 67-26 23-4 44 9 53 29 16 20 17 50 5 74l-12 23-7-50c-9-31-31-47-61-47-34 0-55 20-61 52l-3 36z" fill="#292238" />
+          <path d="M240 111c13-22 34-32 56-29 12-5 26-4 37 2-21-2-39 5-53 15-12 8-24 12-40 12z" fill="#51405a" opacity=".7" />
 
           {/* ears and face */}
-          <ellipse cx="218" cy="203" rx="13" ry="19" fill="#e4a17d" />
-          <ellipse cx="348" cy="203" rx="13" ry="19" fill="#e4a17d" />
-          <path d="M224 173c0-34 22-56 58-56 38 0 60 23 60 58v44c0 40-26 66-60 66-34 0-58-26-58-66z" fill="#f0b28d" />
-          <path d="M221 177c-7-43 13-74 48-82 34-8 66 8 78 38-16-15-32-22-50-23-21 20-45 29-73 27z" fill="#302851" />
+          <ellipse cx="218" cy="203" rx="13" ry="19" fill="#c98565" />
+          <ellipse cx="348" cy="203" rx="13" ry="19" fill="#c98565" />
+          <path d="M224 173c0-34 22-56 58-56 38 0 60 23 60 58v44c0 40-26 66-60 66-34 0-58-26-58-66z" fill="#d99773" />
+          <path d="M240 109c14-18 35-27 57-25" fill="none" stroke="#51405a" strokeWidth="7" strokeLinecap="round" opacity=".7" />
 
           {/* expressive features */}
-          <path d="M246 202c7-6 15-6 22 0M300 202c7-6 15-6 22 0" fill="none" stroke="#493652" strokeWidth="4" strokeLinecap="round" />
-          <ellipse cx="258" cy="215" rx="3.5" ry="4.5" fill="#302851" />
-          <ellipse cx="311" cy="215" rx="3.5" ry="4.5" fill="#302851" />
-          <path d="M270 242c8 7 18 7 26 0" fill="none" stroke="#a95550" strokeWidth="4" strokeLinecap="round" />
-          <ellipse cx="241" cy="232" rx="10" ry="5" fill="#ef8d7c" opacity=".38" />
-          <ellipse cx="328" cy="232" rx="10" ry="5" fill="#ef8d7c" opacity=".38" />
-          <path d="M265 251c5-4 10-4 15-1 5-3 11-3 16 1-2 5-7 7-15 5-8 2-14 0-16-5z" fill="#795044" />
-          <path d="M263 263c7 4 16 5 25 1" fill="none" stroke="#795044" strokeWidth="3" strokeLinecap="round" opacity=".72" />
+          <path d="M246 199c7-5 15-5 22 0M300 199c7-5 15-5 22 0" fill="none" stroke="#46313a" strokeWidth="5" strokeLinecap="round" />
+          <ellipse cx="258" cy="214" rx="3.5" ry="4.5" fill="#292238" />
+          <ellipse cx="311" cy="214" rx="3.5" ry="4.5" fill="#292238" />
+          <path d="M283 216c-2 10-5 17-7 24 4 3 8 4 13 2" fill="none" stroke="#b9755b" strokeWidth="3" strokeLinecap="round" />
+          <path d="M269 244c7 6 18 7 27 0" fill="none" stroke="#984f50" strokeWidth="4" strokeLinecap="round" />
+          <ellipse cx="241" cy="233" rx="9" ry="4" fill="#ef8d7c" opacity=".25" />
+          <ellipse cx="328" cy="233" rx="9" ry="4" fill="#ef8d7c" opacity=".25" />
+          <path d="M255 255c6 10 16 15 27 15s21-5 27-15c-7 3-14 4-27 4s-20-1-27-4z" fill="#64443f" />
+          <path d="M263 258c6 5 14 7 19 7s13-2 19-7" fill="none" stroke="#d99773" strokeWidth="3" strokeLinecap="round" />
+          <path d="M263 274c11 5 23 5 34 0" fill="none" stroke="#bd7e61" strokeWidth="2" strokeLinecap="round" opacity=".65" />
 
           {/* one arm holding a bright opportunity card */}
           <path d="M378 312c22-5 40 1 52 19l36 54-29 19-48-43-32-17z" fill="#6659e5" />
