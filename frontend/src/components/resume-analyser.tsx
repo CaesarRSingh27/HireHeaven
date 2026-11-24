@@ -112,13 +112,12 @@ const ResumeAnalyzer = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-16 bg-secondary/30">
+    <section className="max-w-7xl mx-auto px-4 py-16 bg-secondary/30 tool-section resume-section">
       <div className="text-center mb-12">
         <div
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full border bg
-red-50 dark:bg-red-950/30 mb-4"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full border bg-secondary mb-4"
         >
-          <FileCheck size={16} className="text-red-500" />
+          <FileCheck size={16} className="text-primary" />
           <span className="text-sm font-medium">AI-Powered ATS Analysis</span>
         </div>
         <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -143,7 +142,7 @@ red-50 dark:bg-red-950/30 mb-4"
               <>
                 <DialogHeader>
                   <DialogTitle className="text-2xl flex items-center gap-2">
-                    <FileText className="text-red-500" />
+                    <FileText className="text-primary" />
                     Upload Your Resume
                   </DialogTitle>
                   <DialogDescription>
@@ -163,14 +162,14 @@ pointer hover:border-blue-500 transition-colors"
                         className="h-16 w-16 rounded-full bg-blue-100 dark:bg-blue
 900/30 flex items-center justify-center"
                       >
-                        <Upload size={32} className="text-blue-600" />
+                        <Upload size={32} className="text-primary" />
                       </div>
                       <div>
                         <p className="font-medium mb-1">
                           {file ? file.name : "Click to upload your resume"}
                         </p>
                         <p className="text-sm opacity-60">
-                          PDF format only, maximum 5MB
+                          PDF format only, maximum 25 MB
                         </p>
                       </div>
                       {file && (
@@ -359,7 +358,7 @@ ${getPriorityColor(suggestion.priority)}`}
           </DialogContent>
         </Dialog>
       </div>
-    </div>
+    </section>
   );
 };
 

@@ -83,9 +83,11 @@ const JobsPage = () => {
           <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold mb-2">
-                Explore <span className="text-red-500">Oppertunities</span>
+                Explore <span className="text-primary">opportunities</span>
               </h1>
-              <p className="text-base opacity-70">{jobs.length} jobs</p>
+              <p className="text-base text-muted-foreground">
+                {jobs.length} {jobs.length === 1 ? "open role" : "open roles"} to explore
+              </p>
             </div>
 
             <Button className="gap-2 h-11" onClick={clickEvent}>
@@ -144,7 +146,10 @@ const JobsPage = () => {
                   <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-100 dark:bg-gray-800 mb-4">
                     <Briefcase size={40} className="opacity-40" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">No Jobs found</h3>
+                  <h3 className="text-xl font-semibold mb-2">No roles found</h3>
+                  <p className="max-w-md mx-auto text-sm text-muted-foreground">
+                    Try a different title or location. New opportunities are added as teams grow.
+                  </p>
                 </div>
               )}
             </>
@@ -176,7 +181,7 @@ const JobsPage = () => {
                 <Input
                   id="title"
                   type="text"
-                  placeholder="Enter company name"
+                  placeholder="e.g. Product designer"
                   className="h-11"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}

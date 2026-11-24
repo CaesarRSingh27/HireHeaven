@@ -36,11 +36,11 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
   }, [applications, job.job_id]);
 
   return (
-    <Card className="w-full max-w-[380px] hover:shadow-lg transition-all duration-300 border-2 hover:border-blue-500 group">
+    <Card className="w-full max-w-[380px] transition-all duration-300 border-2 hover:border-primary/60 hover:-translate-y-1 group">
       <CardHeader className="space-y-4 pb-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <h3 className="text-xl font-bold mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+            <h3 className="text-xl font-bold mb-2 line-clamp-2 group-hover:text-primary transition-colors">
               {job.title}
             </h3>
             <div className="flex items-center gap-2 text-sm opacity-70">

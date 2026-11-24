@@ -1,216 +1,143 @@
 "use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import React, { useState } from "react";
+import {
+  ArrowUpRight,
+  BriefcaseBusiness,
+  Building2,
+  Home,
+  Info,
+  LogOut,
+  Menu,
+  UserRound,
+  X,
+} from "lucide-react";
 import { Button } from "./ui/button";
-import { Briefcase, Home, Info, LogOut, Menu, User, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ModeToggle } from "./mode-toggle";
 import { useAppData } from "@/context/AppContext";
 
+const navigation = [
+  { href: "/", label: "Home", icon: Home },
+  { href: "/jobs", label: "Find a job", icon: BriefcaseBusiness },
+  { href: "/about", label: "About", icon: Info },
+];
+
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+  const { isAuth, user, loading, logoutUser } = useAppData();
 
-  const { isAuth, user, setIsAuth, setUser, loading, logoutUser } =
-    useAppData();
+  const closeMenu = () => setIsOpen(false);
 
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const logoutHandler = () => {
-    logoutUser();
-  };
   return (
-    <nav className="z-50 sticky top-0 bg-background/80 border-b backdrop-blur-md shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
-            <Link href={"/"} className="flex items-center gap-1 group">
-              <div className="text-2xl font-bold tracking-tight">
-                <span className="bg-linear-to-r from bg-blue-600 to-blue-800 bg-clip-text text-transparent">
-                  Hire
-                </span>
-                <span className="text-red-500">Heaven</span>
-              </div>
-            </Link>
-          </div>
+    <header className="site-header">
+      <nav className="site-nav" aria-label="Main navigation">
+        <Link href="/" className="site-brand" aria-label="HireHeaven home" onClick={closeMenu}>
+          <span className="site-brand-mark"><Building2 size={19} strokeWidth={2.4} /></span>
+          <span>Hire<span>Heaven</span></span>
+        </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-1">
-            <Link href={"/"}>
-              <Button
-                variant={"ghost"}
-                className="flex items-center gap-2 font-medium"
+        <div className="site-nav-links">
+          {navigation.map(({ href, label }) => {
+            const isActive = pathname === href || (href !== "/" && pathname.startsWith(href));
+            return (
+              <Link
+                href={href}
+                key={href}
+                className={`site-nav-link${isActive ? " is-active" : ""}`}
+                aria-current={isActive ? "page" : undefined}
               >
-                <Home size={16} /> Home
-              </Button>
-            </Link>
+                {label}
+              </Link>
+            );
+          })}
+        </div>
 
-            <Link href={"/jobs"}>
-              <Button
-                variant={"ghost"}
-                className="flex items-center gap-2 font-medium"
-              >
-                <Briefcase size={16} /> Jobs
-              </Button>
-            </Link>
-
-            <Link href={"/about"}>
-              <Button
-                variant={"ghost"}
-                className="flex items-center gap-2 font-medium"
-              >
-                <Info size={16} /> About
-              </Button>
-            </Link>
-          </div>
-
-          {/* Right side Actions */}
-          <div className="hidden md:flex items-center gap-3">
-            {loading ? (
-              ""
-            ) : (
-              <>
-                {isAuth ? (
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                        <Avatar className="h-9 w-9 ring-2 ring-offset-2 ring-offset-background ring-blue-500/20 cursor-pointer hover:ring-blue-500/40 transition-all">
-                          <AvatarImage
-                            src={user ? (user.profile_pic as string) : ""}
-                            alt={user ? user.name : ""}
-                          />
-                          <AvatarFallback className="bg-blue-100 dark:bg-blue-900 text-blue-600">
-                            {user?.name?.charAt(0).toUpperCase() || "U"}
-                          </AvatarFallback>
-                        </Avatar>
-                      </button>
-                    </PopoverTrigger>
-
-                    <PopoverContent className="w-56 p-2" align="end">
-                      <div className="px-3 py-2 mb-2 border-b">
-                        <p className="text-sm font-semibold">
-                          {user && user.name}
-                        </p>
-                        <p className="text-xs opacity-60 truncate">
-                          {user && user.email}
-                        </p>
-                      </div>
-
-                      <Link href={"/account"}>
-                        <Button
-                          className="w-full justify-start gap-2"
-                          variant={"ghost"}
-                        >
-                          <User size={16} /> My Profile
-                        </Button>
-                      </Link>
-
-                      <Button
-                        className="w-full justify-start gap-2 mt-1"
-                        variant={"ghost"}
-                        onClick={logoutHandler}
-                      >
-                        <LogOut size={16} />
-                        Logout
-                      </Button>
-                    </PopoverContent>
-                  </Popover>
-                ) : (
-                  <Link href={"/login"}>
-                    <Button className="gap-2">
-                      <User size={16} />
-                      Sign In
+        <div className="site-nav-actions">
+          <ModeToggle />
+          {!loading && (isAuth ? (
+            <>
+              {user?.role === "recruiter" && (
+                <Link href="/account" className="nav-hiring-link-wrapper">
+                  <Button variant="outline" className="nav-hiring-link">
+                    <Building2 size={16} /> Hiring dashboard
+                  </Button>
+                </Link>
+              )}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button className="site-avatar-button" aria-label="Open account menu">
+                    <Avatar className="site-avatar">
+                      <AvatarImage src={user?.profile_pic || ""} alt={user?.name || ""} />
+                      <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
+                    </Avatar>
+                    <span className="site-avatar-name">{user?.name?.split(" ")[0]}</span>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-60 p-2" align="end">
+                  <div className="px-3 py-3 mb-1 border-b">
+                    <p className="font-semibold truncate">{user?.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+                  </div>
+                  <Link href="/account">
+                    <Button className="w-full justify-start gap-2" variant="ghost">
+                      <UserRound size={16} /> My profile
                     </Button>
                   </Link>
-                )}
-              </>
-            )}
-            <ModeToggle />
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center gap-3">
-            <ModeToggle />
-
-            <button
-              onClick={toggleMenu}
-              className="p-2 rounded-lg hover:bg-accent transition-colors"
-              aria-label="Toggle menu"
-            >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* mobile view */}
-      <div
-        className={`md:hidden border-t overflow-hidden transition-all duration-300 ease-in-out ${
-          isOpen ? "max-96 opacity-100" : "max-h-0 opacity-0"
-        }`}
-      >
-        <div className="px-3 py-3 space-y-1 bg-background/95 backdrop-blur-md">
-          {/* isauth or user */}
-          <Link href={"/"} onClick={toggleMenu}>
-            <Button
-              variant={"ghost"}
-              className="w-full justify-start gap-3 h-11"
-            >
-              <Home size={18} /> Home
-            </Button>
-          </Link>
-
-          <Link href={"/jobs"} onClick={toggleMenu}>
-            <Button
-              variant={"ghost"}
-              className="w-full justify-start gap-3 h-11"
-            >
-              <Briefcase size={18} /> Jobs
-            </Button>
-          </Link>
-
-          <Link href={"/about"} onClick={toggleMenu}>
-            <Button
-              variant={"ghost"}
-              className="w-full justify-start gap-3 h-11"
-            >
-              <Info size={18} /> About
-            </Button>
-          </Link>
-
-          {isAuth ? (
-            <>
-              <Link href={"/about"} onClick={toggleMenu}>
-                <Button
-                  variant={"ghost"}
-                  className="w-full justify-start gap-3 h-11"
-                >
-                  <User size={18} /> My Profile
-                </Button>
-              </Link>
-              <Button
-                variant={"destructive"}
-                className="w-full justify-start gap-3 h-11"
-                onClick={() => {
-                  logoutHandler();
-                  toggleMenu();
-                }}
-              >
-                <LogOut size={18} /> Logout
-              </Button>
+                  <Button
+                    className="w-full justify-start gap-2 text-destructive"
+                    variant="ghost"
+                    onClick={logoutUser}
+                  >
+                    <LogOut size={16} /> Sign out
+                  </Button>
+                </PopoverContent>
+              </Popover>
             </>
           ) : (
-            <Link href={"/login"} onClick={toggleMenu}>
-              <Button className="w-full justify-start gap-3 h-11 mt-2">
-                <User size={18} /> SignIn
-              </Button>
+            <>
+              <Link href="/login" className="nav-sign-in">Sign in</Link>
+              <Link href="/register" className="nav-join-link">
+                <Button className="nav-join-button">Create account <ArrowUpRight size={16} /></Button>
+              </Link>
+            </>
+          ))}
+          <button
+            className="mobile-menu-button"
+            onClick={() => setIsOpen((open) => !open)}
+            aria-label={isOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isOpen}
+          >
+            {isOpen ? <X size={21} /> : <Menu size={21} />}
+          </button>
+        </div>
+      </nav>
+
+      {isOpen && (
+        <div className="mobile-nav-panel">
+          {navigation.map(({ href, label, icon: Icon }) => (
+            <Link href={href} key={href} onClick={closeMenu}>
+              <Icon size={18} /> {label}
             </Link>
+          ))}
+          {isAuth ? (
+            <>
+              <Link href="/account" onClick={closeMenu}><UserRound size={18} /> My profile</Link>
+              {user?.role === "recruiter" && (
+                <Link href="/account" onClick={closeMenu}><Building2 size={18} /> Hiring dashboard</Link>
+              )}
+              <button onClick={() => { logoutUser(); closeMenu(); }}><LogOut size={18} /> Sign out</button>
+            </>
+          ) : !loading && (
+            <Link href="/login" onClick={closeMenu}><UserRound size={18} /> Sign in</Link>
           )}
         </div>
-      </div>
-    </nav>
+      )}
+    </header>
   );
 };
 

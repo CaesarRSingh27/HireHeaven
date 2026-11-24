@@ -53,7 +53,7 @@ const CarrerGuide = () => {
 
   const getCarrerGuidance = async () => {
     if (skills.length === 0) {
-      toast.error("Please add at least on skill");
+      toast.error("Please add at least one skill");
       return;
     }
     setLoading(true);
@@ -63,7 +63,7 @@ const CarrerGuide = () => {
       });
 
       setResponse(data);
-      toast.success("Carrer guidence generated");
+      toast.success("Career guidance generated");
     } catch (error: any) {
       toast.error(error.response.data.message);
     } finally {
@@ -78,19 +78,19 @@ const CarrerGuide = () => {
     setOpen(false);
   };
   return (
-    <div className="max-w-7xl mx-auto px-4 py-16">
+    <section className="max-w-7xl mx-auto px-4 py-16 tool-section career-section">
       <div className="text-center mb-12">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border bg-blue-50 dark:bg-blue-950 mb-4">
-          <Sparkles size={16} className="text-blue-600" />
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border bg-secondary mb-4">
+          <Sparkles size={16} className="text-primary" />
           <span className="text-sm font-medium">
-            AI-Powered Carrer Guidence
+            AI-Powered Career Guidance
           </span>
         </div>
         <h2 className="text-3xl md:text-4xl font-bold mb-4">
-          Discover Your Carrer Path
+          Discover Your Career Path
         </h2>
         <p className="text-lg opacity-70 max-w-2xl mx-auto mb-8">
-          Get personalized job recomendations and learnings roadmaps based on
+          Get personalized job recommendations and learning roadmaps based on
           your skills.
         </p>
 
@@ -98,7 +98,7 @@ const CarrerGuide = () => {
           <DialogTrigger asChild>
             <Button size={"lg"} className="gap-2 h-12 px-8">
               <Sparkles size={18} />
-              Get Carrer Guidence
+              Get Career Guidance
               <ArrowRight size={18} />
             </Button>
           </DialogTrigger>
@@ -108,12 +108,12 @@ const CarrerGuide = () => {
               <>
                 <DialogHeader>
                   <DialogTitle className="text-2xl flex items-center gap-2">
-                    <Sparkles className="text-blue-600" />
+                    <Sparkles className="text-primary" />
                     Tell us about your skills
                   </DialogTitle>
                   <DialogDescription>
-                    Add your technical skills to recieve personalized carrer
-                    recomendations
+                    Add your technical skills to receive personalized career
+                    recommendations
                   </DialogDescription>
                 </DialogHeader>
 
@@ -142,7 +142,7 @@ const CarrerGuide = () => {
                         {skills.map((s) => (
                           <div
                             key={s}
-                            className="inline-flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800"
+                            className="inline-flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-full bg-secondary border border-border"
                           >
                             <span className="text-sm font-medium">{s}</span>
                             <button
@@ -169,7 +169,7 @@ const CarrerGuide = () => {
                       </>
                     ) : (
                       <>
-                        <Sparkles size={18} /> Generate Carrer Guidence
+                        <Sparkles size={18} /> Generate Career Guidance
                       </>
                     )}
                   </Button>
@@ -179,21 +179,21 @@ const CarrerGuide = () => {
               <>
                 <DialogHeader>
                   <DialogTitle className="text-2xl flex items-center gap-2">
-                    <Target className="text-blue-600" />
-                    Your Personlized Carrer Guide
+                    <Target className="text-primary" />
+                    Your Personalized Career Guide
                   </DialogTitle>
                 </DialogHeader>
 
                 <div className="space-y-6 py-4">
                   {/* summary */}
-                  <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-b-blue-200 dark:border-b-blue-800">
+                  <div className="p-4 rounded-2xl bg-secondary border border-border">
                     <div className="flex items-start gap-3">
                       <Lightbulb
-                        className="text-blue-600 mt-1 shrink-0"
+                        className="text-primary mt-1 shrink-0"
                         size={20}
                       />
                       <div>
-                        <h3 className="font-semibold mb-2">Carrer Summary</h3>
+                        <h3 className="font-semibold mb-2">Career summary</h3>
                         <p className="text-sm leading-relaxed opacity-90">
                           {response.summary}
                         </p>
@@ -204,13 +204,13 @@ const CarrerGuide = () => {
                   {/* job options */}
                   <div>
                     <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                      <Briefcase size={20} className="text-blue-600" />
-                      Recomended Carrer Paths
+                      <Briefcase size={20} className="text-primary" />
+                      Recommended career paths
                     </h3>
                     <div className="space-y-3">
                       {response.jobOptions.map((job, index) => (
                         <div
-                          className="p-4 rounded-lg border hover:border-blue-500 transition-colors"
+                          className="p-4 rounded-2xl border hover:border-primary/50 transition-colors"
                           key={index}
                         >
                           <h4 className="font-semibold text-base mb-2">
@@ -239,13 +239,13 @@ const CarrerGuide = () => {
                   {/* Skills to learn */}
                   <div>
                     <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                      <TrendingUp size={20} className="text-blue-600" />
-                      Skills to Enhance Your Carrer
+                      <TrendingUp size={20} className="text-primary" />
+                      Skills to enhance your career
                     </h3>
                     <div className="space-y-4">
                       {response.skillsToLearn.map((category, index) => (
                         <div className="space-y-2" key={index}>
-                          <h4 className="font-semibold text-sm text-blue-600">
+                          <h4 className="font-semibold text-sm text-primary">
                             {category.category}
                           </h4>
                           <div className="space-y-2">
@@ -275,10 +275,10 @@ const CarrerGuide = () => {
                     </div>
                   </div>
 
-                  {/* Learning approch */}
-                  <div className="p-4 rounded-lg border bg-blue-950/20 dark:bg-red-950/20">
+                  {/* Learning approach */}
+                  <div className="p-4 rounded-2xl border bg-secondary">
                     <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                      <BookOpen size={20} className="text-blue-600" />
+                      <BookOpen size={20} className="text-primary" />
                       {response?.learningApproach?.title}
                     </h3>
 
@@ -289,7 +289,7 @@ const CarrerGuide = () => {
                             key={index}
                             className="text-sm flex items-start gap-2"
                           >
-                            <span className="text-blue-600 mt-0.5">•</span>
+                            <span className="text-primary mt-0.5">•</span>
                             <span
                               className="opacity-90"
                               dangerouslySetInnerHTML={{ __html: point }}
@@ -313,7 +313,7 @@ const CarrerGuide = () => {
           </DialogContent>
         </Dialog>
       </div>
-    </div>
+    </section>
   );
 };
 
