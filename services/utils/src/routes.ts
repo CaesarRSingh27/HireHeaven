@@ -86,9 +86,8 @@ dotenv.config();
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY_GEMINI });
 const GEMINI_MODELS = [
-  "gemini-3.5-flash",
+  "gemini-3.8-flash",
   "gemini-3.5-flash-lite",
-  "gemini-3.6-flash",
 ];
 
 async function generateAIContent(contents: GenerateContentParameters["contents"]) {
