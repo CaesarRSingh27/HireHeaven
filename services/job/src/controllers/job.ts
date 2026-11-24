@@ -32,12 +32,38 @@ export const createCompany = TryCatch(
 
     const { name, description, website } = req.body;
 
-    if (!name || !description || !website) {
+    if (
+      typeof name !== "string" ||
+      typeof description !== "string" ||
+      typeof website !== "string" ||
+      !name.trim() ||
+      !description.trim() ||
+      !website.trim()
+    ) {
       throw new ErrorHandler(400, "All the fields required");
     }
 
+    const companyName = name.trim();
+    const companyDescription = description.trim();
+    const companyWebsite = website.trim();
+
+    if (companyName.length > 255 || companyWebsite.length > 2048) {
+      throw new ErrorHandler(400, "Company name or website is too long");
+    }
+
+    let parsedWebsite: URL;
+    try {
+      parsedWebsite = new URL(companyWebsite);
+    } catch {
+      throw new ErrorHandler(400, "Please enter a valid company website URL");
+    }
+
+    if (!["http:", "https:"].includes(parsedWebsite.protocol)) {
+      throw new ErrorHandler(400, "Company website must use HTTP or HTTPS");
+    }
+
     const existingCompanies =
-      await sql`SELECT company_id FROM companies WHERE name = ${name}`;
+      await sql`SELECT company_id FROM companies WHERE name = ${companyName}`;
 
     if (existingCompanies.length > 0) {
       throw new ErrorHandler(
@@ -65,7 +91,7 @@ export const createCompany = TryCatch(
     );
 
     const [newCompany] =
-      await sql`INSERT INTO companies (name, description, website, logo, logo_public_id, recruiter_id) VALUES (${name}, ${description}, ${website}, ${data.url}, ${data.public_id}, ${req.user?.user_id}) RETURNING *`;
+      await sql`INSERT INTO companies (name, description, website, logo, logo_public_id, recruiter_id) VALUES (${companyName}, ${companyDescription}, ${companyWebsite}, ${data.url}, ${data.public_id}, ${user.user_id}) RETURNING *`;
 
     res.json({
       message: "Company created successfully",

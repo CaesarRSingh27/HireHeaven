@@ -29,13 +29,16 @@ async function initDB() {
     company_id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,
     description TEXT NOT NULL,
-    website VARCHAR(255) NOT NULL,
+    website TEXT NOT NULL,
     logo VARCHAR(255) NOT NULL,
     logo_public_id VARCHAR(255) NOT NULL,
     recruiter_id INTEGER NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
     )
     `;
+
+    // Existing databases may still have the original VARCHAR(255) column.
+    await sql`ALTER TABLE companies ALTER COLUMN website TYPE TEXT`;
 
     await sql`
     CREATE TABLE IF NOT EXISTS jobs(
