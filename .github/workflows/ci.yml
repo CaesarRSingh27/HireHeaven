@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  services:
+    name: service / ${{ matrix.service }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [auth, job, payment, user, utils]
+    defaults:
+      run:
+        working-directory: services/${{ matrix.service }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - name: Type-check
+        run: npx tsc --noEmit
+      - name: Unit tests
+        run: npm test
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - name: Lint (advisory)
+        run: npm run lint
+        continue-on-error: true
+      - name: Build
+        run: npm run build
+
+  docker:
+    name: docker build / ${{ matrix.target }}
+    runs-on: ubuntu-latest
+    needs: [services, frontend]
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [auth, job, payment, user, utils, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build image (no push)
+        run: |
+          if [ "${{ matrix.target }}" = "frontend" ]; then ctx=frontend; else ctx=services/${{ matrix.target }}; fi
+          docker buildx build "$ctx" --tag job-portal-${{ matrix.target }}:ci
+
+  compose-config:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate docker-compose.yml with dummy values
+        run: |
+          cp .env.example .env
+          sed -i 's/^JWT_SEC=.*/JWT_SEC=ci/; s/^INTERNAL_API_KEY=.*/INTERNAL_API_KEY=ci/; s/^CLOUDINARY_CLOUD_NAME=.*/CLOUDINARY_CLOUD_NAME=ci/; s/^CLOUDINARY_API_KEY=.*/CLOUDINARY_API_KEY=ci/; s/^CLOUDINARY_API_SECRET=.*/CLOUDINARY_API_SECRET=ci/; s/^SMTP_USER=.*/SMTP_USER=ci@example.com/; s/^SMTP_PASS=.*/SMTP_PASS=ci/; s/^GEMINI_API_KEY=.*/GEMINI_API_KEY=ci/; s/^RAZORPAY_KEY_SECRET=.*/RAZORPAY_KEY_SECRET=ci/' .env
+          docker compose config --quiet
