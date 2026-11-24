@@ -1,66 +1,114 @@
-import { Button } from "@/components/ui/button";
+import { ArrowRight, BriefcaseBusiness, Compass, HeartHandshake, Sparkles, Target } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-const About = () => {
-  return (
-    <div className="min-h-screen">
-      {/* Mission Section */}
-      <section className="container mx-auto px-4 py-12 md:py-16">
-        <div className="max-w-4xl mx-auto">
-          {/* Image */}
-          <div className="flex justify-center mb-8">
-            <img
-              src="/about.jpg"
-              className="w-full max-w-[500px] rounded-2xl shadow-lg"
-              alt="About HireHeaven"
-            />
-          </div>
+const values = [
+  {
+    icon: HeartHandshake,
+    title: "People Come First",
+    description: "A thoughtful experience for candidates and the teams looking to meet them.",
+    tone: "about-value-lilac",
+  },
+  {
+    icon: Target,
+    title: "Find The Right Fit",
+    description: "Clear role details and useful career tools help every next step feel more confident.",
+    tone: "about-value-peach",
+  },
+  {
+    icon: Compass,
+    title: "Keep Moving Forward",
+    description: "Explore new opportunities, build your profile, and make progress at your pace.",
+    tone: "about-value-mint",
+  },
+];
 
-          {/* Content */}
-          <div className="text-center space-y-6">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold">
-              Our Mission At Hire
-              <span className="text-red-500">Heaven</span>
-            </h1>
+const About = () => (
+  <main className="about-page">
+    <section className="about-hero">
+      <div className="about-hero-copy">
+        <span className="about-eyebrow"><Sparkles size={15} /> A Better Way To Connect</span>
+        <h1>Good Work Starts With A Great Connection.</h1>
+        <p>
+          HireHeaven brings people and teams together with a clearer, friendlier way to find
+          meaningful work and discover the talent behind it.
+        </p>
+        <div className="about-hero-actions">
+          <Link href="/jobs">
+            <Button size="lg" className="gap-2">Explore Opportunities <ArrowRight size={18} /></Button>
+          </Link>
+          <span className="about-hand-note">Your next chapter starts here</span>
+        </div>
+      </div>
 
-            <p
-              className="text-lg md:text-xl leading-relaxed opacity-90 max-w-3xl mx
-auto"
-            >
-              At HireHaven, we're dedicated to revolutionizing the job search
-              experience. Our mission is to create meaningful connections
-              between talented individuals and forward-thinking companies,
-              fostering growth and success for both.
-            </p>
+      <div className="about-visual-wrap">
+        <div className="about-photo-frame">
+          <Image
+            src="/about.jpg"
+            fill
+            priority
+            sizes="(max-width: 900px) 100vw, 48vw"
+            className="about-photo"
+            alt="A bright workspace ready for the next big idea"
+          />
+          <div className="about-photo-label">
+            <span className="about-photo-icon"><BriefcaseBusiness size={18} /></span>
+            <span><strong>Make Room For What’s Next</strong><small>People, purpose, possibility.</small></span>
           </div>
         </div>
-      </section>
+        <div className="about-stamp" aria-hidden="true">Made For<br />Your Next Move</div>
+      </div>
+    </section>
 
-      {/* CTA Section */}
-      <section className="py-16 md:py-20 bg-secondary">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center space-y-6">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold">
-              Ready to find your dream job?
-            </h2>
-            <p className="text-lg md:text-xl opacity-80">
-              Join thousands of successful job seekers on HireHeaven
-            </p>
-            <div className="pt-4">
-              <Link href="/jobs">
-                <Button size="lg" className="gap-2 h-12 px-8 text-base">
-                  Get Started
-                  <ArrowRight size={18} />
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-};
+    <section className="about-story" aria-labelledby="about-story-title">
+      <div className="about-story-heading">
+        <span className="about-eyebrow"><span className="about-eyebrow-dot" /> Our Mission</span>
+        <h2 id="about-story-title">A little less searching.<br /><span>A lot more possibility.</span></h2>
+      </div>
+      <div className="about-story-copy">
+        <p>
+          Looking for a job or the right person shouldn’t feel like sorting through endless noise.
+          We’re building a welcoming place where candidates can show what they do best and
+          employers can find people who are ready to make a difference.
+        </p>
+        <p>
+          From discovering roles to presenting your experience, HireHeaven helps make each step
+          feel more human, more useful, and easier to act on.
+        </p>
+      </div>
+    </section>
+
+    <section className="about-values" aria-labelledby="about-values-title">
+      <div className="about-section-heading">
+        <span className="about-eyebrow">What We Believe</span>
+        <h2 id="about-values-title">Built Around Better Connections</h2>
+        <p>Small details make the journey feel more human. These ideas guide every part of HireHeaven.</p>
+      </div>
+      <div className="about-values-grid">
+        {values.map(({ icon: Icon, title, description, tone }, index) => (
+          <article className={`about-value-card ${tone}`} key={title}>
+            <div className="about-value-topline"><span>0{index + 1}</span><Icon size={21} /></div>
+            <h3>{title}</h3>
+            <p>{description}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section className="about-cta">
+      <div className="about-cta-orbit" aria-hidden="true" />
+      <div className="about-cta-copy">
+        <span className="about-eyebrow"><Sparkles size={15} /> Your Next Chapter</span>
+        <h2>Ready To See What’s Out There?</h2>
+        <p>Start exploring roles and find an opportunity that feels right for you.</p>
+      </div>
+      <Link href="/jobs" className="about-cta-link">
+        <Button variant="outline" size="lg" className="gap-2">Find A Job <ArrowRight size={18} /></Button>
+      </Link>
+    </section>
+  </main>
+);
 
 export default About;
