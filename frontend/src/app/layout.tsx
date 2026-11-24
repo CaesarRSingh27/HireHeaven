@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Manrope, Space_Grotesk } from "next/font/google";
+import { Caveat, Manrope, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -17,6 +17,7 @@ const spaceGrotesk = Space_Grotesk({
   variable: "--font-display",
   display: "swap",
 });
+const caveat = Caveat({ subsets: ["latin"], variable: "--font-handwriting", display: "swap" });
 
 export default function RootLayout({
   children,
@@ -25,11 +26,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${manrope.variable} ${spaceGrotesk.variable}`}>
+      <body className={`${manrope.variable} ${spaceGrotesk.variable} ${caveat.variable}`}>
         <AppProvider>
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
+            defaultTheme="light"
             enableSystem
             disableTransitionOnChange
           >

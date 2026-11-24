@@ -44,23 +44,23 @@
 :root {
   color-scheme: light;
   --radius: 1.15rem;
-  --background: oklch(0.982 0.008 91);
+  --background: oklch(0.965 0.018 88);
   --foreground: oklch(0.22 0.035 269);
-  --card: oklch(0.998 0.002 90);
+  --card: oklch(0.99 0.009 91);
   --card-foreground: oklch(0.22 0.035 269);
-  --popover: oklch(0.998 0.002 90);
+  --popover: oklch(0.99 0.009 91);
   --popover-foreground: oklch(0.22 0.035 269);
-  --primary: oklch(0.54 0.2 282);
+  --primary: oklch(0.57 0.19 285);
   --primary-foreground: oklch(0.99 0.004 95);
-  --secondary: oklch(0.946 0.025 280);
+  --secondary: oklch(0.925 0.045 286);
   --secondary-foreground: oklch(0.27 0.055 280);
-  --muted: oklch(0.954 0.011 260);
-  --muted-foreground: oklch(0.52 0.025 265);
-  --accent: oklch(0.94 0.048 49);
-  --accent-foreground: oklch(0.35 0.08 39);
+  --muted: oklch(0.94 0.019 83);
+  --muted-foreground: oklch(0.48 0.028 266);
+  --accent: oklch(0.91 0.105 88);
+  --accent-foreground: oklch(0.33 0.066 51);
   --destructive: oklch(0.59 0.22 25);
-  --border: oklch(0.89 0.018 270);
-  --input: oklch(0.91 0.014 270);
+  --border: oklch(0.31 0.035 268 / 58%);
+  --input: oklch(0.31 0.035 268 / 48%);
   --ring: oklch(0.64 0.16 282);
   --chart-1: oklch(0.61 0.2 282);
   --chart-2: oklch(0.69 0.14 171);
@@ -129,12 +129,12 @@
     -webkit-font-smoothing: antialiased;
     background-image: radial-gradient(
         ellipse at 12% 0%,
-        color-mix(in oklch, var(--primary) 8%, transparent),
+        color-mix(in oklch, var(--primary) 10%, transparent),
         transparent 32rem
       ),
       radial-gradient(
         ellipse at 92% 18%,
-        color-mix(in oklch, var(--accent) 42%, transparent),
+        color-mix(in oklch, var(--accent) 28%, transparent),
         transparent 30rem
       );
   }
@@ -158,17 +158,18 @@
 }
 
 [data-slot="button"] {
-  border-radius: 999px;
+  border: 1.5px solid color-mix(in oklch, var(--foreground) 76%, transparent);
+  border-radius: 0.9rem;
   font-weight: 650;
   letter-spacing: -0.01em;
-  box-shadow: 0 1px 2px color-mix(in oklch, var(--foreground) 8%, transparent);
+  box-shadow: 3px 3px 0 color-mix(in oklch, var(--foreground) 76%, transparent);
   transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
   text-transform: capitalize;
 }
 
 [data-slot="button"]:not(:disabled):hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 20px color-mix(in oklch, var(--primary) 18%, transparent);
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 color-mix(in oklch, var(--foreground) 76%, transparent);
 }
 
 [data-slot="button"]:not(:disabled):active {
@@ -176,19 +177,22 @@
 }
 
 [data-slot="card"] {
+  border: 2px solid color-mix(in oklch, var(--foreground) 78%, transparent);
   border-radius: 1.35rem;
-  box-shadow: 0 10px 35px color-mix(in oklch, var(--foreground) 6%, transparent);
+  box-shadow: 5px 5px 0 color-mix(in oklch, var(--foreground) 78%, transparent);
 }
 
 [data-slot="dialog-content"],
 [data-slot="popover-content"] {
+  border: 2px solid color-mix(in oklch, var(--foreground) 78%, transparent);
   border-radius: 1.35rem;
-  box-shadow: 0 24px 80px color-mix(in oklch, var(--foreground) 18%, transparent);
+  box-shadow: 7px 7px 0 color-mix(in oklch, var(--foreground) 65%, transparent);
 }
 
 [data-slot="input"],
 textarea,
 select {
+  border: 1.5px solid color-mix(in oklch, var(--foreground) 60%, transparent);
   border-radius: 0.9rem;
   background-color: color-mix(in oklch, var(--card) 88%, var(--background));
   transition: border-color 160ms ease, box-shadow 160ms ease,
@@ -219,8 +223,8 @@ label,
   position: sticky;
   z-index: 50;
   top: 0;
-  border-bottom: 1px solid color-mix(in oklch, var(--border) 82%, transparent);
-  background: color-mix(in oklch, var(--background) 87%, transparent);
+  border-bottom: 2px solid color-mix(in oklch, var(--foreground) 75%, transparent);
+  background: color-mix(in oklch, var(--background) 92%, transparent);
   backdrop-filter: blur(18px) saturate(1.35);
 }
 
@@ -440,8 +444,8 @@ label,
   overflow: hidden;
   isolation: isolate;
   background:
-    radial-gradient(ellipse at 78% 48%, color-mix(in oklch, var(--primary) 14%, transparent), transparent 36rem),
-    linear-gradient(135deg, color-mix(in oklch, var(--secondary) 55%, var(--background)), var(--background) 70%);
+    radial-gradient(ellipse at 78% 48%, color-mix(in oklch, var(--primary) 12%, transparent), transparent 36rem),
+    linear-gradient(135deg, color-mix(in oklch, var(--secondary) 42%, var(--background)), var(--background) 70%);
 }
 
 .hero-shell::before,
@@ -579,11 +583,11 @@ label,
   place-items: center;
   overflow: hidden;
   background:
-    radial-gradient(ellipse at 50% 60%, color-mix(in oklch, var(--primary) 20%, transparent), transparent 52%),
-    color-mix(in oklch, var(--card) 78%, var(--secondary));
-  border: 1px solid color-mix(in oklch, var(--primary) 18%, var(--border));
-  border-radius: 2.5rem;
-  box-shadow: 0 30px 90px color-mix(in oklch, var(--primary) 16%, transparent), inset 0 1px 0 color-mix(in oklch, white 70%, transparent);
+    radial-gradient(ellipse at 50% 60%, color-mix(in oklch, var(--primary) 15%, transparent), transparent 52%),
+    color-mix(in oklch, var(--card) 86%, var(--secondary));
+  border: 2px solid color-mix(in oklch, var(--foreground) 78%, transparent);
+  border-radius: 2rem;
+  box-shadow: 7px 7px 0 color-mix(in oklch, var(--foreground) 78%, transparent);
 }
 
 .hero-art-panel::before {
@@ -619,9 +623,9 @@ label,
   padding: 0.85rem 1rem;
   color: var(--foreground);
   background: color-mix(in oklch, var(--card) 92%, transparent);
-  border: 1px solid color-mix(in oklch, var(--border) 80%, white);
+  border: 1.5px solid color-mix(in oklch, var(--foreground) 78%, transparent);
   border-radius: 1rem;
-  box-shadow: 0 14px 36px color-mix(in oklch, var(--foreground) 12%, transparent);
+  box-shadow: 3px 3px 0 color-mix(in oklch, var(--foreground) 76%, transparent);
   backdrop-filter: blur(14px);
   animation: card-drift 5s ease-in-out infinite;
 }
@@ -635,6 +639,49 @@ label,
   bottom: 13%;
   left: 2%;
   animation-delay: -2s;
+}
+
+.hero-art-note {
+  position: absolute;
+  z-index: 2;
+  top: 8%;
+  left: 5%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  padding: 0.7rem 0.9rem 0.75rem;
+  color: var(--foreground);
+  background: color-mix(in oklch, var(--accent) 76%, var(--card));
+  border: 2px solid color-mix(in oklch, var(--foreground) 86%, transparent);
+  border-radius: 0.8rem 0.8rem 0.8rem 0.2rem;
+  box-shadow: 3px 3px 0 color-mix(in oklch, var(--foreground) 78%, transparent);
+  transform: rotate(-4deg);
+}
+
+.hero-art-note span,
+.hero-art-note strong {
+  font-family: var(--font-handwriting), "Comic Sans MS", cursive;
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-transform: none;
+}
+
+.hero-art-note strong {
+  font-size: 1.65rem;
+  font-weight: 700;
+}
+
+.hero-art-note i {
+  position: absolute;
+  right: 0.7rem;
+  bottom: -0.45rem;
+  width: 1.2rem;
+  height: 0.55rem;
+  border-bottom: 2px solid var(--foreground);
+  border-radius: 50%;
+  transform: rotate(-14deg);
 }
 
 .floating-icon {

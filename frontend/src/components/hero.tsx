@@ -88,6 +88,12 @@ function TalentIllustration() {
           </g>
         </svg>
 
+        <div className="hero-art-note" aria-hidden="true">
+          <span>Fast. Simple.</span>
+          <strong>People First.</strong>
+          <i />
+        </div>
+
         <div className="floating-card floating-card-match">
           <div className="floating-icon"><Check size={18} /></div>
           <div><strong>Great match</strong><span>Your next role is out there</span></div>
