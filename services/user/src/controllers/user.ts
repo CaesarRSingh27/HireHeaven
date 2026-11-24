@@ -69,11 +69,34 @@ export const updateUserProfile = TryCatch(
       throw new ErrorHandler(401, "Authentication required");
     }
 
-    const { name, phoneNumber, bio } = req.body;
+    const { name, phoneNumber, bio } = req.body ?? {};
 
-    const newName = name || user.name;
-    const newPhoneNumber = phoneNumber || user.phone_number;
-    const newBio = bio || user.bio;
+    if (name === undefined && phoneNumber === undefined && bio === undefined) {
+      throw new ErrorHandler(400, "No profile changes were provided");
+    }
+
+    if (
+      name !== undefined &&
+      (typeof name !== "string" || !name.trim() || name.trim().length > 255)
+    ) {
+      throw new ErrorHandler(400, "Name must be between 1 and 255 characters");
+    }
+
+    if (
+      phoneNumber !== undefined &&
+      (typeof phoneNumber !== "string" || !/^\+?[\d\s-]{7,20}$/.test(phoneNumber))
+    ) {
+      throw new ErrorHandler(400, "Please enter a valid phone number");
+    }
+
+    if (bio !== undefined && (typeof bio !== "string" || bio.length > 10000)) {
+      throw new ErrorHandler(400, "About text must be 10,000 characters or fewer");
+    }
+
+    const newName = name === undefined ? user.name : name.trim();
+    const newPhoneNumber = phoneNumber === undefined ? user.phone_number : phoneNumber;
+    // An explicit empty string clears the about text; an omitted field keeps it.
+    const newBio = bio === undefined ? user.bio : bio;
 
     const [updatedUser] = await sql`
     UPDATE users SET name = ${newName}, phone_number = ${newPhoneNumber}, bio = ${newBio}
