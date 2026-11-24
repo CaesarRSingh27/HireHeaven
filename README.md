@@ -89,3 +89,8 @@ If your database predates this version run `db/migrations/001_openings_integer.s
 - The JWT lives in a JS-readable cookie (no logout revocation, 15 day expiry). An httpOnly cookie + refresh tokens would be stronger.
 - No email verification, no admin role, no job delete / company edit endpoints, no frontend pagination UI.
 - Kafka and Redis are single-node containers (fine for a small deployment, not highly available).
+
+## Reference guides
+
+- [Kafka setup guide](docs/reference/kafka-setup-guide.pdf)
+- [Resume analyser guide](docs/reference/resume-analyser-guide.pdf)
