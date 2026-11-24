@@ -16,12 +16,24 @@ Browser --> nginx :80/:443 --+--> frontend (Next.js)      :3000
 
 ## Run everything with Docker (recommended)
 
-```bash
-sh scripts/gen-secrets.sh        # creates .env with random JWT_SEC + INTERNAL_API_KEY
-nano .env                        # fill DB_URL, Razorpay, Cloudinary, SMTP, Gemini
+Windows PowerShell:
+
+```powershell
+.\scripts\gen-secrets.ps1       # creates .env with random JWT_SEC + INTERNAL_API_KEY
+notepad .env                     # fill DB_URL, Razorpay, Cloudinary, SMTP, Gemini
 docker compose up -d --build
 docker compose ps                # wait until everything is "healthy"
-open http://localhost
+Start-Process http://localhost
+```
+
+macOS / Linux / Git Bash:
+
+```bash
+sh scripts/gen-secrets.sh
+nano .env
+docker compose up -d --build
+docker compose ps                # wait until everything is "healthy"
+open http://localhost            # on Linux, use xdg-open instead
 ```
 
 Start order is enforced by healthchecks: `kafka, redis, utils -> auth -> job -> user, payment -> nginx`
