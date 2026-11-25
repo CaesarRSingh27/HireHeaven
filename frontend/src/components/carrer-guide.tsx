@@ -115,9 +115,9 @@ const CarrerGuide = () => {
             fitting roles, spot what to learn next, and build a plan you can follow.
           </p>
           <div className="career-path-steps" aria-label="How career guidance works">
-            <div><span>01</span><b>Share your strengths</b></div>
-            <div><span>02</span><b>Explore fitting roles</b></div>
-            <div><span>03</span><b>Plan what’s next</b></div>
+            <div><b>Share your strengths</b></div>
+            <div><b>Explore fitting roles</b></div>
+            <div><b>Plan what’s next</b></div>
           </div>
 
         <Dialog open={open} onOpenChange={setOpen}>

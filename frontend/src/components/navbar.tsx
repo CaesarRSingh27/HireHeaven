@@ -40,7 +40,7 @@ const NavBar = () => {
     <header className="site-header">
       <nav className="site-nav" aria-label="Main navigation">
         <Link href="/" className="site-brand" aria-label="HireHeaven home" onClick={closeMenu}>
-          <Image className="site-brand-mark" src="/hireheaven-logo.svg" width={40} height={40} alt="" priority />
+          <Image className="site-brand-mark" src="/hireheaven-mark.png" width={40} height={40} alt="" priority />
           <span className="site-brand-wordmark"><span className="site-brand-hire">Hire</span><span className="site-brand-heaven">Heaven</span></span>
         </Link>
 
