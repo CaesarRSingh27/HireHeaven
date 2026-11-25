@@ -1,16 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" fill="none">
   <defs>
-    <linearGradient id="tile" x1="12" y1="8" x2="84" y2="90" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#9A79F4"/>
-      <stop offset="1" stop-color="#5335AC"/>
-    </linearGradient>
-    <linearGradient id="path" x1="28" y1="70" x2="72" y2="31" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#D6C8FF"/>
-      <stop offset="1" stop-color="#FFD47A"/>
+    <linearGradient id="flight" x1="14" y1="73" x2="80" y2="21" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7050D1"/>
+      <stop offset=".68" stop-color="#AA8FFF"/>
+      <stop offset="1" stop-color="#E8AC61"/>
     </linearGradient>
   </defs>
-  <rect x="3" y="3" width="90" height="90" rx="27" fill="url(#tile)"/>
-  <path d="M19 76V48a29 29 0 0 1 58 0v8" stroke="#FFF" stroke-opacity=".96" stroke-width="8" stroke-linecap="round"/>
-  <path d="M28 76c12-3 17-12 23-21 6-8 12-14 22-19" stroke="url(#path)" stroke-width="7" stroke-linecap="round"/>
-  <path d="m74 26 2.2 5.8L82 34l-5.8 2.2L74 42l-2.2-5.8L66 34l5.8-2.2L74 26Z" fill="#FFD47A"/>
+  <path d="M11 64c14 0 22-10 32-22 11-13 22-20 41-21" stroke="url(#flight)" stroke-width="10" stroke-linecap="round"/>
+  <path d="M19 77c15 0 25-9 35-20 8-9 16-14 28-16" stroke="#9B7CEB" stroke-width="7" stroke-linecap="round"/>
+  <path d="M35 86c14-1 22-8 30-17 5-6 10-9 17-11" stroke="#C98A53" stroke-width="5" stroke-linecap="round"/>
+  <path d="m82 8 2.5 7 7 2.5-7 2.5-2.5 7-2.5-7-7-2.5 7-2.5L82 8Z" fill="#E8AC61"/>
 </svg>
