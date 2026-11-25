@@ -1,5 +1,6 @@
 "use client";
 import { CareerGuideResponse } from "@/type";
+import Image from "next/image";
 import axios from "axios";
 import {
   ArrowRight,
@@ -79,26 +80,51 @@ const CarrerGuide = () => {
   };
   return (
     <section className="max-w-7xl mx-auto px-4 py-16 tool-section career-section">
-      <div className="text-center mb-12">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border bg-secondary mb-4">
-          <Sparkles size={16} className="text-primary" />
-          <span className="text-sm font-medium">
-            AI-Powered Career Guidance
-          </span>
+      <div className="career-feature-shell">
+        <div className="career-feature-art">
+          <Image
+            src="/mikasa-guide.png"
+            alt="Mikasa, your HireHeaven career guide"
+            fill
+            sizes="(max-width: 760px) 100vw, 45vw"
+            className="career-guide-portrait"
+          />
+          <div className="career-art-shade" />
+          <div className="career-art-sticker">
+            <Sparkles size={16} />
+            <span>YOUR NEXT CHAPTER</span>
+          </div>
+          <div className="career-art-caption">
+            <span>CAREER GUIDE</span>
+            <strong>Mikasa</strong>
+            <p>Let’s turn what you know into where you could go.</p>
+          </div>
+          <div className="career-art-insight">
+            <span className="career-insight-icon"><Target size={17} /></span>
+            <span><b>Strengths to direction</b><small>A roadmap made around you</small></span>
+          </div>
         </div>
-        <h2 className="text-3xl md:text-4xl font-bold mb-4">
-          Discover Your Career Path
-        </h2>
-        <p className="text-lg opacity-70 max-w-2xl mx-auto mb-8">
-          Get personalized job recommendations and learning roadmaps based on
-          your skills.
-        </p>
+
+        <div className="career-feature-copy">
+          <div className="feature-overline"><span>01</span> THE CAREER COMPASS</div>
+          <h2 className="feature-display-title">
+            Find a path that feels <em>like yours.</em>
+          </h2>
+          <p className="feature-lede">
+            Turn your skills into a thoughtful next step. Mikasa helps you explore
+            fitting roles, spot what to learn next, and build a plan you can follow.
+          </p>
+          <div className="career-path-steps" aria-label="How career guidance works">
+            <div><span>01</span><b>Share your strengths</b></div>
+            <div><span>02</span><b>Explore fitting roles</b></div>
+            <div><span>03</span><b>Plan what’s next</b></div>
+          </div>
 
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button size={"lg"} className="gap-2 h-12 px-8">
+            <Button size={"lg"} className="gap-2 h-12 px-8 career-feature-cta">
               <Sparkles size={18} />
-              Get Career Guidance
+              Build My Career Roadmap
               <ArrowRight size={18} />
             </Button>
           </DialogTrigger>
@@ -312,6 +338,7 @@ const CarrerGuide = () => {
             )}
           </DialogContent>
         </Dialog>
+      </div>
       </div>
     </section>
   );

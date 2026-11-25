@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -20,6 +21,8 @@ import {
   ArrowRight,
   FileCheck,
   Zap,
+  ScanSearch,
+  Sparkles,
 } from "lucide-react";
 import axios from "axios";
 import { ResumeAnalysisResponse } from "@/type";
@@ -112,27 +115,28 @@ const ResumeAnalyzer = () => {
   };
 
   return (
-    <section className="max-w-7xl mx-auto px-4 py-16 bg-secondary/30 tool-section resume-section">
-      <div className="text-center mb-12">
-        <div
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full border bg-secondary mb-4"
-        >
-          <FileCheck size={16} className="text-primary" />
-          <span className="text-sm font-medium">AI-Powered ATS Analysis</span>
-        </div>
-        <h2 className="text-3xl md:text-4xl font-bold mb-4">
-          Optimize Your Resume for ATS
-        </h2>
-        <p className="text-lg opacity-70 max-w-2xl mx-auto mb-8">
-          Get instant feedback on your resume's compatibility with Applicant
-          Tracking Systems
-        </p>
+    <section className="max-w-7xl mx-auto px-4 py-16 tool-section resume-section">
+      <div className="resume-feature-shell">
+        <div className="resume-feature-copy">
+          <div className="feature-overline resume-overline"><span>02</span> THE RESUME STUDIO</div>
+          <h2 className="feature-display-title">
+            Make your experience <em>stand out.</em>
+          </h2>
+          <p className="feature-lede">
+            Give your resume a clear, confident first impression. Get an ATS
+            compatibility score, practical feedback, and focused ways to improve.
+          </p>
+          <div className="resume-feature-points">
+            <div><FileCheck size={17} /><span>Compatibility score</span></div>
+            <div><ScanSearch size={17} /><span>Section-by-section feedback</span></div>
+            <div><Sparkles size={17} /><span>Clear next steps</span></div>
+          </div>
 
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button size="lg" className="gap-2 h-12 px-8">
+            <Button size="lg" className="gap-2 h-12 px-8 resume-feature-cta">
               <FileText size={18} />
-              Analyze My Resume
+              Review My Resume
               <ArrowRight size={18} />
             </Button>
           </DialogTrigger>
@@ -357,6 +361,40 @@ ${getPriorityColor(suggestion.priority)}`}
             )}
           </DialogContent>
         </Dialog>
+      </div>
+        <div className="resume-preview-stage" aria-hidden="true">
+          <div className="resume-preview-orbit resume-preview-orbit-one" />
+          <div className="resume-preview-orbit resume-preview-orbit-two" />
+          <div className="resume-paper-card">
+            <div className="resume-paper-top"><span /><span /><span /></div>
+            <div className="resume-paper-heading">
+              <div className="resume-paper-avatar">M</div>
+              <div><b>SAMPLE RESUME</b><span>Experience, made clear</span></div>
+            </div>
+            <div className="resume-paper-rule" />
+            <div className="resume-paper-label">PROFESSIONAL SUMMARY</div>
+            <div className="resume-paper-line resume-paper-line-long" />
+            <div className="resume-paper-line" />
+            <div className="resume-paper-label resume-paper-label-spaced">EXPERIENCE</div>
+            <div className="resume-paper-job"><i /><span><b>Product Designer</b><small>Impact, clarity, and craft</small></span></div>
+            <div className="resume-paper-line resume-paper-line-long" />
+            <div className="resume-paper-line resume-paper-line-medium" />
+            <div className="resume-paper-skill-row"><span>Research</span><span>Strategy</span><span>Design</span></div>
+          </div>
+          <div className="resume-score-card">
+            <div className="resume-score-icon"><TrendingUp size={17} /></div>
+            <div className="resume-score-copy"><span>SAMPLE ATS MATCH</span><b>86<span>/100</span></b></div>
+            <div className="resume-score-track"><i /></div>
+            <small><CheckCircle2 size={13} /> Example score preview</small>
+          </div>
+          <div className="resume-guide-note">
+            <span className="resume-guide-avatar"><Image src="/mikasa-guide.png" alt="" fill sizes="44px" /></span>
+            <span><b>Mikasa’s note</b><small>Your story deserves to be seen.</small></span>
+            <Sparkles size={17} />
+          </div>
+          <span className="resume-sparkle resume-sparkle-one">✦</span>
+          <span className="resume-sparkle resume-sparkle-two">✦</span>
+        </div>
       </div>
     </section>
   );
