@@ -63,9 +63,9 @@ Start order is enforced by healthchecks: `kafka, redis, utils -> auth -> job -> 
 
 `NEXT_PUBLIC_*` frontend variables are baked in at **build** time - rebuild the frontend image after changing them.
 
-### Google and LinkedIn sign-in
+### Social sign-in
 
-Social sign-in creates a minimal account without requiring a password, phone number, bio, or resume up front. Clerk's development instance provides shared Google and LinkedIn OAuth credentials; configure its keys in the ignored environment files. See [OAuth provider setup](docs/oauth-sign-in.md). Direct Google/LinkedIn OAuth credentials remain available as an alternative.
+Social sign-in creates a minimal account without requiring a password, phone number, bio, or resume up front. Clerk's development instance provides shared Google, LinkedIn, and GitHub OAuth credentials; configure its keys in the ignored environment files. See [OAuth provider setup](docs/oauth-sign-in.md). Direct Google/LinkedIn OAuth credentials remain available as an alternative.
 
 ### Resume PDF delivery (Cloudinary)
 

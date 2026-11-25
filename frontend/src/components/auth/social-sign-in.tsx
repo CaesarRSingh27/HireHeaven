@@ -2,14 +2,22 @@
 
 import { auth_service } from "@/context/AppContext";
 import { useSignIn } from "@clerk/nextjs";
+import { Github } from "lucide-react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-type Provider = "google" | "linkedin";
-type ProviderStatus = Record<Provider, boolean>;
+type Provider = "google" | "linkedin" | "github";
+type DirectProvider = Exclude<Provider, "github">;
+type ProviderStatus = Record<DirectProvider, boolean>;
 
-const providers: { id: Provider; label: string; mark: string }[] = [
+const clerkProviders: { id: Provider; label: string; mark?: string }[] = [
+  { id: "google", label: "Google", mark: "G" },
+  { id: "linkedin", label: "LinkedIn", mark: "in" },
+  { id: "github", label: "GitHub" },
+];
+
+const directProviders: { id: DirectProvider; label: string; mark: string }[] = [
   { id: "google", label: "Google", mark: "G" },
   { id: "linkedin", label: "LinkedIn", mark: "in" },
 ];
@@ -39,7 +47,11 @@ function ClerkSocialSignIn({ role }: { role?: "jobseeker" | "recruiter" }) {
       if (role) window.sessionStorage.setItem("hireheaven:signup-role", role);
       else window.sessionStorage.removeItem("hireheaven:signup-role");
       const { error } = await signIn.sso({
-        strategy: provider === "google" ? "oauth_google" : "oauth_linkedin_oidc",
+        strategy: ({
+          google: "oauth_google",
+          linkedin: "oauth_linkedin_oidc",
+          github: "oauth_github",
+        } as const)[provider],
         redirectUrl: `${window.location.origin}/auth/clerk-complete`,
         redirectCallbackUrl: `${window.location.origin}/auth/clerk-callback`,
       });
@@ -47,7 +59,7 @@ function ClerkSocialSignIn({ role }: { role?: "jobseeker" | "recruiter" }) {
     } catch {
       setBusyProvider(null);
       toast.error(
-        `${provider === "google" ? "Google" : "LinkedIn"} sign-in is not enabled in the Clerk development dashboard yet.`
+        `${clerkProviders.find((option) => option.id === provider)?.label} sign-in could not be started. Please try again.`
       );
     }
   }
@@ -55,7 +67,7 @@ function ClerkSocialSignIn({ role }: { role?: "jobseeker" | "recruiter" }) {
   return (
     <div className="social-auth-section">
       <div className="social-auth-buttons">
-        {providers.map((provider) => (
+        {clerkProviders.map((provider) => (
           <button
             key={provider.id}
             type="button"
@@ -64,7 +76,7 @@ function ClerkSocialSignIn({ role }: { role?: "jobseeker" | "recruiter" }) {
             onClick={() => void begin(provider.id)}
           >
             <span className={`social-provider-icon ${provider.id}`} aria-hidden="true">
-              {provider.mark}
+              {provider.id === "github" ? <Github size={19} strokeWidth={2.2} /> : provider.mark}
             </span>
             <span>
               {busyProvider === provider.id
@@ -125,7 +137,7 @@ function DirectOAuthSignIn({ role }: { role?: "jobseeker" | "recruiter" }) {
   return (
     <div className="social-auth-section">
       <div className="social-auth-buttons">
-        {providers.map((provider) => {
+        {directProviders.map((provider) => {
           const enabled = status[provider.id];
           const query = role ? `?role=${encodeURIComponent(role)}` : "";
           return (
