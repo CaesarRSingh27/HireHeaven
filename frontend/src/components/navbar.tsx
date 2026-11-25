@@ -41,7 +41,10 @@ const NavBar = () => {
       <nav className="site-nav" aria-label="Main navigation">
         <Link href="/" className="site-brand" aria-label="HireHeaven home" onClick={closeMenu}>
           <Image className="site-brand-mark" src="/hireheaven-mark.svg" width={40} height={40} alt="" priority />
-          <span className="site-brand-wordmark">HireHeaven</span>
+          <span className="site-brand-copy">
+            <span className="site-brand-wordmark">HireHeaven</span>
+            <span className="site-brand-tagline">Careers, elevated</span>
+          </span>
         </Link>
 
         <div className="site-nav-links">
