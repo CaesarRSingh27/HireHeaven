@@ -26,9 +26,9 @@ const values = [
 ];
 
 const journey = [
-  { icon: Search, title: "Find your kind of work.", text: "Explore openings by role and discover teams where your strengths can shine.", character: "/violettee-anime.webp", alt: "Violettee pointing toward new job opportunities", action: "Explore roles", href: "/jobs" },
-  { icon: FileCheck2, title: "Tell your story well.", text: "Build a profile and resume that make your experience easy to see.", character: "/chinatsu-anime.webp", alt: "Chinatsu presenting a career portfolio", action: "Create a profile", href: "/register" },
-  { icon: UsersRound, title: "Make a real connection.", text: "Bring people and teams closer, then plan the next step with confidence.", character: "/genshin-anime.webp", alt: "Genshin welcoming visitors toward their next career step", action: "Get career guidance", href: "/#career-guidance" },
+  { icon: Search, title: "Find your kind of work.", text: "Explore openings by role and discover teams where your strengths can shine.", action: "Explore roles", href: "/jobs" },
+  { icon: FileCheck2, title: "Tell your story well.", text: "Build a profile and resume that make your experience easy to see.", action: "Create a profile", href: "/register" },
+  { icon: UsersRound, title: "Make a real connection.", text: "Bring people and teams closer, then plan the next step with confidence.", action: "Get career guidance", href: "/#career-guidance" },
 ];
 
 const About = () => (
@@ -102,11 +102,10 @@ const About = () => (
           <p>From first search to a confident next move, we make the journey feel clear and human.</p>
       </div>
       <div className="about-journey-grid">
-          {journey.map(({ icon: Icon, title, text, character, alt, action, href }, index) => (
+          {journey.map(({ icon: Icon, title, text, action, href }, index) => (
           <article className="about-journey-card" key={title}>
             <div className="about-journey-top"><Icon size={21} /></div>
               <div className="about-journey-copy"><span className="about-journey-kicker">{["DISCOVER", "SHOW YOUR VALUE", "MOVE FORWARD"][index]}</span><h3>{title}</h3><p>{text}</p></div>
-              <Image className="about-journey-character" src={character} width={210} height={315} alt={alt} />
               <Link className="about-journey-action" href={href}>{action}<ArrowRight size={15} /></Link>
           </article>
         ))}

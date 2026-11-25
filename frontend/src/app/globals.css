@@ -1415,14 +1415,11 @@ label,
 .about-journey-card::before, .about-value-card::before { position: absolute; top: 0; left: 1.35rem; width: 3.2rem; height: 0.25rem; background: var(--about-card-accent, var(--primary)); border-radius: 0 0 999px 999px; content: ""; }
 .about-journey-top { position: relative; z-index: 2; }
 .about-journey-top > svg { display: grid; box-sizing: content-box; width: 1.2rem; height: 1.2rem; padding: 0.65rem; color: var(--about-card-accent, var(--primary)); background: color-mix(in oklch, var(--about-card-accent, var(--primary)) 12%, var(--card)); border: 1px solid color-mix(in oklch, var(--about-card-accent, var(--primary)) 28%, transparent); border-radius: 0.85rem; }
-.about-journey-copy { position: relative; z-index: 1; width: 64%; margin-top: 1.1rem; }
+.about-journey-copy { position: relative; z-index: 1; width: 100%; margin-top: 1.1rem; }
 .about-journey-kicker { color: var(--about-card-accent, var(--primary)); font-size: 0.65rem; font-weight: 850; letter-spacing: 0.15em; }
 .about-journey-grid .about-journey-card h3 { margin: 0.5rem 0 0.55rem; font-family: var(--font-display), sans-serif; font-size: clamp(1.15rem, 1.7vw, 1.48rem); font-weight: 700; letter-spacing: -0.04em; line-height: 1.18; }
 .about-journey-grid .about-journey-card p { margin: 0; color: var(--muted-foreground); font-size: 0.85rem; line-height: 1.65; }
-.about-journey-character { position: absolute; z-index: 0; right: -0.45rem; bottom: -0.55rem; width: clamp(5.7rem, 8vw, 6.6rem); height: 12.4rem; object-fit: contain; object-position: center bottom; filter: drop-shadow(0 7px 8px rgb(35 26 45 / 18%)); animation: about-character-float 5.2s ease-in-out infinite; }
-.about-journey-card:nth-child(2) .about-journey-character { animation-delay: -1.8s; }
-.about-journey-card:nth-child(3) .about-journey-character { animation-delay: -3.2s; }
-.about-journey-action { position: relative; z-index: 2; display: flex; width: 70%; align-items: center; justify-content: space-between; gap: 0.4rem; margin-top: auto; padding-top: 0.75rem; color: var(--foreground); border-top: 1px solid color-mix(in oklch, var(--foreground) 15%, transparent); font-size: 0.76rem; font-weight: 780; text-decoration: none; }
+.about-journey-action { position: relative; z-index: 2; display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 0.4rem; margin-top: auto; padding-top: 0.75rem; color: var(--foreground); border-top: 1px solid color-mix(in oklch, var(--foreground) 15%, transparent); font-size: 0.76rem; font-weight: 780; text-decoration: none; }
 .about-journey-action svg { flex: 0 0 auto; color: var(--about-card-accent, var(--primary)); transition: transform 160ms ease; }
 .about-journey-action:hover svg { transform: translateX(4px); }
 
