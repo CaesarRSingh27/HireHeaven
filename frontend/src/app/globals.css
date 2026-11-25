@@ -577,14 +577,14 @@ label,
 }
 
 .social-auth-section { margin-bottom: 1rem; }
-.social-auth-buttons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7rem; }
+.social-auth-buttons { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); justify-content: space-between; gap: 0.75rem; width: 100%; }
 .social-auth-button {
   display: flex;
-  min-height: 3.1rem;
+  min-width: 0;
+  min-height: 3.25rem;
   align-items: center;
   justify-content: center;
-  gap: 0.55rem;
-  padding: 0.6rem 0.7rem;
+  padding: 0.55rem;
   color: var(--foreground);
   background: color-mix(in oklch, var(--card) 94%, transparent);
   border: 1px solid color-mix(in oklch, var(--foreground) 22%, transparent);
@@ -604,6 +604,7 @@ label,
 .social-provider-icon.google { color: #4285f4; font-family: Arial, sans-serif; font-size: 1.25rem; }
 .social-provider-icon.linkedin { width: 1.3rem; height: 1.3rem; color: white; background: #0a66c2; border-radius: 0.2rem; font-size: 0.82rem; }
 .social-provider-icon.github { color: var(--foreground, #171717); }
+.social-provider-icon svg { display: block; width: 1.5rem; height: 1.5rem; }
 .social-auth-divider { display: flex; align-items: center; gap: 0.85rem; margin: 1rem 0 1.25rem; color: var(--muted-foreground); font-size: 0.72rem; font-weight: 650; text-transform: uppercase; letter-spacing: 0.08em; }
 .social-auth-divider::before, .social-auth-divider::after { height: 1px; flex: 1; background: color-mix(in oklch, var(--foreground) 15%, transparent); content: ""; }
 .social-auth-hint { margin: 0.65rem 0 0; color: var(--muted-foreground); font-size: 0.72rem; line-height: 1.45; text-align: center; }
