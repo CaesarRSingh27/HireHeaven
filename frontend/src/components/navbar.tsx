@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import React, { useState } from "react";
 import {
@@ -39,8 +40,8 @@ const NavBar = () => {
     <header className="site-header">
       <nav className="site-nav" aria-label="Main navigation">
         <Link href="/" className="site-brand" aria-label="HireHeaven home" onClick={closeMenu}>
-          <span className="site-brand-mark"><Building2 size={19} strokeWidth={2.4} /></span>
-          <span>Hire<span>Heaven</span></span>
+          <Image className="site-brand-mark" src="/hireheaven-logo.svg" width={40} height={40} alt="" priority />
+          <span className="site-brand-wordmark"><span className="site-brand-hire">Hire</span><span className="site-brand-heaven">Heaven</span></span>
         </Link>
 
         <div className="site-nav-links">

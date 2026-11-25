@@ -120,9 +120,9 @@ const About = () => (
         <p>Good work begins with people. These are the principles behind every connection we make.</p>
       </div>
       <div className="about-values-grid">
-        {values.map(({ icon: Icon, title, description, tone }, index) => (
+        {values.map(({ icon: Icon, title, description, tone }) => (
           <article className={`about-value-card ${tone}`} key={title}>
-            <div className="about-value-topline"><span>0{index + 1}</span><Icon size={21} /></div>
+            <div className="about-value-topline"><Icon size={21} /></div>
             <h3>{title}</h3>
             <p>{description}</p>
           </article>

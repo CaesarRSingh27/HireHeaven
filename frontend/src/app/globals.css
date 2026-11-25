@@ -247,28 +247,27 @@ label,
 .site-brand {
   display: inline-flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.58rem;
   color: var(--foreground);
-  font-size: 1.22rem;
-  font-weight: 800;
-  letter-spacing: -0.055em;
+  font-size: 1.08rem;
+  font-weight: 750;
+  letter-spacing: -0.045em;
   white-space: nowrap;
-  text-transform: capitalize;
+  text-decoration: none;
 }
 
-.site-brand > span:last-child > span {
-  color: var(--primary);
-}
+.site-brand-wordmark { display: inline-flex; align-items: baseline; gap: 0.12rem; }
+.site-brand-hire { font-family: var(--font-display), sans-serif; }
+.site-brand-heaven { color: var(--primary); font-family: var(--font-handwriting), cursive; font-size: 1.58em; font-style: italic; font-weight: 700; letter-spacing: -0.045em; transform: translateY(0.035em) rotate(-3deg); transform-origin: left center; }
+.site-brand:hover .site-brand-heaven { text-shadow: 0 0 20px color-mix(in oklch, var(--primary) 34%, transparent); }
+.site-brand:focus-visible { border-radius: 0.6rem; outline: 2px solid var(--ring); outline-offset: 5px; }
+.site-brand-mark { width: 2.45rem; height: 2.45rem; object-fit: contain; filter: drop-shadow(0 6px 10px color-mix(in oklch, var(--primary) 28%, transparent)); transition: transform 180ms ease; }
+.site-brand:hover .site-brand-mark { transform: rotate(-5deg) scale(1.05); }
 
-.site-brand-mark {
-  display: grid;
-  width: 2.2rem;
-  height: 2.2rem;
-  place-items: center;
-  color: white;
-  background: linear-gradient(145deg, var(--primary), oklch(0.69 0.17 319));
-  border-radius: 0.75rem;
-  box-shadow: 0 6px 14px color-mix(in oklch, var(--primary) 28%, transparent);
+/* Keep the full brand legible in the narrow mobile header. */
+@media (max-width: 420px) {
+  .site-brand { gap: 0.42rem; font-size: 0.98rem; }
+  .site-brand-mark { width: 2.15rem; height: 2.15rem; }
 }
 
 .site-nav-links,
@@ -1180,8 +1179,7 @@ label,
 .home-journey-action:hover svg { transform: translateX(4px); }
 .home-journey-card:nth-child(2), .about-journey-card:nth-child(2) { background: color-mix(in oklch, oklch(0.92 0.07 52) 48%, var(--card)); }
 .home-journey-card:nth-child(3), .about-journey-card:nth-child(3) { background: color-mix(in oklch, oklch(0.91 0.06 164) 42%, var(--card)); }
-.home-journey-top, .about-journey-top { display: flex; align-items: center; justify-content: space-between; color: var(--primary); }
-.home-journey-top > span, .about-journey-top > span { color: var(--muted-foreground); font-size: 0.76rem; font-weight: 800; letter-spacing: 0.14em; }
+.home-journey-top, .about-journey-top { display: flex; align-items: center; justify-content: flex-end; color: var(--primary); }
 .home-journey-card h3, .about-journey-card h3 { margin: 2rem 0 0.55rem; font-size: 1.25rem; }
 .home-journey-card p, .about-journey-card p { margin: 0; color: var(--muted-foreground); line-height: 1.7; }
 .home-audience { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 2rem; overflow: hidden; margin-bottom: clamp(4rem, 8vw, 7rem); padding: clamp(1.7rem, 4vw, 3rem); background: linear-gradient(120deg, color-mix(in oklch, var(--secondary) 74%, var(--card)), color-mix(in oklch, var(--accent) 36%, var(--card))); border: 1.5px solid color-mix(in oklch, var(--foreground) 72%, transparent); border-radius: 1.65rem; box-shadow: 6px 6px 0 color-mix(in oklch, var(--foreground) 70%, transparent); }
@@ -1439,9 +1437,8 @@ label,
 .about-value-lilac { --about-card-accent: #7456d6; }
 .about-value-card::before { left: 1.35rem; }
 
-.about-value-topline { display: flex; align-items: center; justify-content: space-between; color: var(--primary); }
+.about-value-topline { display: flex; align-items: center; justify-content: flex-end; color: var(--primary); }
 .about-value-topline svg { box-sizing: content-box; width: 1.2rem; height: 1.2rem; padding: 0.65rem; color: var(--about-card-accent, var(--primary)); background: color-mix(in oklch, var(--about-card-accent, var(--primary)) 12%, var(--card)); border: 1px solid color-mix(in oklch, var(--about-card-accent, var(--primary)) 28%, transparent); border-radius: 0.85rem; }
-.about-value-topline span { color: var(--muted-foreground); font-size: 0.78rem; font-weight: 750; letter-spacing: 0.1em; }
 .about-value-card h3 { margin: 2.3rem 0 0.5rem; font-family: var(--font-display), sans-serif; font-size: 1.4rem; font-weight: 700; letter-spacing: -0.04em; }
 .about-value-card p { margin: 0; color: var(--muted-foreground); line-height: 1.65; }
 

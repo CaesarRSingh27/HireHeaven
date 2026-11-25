@@ -10,9 +10,9 @@ import Link from "next/link";
 import React from "react";
 
 const journeySteps = [
-  { number: "01", label: "DISCOVER", icon: Search, title: "Find work that fits.", text: "Explore openings by role and location, and find opportunities that match your strengths and ambitions.", action: "Explore open roles", href: "/jobs" },
-  { number: "02", label: "MAKE YOUR MARK", icon: FileCheck2, title: "Let your experience speak.", text: "Build a standout profile and give your resume the polish it needs to make a memorable first impression.", action: "Create your profile", href: "/register" },
-  { number: "03", label: "MOVE FORWARD", icon: Compass, title: "Turn possibility into a plan.", text: "Connect your strengths to new directions with career guidance designed around what you can do next.", action: "Find your direction", href: "#career-guidance" },
+  { label: "DISCOVER", icon: Search, title: "Find work that fits.", text: "Explore openings by role and location, and find opportunities that match your strengths and ambitions.", action: "Explore open roles", href: "/jobs" },
+  { label: "MAKE YOUR MARK", icon: FileCheck2, title: "Let your experience speak.", text: "Build a standout profile and give your resume the polish it needs to make a memorable first impression.", action: "Create your profile", href: "/register" },
+  { label: "MOVE FORWARD", icon: Compass, title: "Turn possibility into a plan.", text: "Connect your strengths to new directions with career guidance designed around what you can do next.", action: "Find your direction", href: "#career-guidance" },
 ];
 
 const Home = () => {
@@ -28,9 +28,9 @@ const Home = () => {
           <p>From the first search to a confident next step, find the tools and support to move your career forward.</p>
         </div>
         <div className="home-journey-grid">
-          {journeySteps.map(({ number, label, icon: Icon, title, text, action, href }) => (
-            <article className="home-journey-card" key={number}>
-              <div className="home-journey-top"><span>{number}</span><span className="home-journey-icon"><Icon size={20} /></span></div>
+          {journeySteps.map(({ label, icon: Icon, title, text, action, href }) => (
+            <article className="home-journey-card" key={label}>
+              <div className="home-journey-top"><span className="home-journey-icon"><Icon size={20} /></span></div>
               <span className="home-journey-kicker">{label}</span>
               <h3>{title}</h3>
               <p>{text}</p>
