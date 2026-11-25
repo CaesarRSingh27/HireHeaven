@@ -148,8 +148,8 @@ function DirectOAuthSignIn({ role }: { role?: "jobseeker" | "recruiter" }) {
       </div>
       {!status.google && !status.linkedin && (
         <p className="social-auth-hint">
-          Configure the Clerk development keys in the ignored root .env for Docker,
-          or frontend/.env.local and services/auth/.env for local development.
+          Email and password sign-in is ready. Google and LinkedIn sign-in will appear
+          here after their OAuth client credentials are configured.
         </p>
       )}
     </div>
