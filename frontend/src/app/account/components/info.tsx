@@ -122,7 +122,7 @@ const Info: React.FC<AccontProps> = ({ user, isYourAccount }) => {
   const handleEditClick = () => {
     editRef.current?.click();
     setName(user.name);
-    setPhoneNumber(user.phone_number);
+    setPhoneNumber(user.phone_number || "");
     setBio(user.bio || "");
   };
 
@@ -249,7 +249,7 @@ const Info: React.FC<AccontProps> = ({ user, isYourAccount }) => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs opacity-70 font-medium">Phone</p>
-                  <p className="text-sm truncate">{user.phone_number}</p>
+                  <p className="text-sm truncate">{user.phone_number || "Add a phone number"}</p>
                 </div>
               </div>
             </div>

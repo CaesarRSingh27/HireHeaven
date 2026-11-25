@@ -11,6 +11,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Loading from "@/components/loading";
+import SocialSignIn, { AuthDivider } from "@/components/auth/social-sign-in";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -64,6 +65,8 @@ const LoginPage = () => {
           <p className="text-sm opacity-70">Sign in to continue your journey</p>
         </div>
         <div className="border border-gray-400 rounded-2xl p-8 shadow-lg backdrop-blur-sm">
+          <SocialSignIn />
+          <AuthDivider />
           <form onSubmit={submitHandler} className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium">

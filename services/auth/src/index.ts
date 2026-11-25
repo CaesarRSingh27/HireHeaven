@@ -37,6 +37,22 @@ async function initDb() {
       )
     `;
 
+    // OAuth-only accounts start with a verified email and can add a phone,
+    // resume, and password later from their profile.
+    await sql`ALTER TABLE users ALTER COLUMN password DROP NOT NULL`;
+    await sql`ALTER TABLE users ALTER COLUMN phone_number DROP NOT NULL`;
+    await sql`ALTER TABLE users ALTER COLUMN role SET DEFAULT 'jobseeker'`;
+    await sql`
+      CREATE TABLE IF NOT EXISTS oauth_identities (
+        provider VARCHAR(32) NOT NULL,
+        provider_subject VARCHAR(255) NOT NULL,
+        user_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (provider, provider_subject),
+        UNIQUE (provider, user_id)
+      )
+    `;
+
     await sql`
      CREATE TABLE IF NOT EXISTS skills (
        skill_id SERIAL PRIMARY KEY,

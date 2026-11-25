@@ -11,6 +11,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Loading from "@/components/loading";
+import SocialSignIn, { AuthDivider } from "@/components/auth/social-sign-in";
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
@@ -100,6 +101,13 @@ const RegisterPage = () => {
                 </select>
               </div>
             </div>
+
+            <p className="text-center text-sm opacity-70">
+              Continue with a provider to create your account now and complete
+              your profile later. New accounts default to Find a Job.
+            </p>
+            <SocialSignIn role={role === "recruiter" ? "recruiter" : "jobseeker"} />
+            <AuthDivider />
 
             {role && (
               <div className="space-y-5 animate-in fade-in duration-300">
@@ -227,7 +235,7 @@ const RegisterPage = () => {
             <p className="text-center text-sm">
               Already have an account{" "}
               <Link
-                href={"/register"}
+                href={"/login"}
                 className="text-blue-500 font-medium hover:underline transition-all"
               >
                 Login?

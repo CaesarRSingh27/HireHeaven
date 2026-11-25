@@ -98,7 +98,8 @@ export const updateUserProfile = TryCatch(
 
     if (
       phoneNumber !== undefined &&
-      (typeof phoneNumber !== "string" || !/^\+?[\d\s-]{7,20}$/.test(phoneNumber))
+      (typeof phoneNumber !== "string" ||
+        (phoneNumber.trim() !== "" && !/^\+?[\d\s-]{7,20}$/.test(phoneNumber)))
     ) {
       throw new ErrorHandler(400, "Please enter a valid phone number");
     }
@@ -108,7 +109,8 @@ export const updateUserProfile = TryCatch(
     }
 
     const newName = name === undefined ? user.name : name.trim();
-    const newPhoneNumber = phoneNumber === undefined ? user.phone_number : phoneNumber;
+    const newPhoneNumber =
+      phoneNumber === undefined ? user.phone_number : phoneNumber.trim() || null;
     // An explicit empty string clears the about text; an omitted field keeps it.
     const newBio = bio === undefined ? user.bio : bio;
 

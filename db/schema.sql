@@ -1,6 +1,6 @@
 -- Consolidated schema for a FRESH database.
 -- You do NOT have to run this: every service creates what it owns on start-up
--- (auth: users/skills/user_skills, job: companies/jobs/applications,
+-- (auth: users/oauth_identities/skills/user_skills, job: companies/jobs/applications,
 -- payment: payment_orders). It is here for review, DBA tooling and disaster recovery.
 
 DO $$ BEGIN
@@ -23,9 +23,9 @@ CREATE TABLE IF NOT EXISTS users (
   user_id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   email VARCHAR(255) NOT NULL UNIQUE,
-  password VARCHAR(255) NOT NULL,
-  phone_number VARCHAR(20) NOT NULL,
-  role user_role NOT NULL,
+  password VARCHAR(255),
+  phone_number VARCHAR(20),
+  role user_role NOT NULL DEFAULT 'jobseeker',
   bio TEXT,
   resume VARCHAR(255),
   resume_public_id VARCHAR(255),
@@ -33,6 +33,15 @@ CREATE TABLE IF NOT EXISTS users (
   profile_pic_public_id VARCHAR(255),
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   subscription TIMESTAMPTZ
+);
+
+CREATE TABLE IF NOT EXISTS oauth_identities (
+  provider VARCHAR(32) NOT NULL,
+  provider_subject VARCHAR(255) NOT NULL,
+  user_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (provider, provider_subject),
+  UNIQUE (provider, user_id)
 );
 
 CREATE TABLE IF NOT EXISTS skills (

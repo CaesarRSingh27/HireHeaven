@@ -85,6 +85,11 @@ services:
       Kafka_Broker: kafka:9092
       Redis_url: redis://redis:6379
       Frontend_Url: ${PUBLIC_URL:-http://localhost}
+      OAUTH_CALLBACK_BASE_URL: ${OAUTH_CALLBACK_BASE_URL:-http://localhost}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      LINKEDIN_CLIENT_ID: ${LINKEDIN_CLIENT_ID:-}
+      LINKEDIN_CLIENT_SECRET: ${LINKEDIN_CLIENT_SECRET:-}
     depends_on:
       kafka: { condition: service_healthy }
       redis: { condition: service_healthy }

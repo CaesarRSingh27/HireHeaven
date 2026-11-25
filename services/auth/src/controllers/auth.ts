@@ -115,7 +115,9 @@ export const loginUser = TryCatch(async (req, res, next) => {
 
   const userObject = user[0];
 
-  const matchPassword = await bcrypt.compare(password, userObject.password);
+  const matchPassword = userObject.password
+    ? await bcrypt.compare(password, userObject.password)
+    : false;
 
   if (!matchPassword) {
     throw new ErrorHandler(400, "Invalid credentials");

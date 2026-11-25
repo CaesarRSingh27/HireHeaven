@@ -56,9 +56,15 @@ Start order is enforced by healthchecks: `kafka, redis, utils -> auth -> job -> 
 | `RAZORPAY_KEY_ID` / `_SECRET` / `_WEBHOOK_SECRET` | payment (+ key id in frontend build) | |
 | `SUBSCRIPTION_PRICE_INR` | payment | default 119 |
 | `CLOUDINARY_*`, `SMTP_*`, `GEMINI_API_KEY` | utils | |
+| `GOOGLE_CLIENT_ID` / `_SECRET`, `LINKEDIN_CLIENT_ID` / `_SECRET` | auth | Optional OAuth sign-in credentials; keep secrets in the ignored root `.env` |
+| `OAUTH_CALLBACK_BASE_URL` | auth | Public app origin used to build provider callback URLs; defaults to `http://localhost` |
 | `CORS_ORIGINS` | all services | optional; irrelevant behind nginx (same origin) |
 
 `NEXT_PUBLIC_*` frontend variables are baked in at **build** time - rebuild the frontend image after changing them.
+
+### Google and LinkedIn sign-in
+
+Social sign-in creates a minimal account without requiring a password, phone number, bio, or resume up front. See [OAuth provider setup](docs/oauth-sign-in.md) for provider credentials and callback URLs. Until those credentials are added, the social buttons remain disabled and password/email sign-in continues to work.
 
 ### Resume PDF delivery (Cloudinary)
 
@@ -86,7 +92,7 @@ Then set `PUBLIC_URL=https://$DOMAIN` in `.env` and `docker compose up -d`.
 ## Database
 
 Each service creates and indexes its own tables on start (`CREATE ... IF NOT EXISTS`). `db/schema.sql` is the consolidated reference.
-If your database predates this version run `db/migrations/001_openings_integer.sql` once.
+If your database predates this version run `db/migrations/001_openings_integer.sql` once. The auth service applies the OAuth account migration at startup; its SQL is also available in `db/migrations/002_oauth_accounts.sql`.
 
 ## CI / CD
 
