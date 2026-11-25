@@ -256,13 +256,13 @@ label,
   text-decoration: none;
 }
 
-.site-brand-wordmark { display: inline-flex; align-items: baseline; gap: 0.12rem; }
-.site-brand-hire { font-family: var(--font-display), sans-serif; }
-.site-brand-heaven { color: var(--primary); font-family: var(--font-handwriting), cursive; font-size: 1.58em; font-style: italic; font-weight: 700; letter-spacing: -0.045em; transform: translateY(0.035em) rotate(-3deg); transform-origin: left center; }
+.site-brand-wordmark { display: inline-flex; align-items: baseline; gap: 0; line-height: 1; }
+.site-brand-hire { font-family: var(--font-display), sans-serif; font-weight: 750; letter-spacing: -0.075em; }
+.site-brand-heaven { color: var(--primary); font-family: var(--font-handwriting), cursive; font-size: 1.48em; font-style: italic; font-weight: 700; letter-spacing: -0.055em; transform: translateY(0.035em) rotate(-2deg); transform-origin: left center; }
 .site-brand:hover .site-brand-heaven { text-shadow: 0 0 20px color-mix(in oklch, var(--primary) 34%, transparent); }
 .site-brand:focus-visible { border-radius: 0.6rem; outline: 2px solid var(--ring); outline-offset: 5px; }
-.site-brand-mark { width: 2.45rem; height: 2.45rem; object-fit: contain; filter: drop-shadow(0 6px 10px color-mix(in oklch, var(--primary) 28%, transparent)); transition: transform 180ms ease; }
-.site-brand:hover .site-brand-mark { transform: rotate(-5deg) scale(1.05); }
+.site-brand-mark { width: 2.35rem; height: 2.35rem; object-fit: contain; filter: drop-shadow(0 5px 9px color-mix(in oklch, var(--primary) 22%, transparent)); transition: transform 180ms ease; }
+.site-brand:hover .site-brand-mark { transform: translateY(-2px) scale(1.05); }
 
 /* Keep the full brand legible in the narrow mobile header. */
 @media (max-width: 420px) {

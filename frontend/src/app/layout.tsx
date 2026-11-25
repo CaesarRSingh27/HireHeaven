@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: "HireHeaven | Find your next opportunity",
   description:
     "Discover roles, meet ambitious teams, and use thoughtful AI tools to make your next career move.",
-  icons: { icon: "/hireheaven-mark.png" },
+  icons: { icon: "/hireheaven-mark.svg" },
 };
 
 const manrope = Manrope({ subsets: ["latin"], variable: "--font-ui", display: "swap" });
