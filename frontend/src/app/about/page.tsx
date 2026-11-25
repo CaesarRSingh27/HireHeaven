@@ -7,28 +7,28 @@ import { Button } from "@/components/ui/button";
 const values = [
   {
     icon: HeartHandshake,
-    title: "People Come First",
-    description: "A thoughtful experience for candidates and the teams looking to meet them.",
+    title: "People, before profiles",
+    description: "Every search starts with a person, a goal, and a story worth noticing.",
     tone: "about-value-lilac",
   },
   {
     icon: Target,
-    title: "Find The Right Fit",
-    description: "Clear role details and useful career tools help every next step feel more confident.",
+    title: "The right fit matters",
+    description: "Find roles and teams that align with your strengths and the way you want to grow.",
     tone: "about-value-peach",
   },
   {
     icon: Compass,
-    title: "Keep Moving Forward",
-    description: "Explore new opportunities, build your profile, and make progress at your pace.",
+    title: "Progress, your way",
+    description: "Take a useful next step with tools that make room for your own pace and ambition.",
     tone: "about-value-mint",
   },
 ];
 
 const journey = [
-  { icon: Search, title: "Discover Possibility", text: "Explore open roles and learn about the teams behind them, with the details you need to decide what feels right." },
-  { icon: FileCheck2, title: "Put Your Best Forward", text: "Create a profile that reflects your strengths and make your resume easier to understand at a glance." },
-  { icon: UsersRound, title: "Make A Human Connection", text: "Bring candidates and hiring teams closer through a more considered place to meet." },
+  { icon: Search, title: "Find your kind of work.", text: "Explore openings by role and discover teams where your strengths can shine.", character: "/violettee-anime.webp", alt: "Violettee pointing toward new job opportunities", action: "Explore roles", href: "/jobs" },
+  { icon: FileCheck2, title: "Tell your story well.", text: "Build a profile and resume that make your experience easy to see.", character: "/chinatsu-anime.webp", alt: "Chinatsu presenting a career portfolio", action: "Create a profile", href: "/register" },
+  { icon: UsersRound, title: "Make a real connection.", text: "Bring people and teams closer, then plan the next step with confidence.", character: "/genshin-anime.webp", alt: "Genshin welcoming visitors toward their next career step", action: "Get career guidance", href: "/#career-guidance" },
 ];
 
 const About = () => (
@@ -79,38 +79,35 @@ const About = () => (
     <section className="about-story" aria-labelledby="about-story-title">
       <div className="about-story-heading">
         <span className="about-eyebrow"><span className="about-eyebrow-dot" /> Our Mission</span>
-        <h2 id="about-story-title">A little less searching.<br /><span>A lot more possibility.</span></h2>
+        <h2 id="about-story-title">Less noise.<br /><span>More possibility.</span></h2>
+        <div className="about-story-aside">
+          <p>Better tools. More human connections. Room to grow.</p>
+          <Image src="/genshin-anime.webp" width={200} height={225} alt="Genshin welcoming visitors toward new possibilities" />
+        </div>
       </div>
       <div className="about-story-copy">
-        <p>
-          Looking for a job or the right person shouldn’t feel like sorting through endless noise.
-          We’re building a welcoming place where candidates can show what they do best and
-          employers can find people who are ready to make a difference.
+        <p className="about-story-lead">
+          Finding your next role—or the right person—should feel full of possibility, not buried in tabs and guesswork.
         </p>
         <p>
-          From discovering roles to presenting your experience, HireHeaven helps make each step
-          feel more human, more useful, and easier to act on.
-        </p>
-        <p>
-          We believe a career move is more than a search result. It’s a chance to grow, contribute,
-          and find a team where your work matters. That belief shapes the tools we build and the
-          way we bring opportunities into view.
+          HireHeaven brings opportunities, useful career tools, and people together in one considered space—so you can show your strengths, find a better fit, and move forward on your terms.
         </p>
       </div>
     </section>
 
     <section className="about-journey" aria-labelledby="about-journey-title">
       <div className="about-section-heading">
-        <span className="about-eyebrow"><Compass size={15} /> The HireHeaven Experience</span>
-        <h2 id="about-journey-title">A Little More Clarity At Every Step.</h2>
-        <p>Useful tools, thoughtful details, and room to move at your own pace.</p>
+          <span className="about-eyebrow"><Compass size={15} /> The HireHeaven Experience</span>
+          <h2 id="about-journey-title">Three thoughtful steps to <em>what’s next.</em></h2>
+          <p>From first search to a confident next move, we make the journey feel clear and human.</p>
       </div>
       <div className="about-journey-grid">
-        {journey.map(({ icon: Icon, title, text }, index) => (
+          {journey.map(({ icon: Icon, title, text, character, alt, action, href }, index) => (
           <article className="about-journey-card" key={title}>
             <div className="about-journey-top"><span>0{index + 1}</span><Icon size={21} /></div>
-            <h3>{title}</h3>
-            <p>{text}</p>
+              <div className="about-journey-copy"><span className="about-journey-kicker">{["DISCOVER", "SHOW YOUR VALUE", "MOVE FORWARD"][index]}</span><h3>{title}</h3><p>{text}</p></div>
+              <Image className="about-journey-character" src={character} width={210} height={315} alt={alt} />
+              <Link className="about-journey-action" href={href}>{action}<ArrowRight size={15} /></Link>
           </article>
         ))}
       </div>
@@ -118,9 +115,9 @@ const About = () => (
 
     <section className="about-values" aria-labelledby="about-values-title">
       <div className="about-section-heading">
-        <span className="about-eyebrow">What We Believe</span>
-        <h2 id="about-values-title">Built Around Better Connections</h2>
-        <p>Small details make the journey feel more human. These ideas guide every part of HireHeaven.</p>
+        <span className="about-eyebrow"><HeartHandshake size={15} /> What We Believe</span>
+        <h2 id="about-values-title">Built for people.<br /><em>Built for possibility.</em></h2>
+        <p>Good work begins with people. These are the principles behind every connection we make.</p>
       </div>
       <div className="about-values-grid">
         {values.map(({ icon: Icon, title, description, tone }, index) => (
@@ -137,9 +134,10 @@ const About = () => (
       <div className="about-cta-orbit" aria-hidden="true" />
       <div className="about-cta-copy">
         <span className="about-eyebrow"><Sparkles size={15} /> Your Next Chapter</span>
-        <h2>Ready To See What’s Out There?</h2>
-        <p>Start exploring roles, build your profile, and find an opportunity that feels right for you.</p>
+        <h2>Ready for a better next step?</h2>
+        <p>Find a role that fits, show what you can do, and start a chapter that feels like yours.</p>
       </div>
+      <div className="about-cta-character"><Image src="/trissy-anime.webp" width={230} height={345} alt="Trissy presenting the next career opportunity" /></div>
       <Link href="/jobs" className="about-cta-link">
         <Button variant="outline" size="lg" className="gap-2">Find A Job <ArrowRight size={18} /></Button>
       </Link>
