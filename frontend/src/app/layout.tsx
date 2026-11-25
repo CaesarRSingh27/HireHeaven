@@ -5,6 +5,7 @@ import NavBar from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AppProvider } from "@/context/AppContext";
 import ClerkAuthProvider from "@/components/auth/clerk-auth-provider";
+import RezeChat from "@/components/reze-chat";
 
 export const metadata: Metadata = {
   title: "HireHeaven | Find your next opportunity",
@@ -38,6 +39,7 @@ export default function RootLayout({
             >
               <NavBar />
               {children}
+              <RezeChat />
             </ThemeProvider>
           </AppProvider>
         </ClerkAuthProvider>
