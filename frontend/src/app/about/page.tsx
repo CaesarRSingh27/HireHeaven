@@ -104,7 +104,7 @@ const About = () => (
       <div className="about-journey-grid">
           {journey.map(({ icon: Icon, title, text, character, alt, action, href }, index) => (
           <article className="about-journey-card" key={title}>
-            <div className="about-journey-top"><span>0{index + 1}</span><Icon size={21} /></div>
+            <div className="about-journey-top"><Icon size={21} /></div>
               <div className="about-journey-copy"><span className="about-journey-kicker">{["DISCOVER", "SHOW YOUR VALUE", "MOVE FORWARD"][index]}</span><h3>{title}</h3><p>{text}</p></div>
               <Image className="about-journey-character" src={character} width={210} height={315} alt={alt} />
               <Link className="about-journey-action" href={href}>{action}<ArrowRight size={15} /></Link>
