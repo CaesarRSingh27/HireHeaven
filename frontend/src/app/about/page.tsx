@@ -59,6 +59,14 @@ const About = () => (
             className="about-photo"
             alt="A bright workspace ready for the next big idea"
           />
+          <Image
+            src="/trissy-anime.webp"
+            width={250}
+            height={375}
+            className="about-character-guide"
+            alt="Trissy presenting the next career step"
+          />
+          <span className="about-character-note">Your story, beautifully told</span>
           <div className="about-photo-label">
             <span className="about-photo-icon"><BriefcaseBusiness size={18} /></span>
             <span><strong>Make Room For What’s Next</strong><small>People, purpose, possibility.</small></span>

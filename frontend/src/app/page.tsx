@@ -17,10 +17,10 @@ const journeySteps = [
 ];
 
 const characters = [
-  { name: "Genshin", image: "/genshin-character.webp", alt: "Genshin character artwork", note: "Curiosity for every new direction.", tone: "character-violet" },
-  { name: "Chinatsu", image: "/chinatsu-character.webp", alt: "Chinatsu character artwork", note: "A warm welcome at every step.", tone: "character-peach" },
-  { name: "Violettee", image: "/violettee-character.webp", alt: "Violettee character artwork", note: "Confidence for bold career moves.", tone: "character-amber" },
-  { name: "Trissy", image: "/trissy-character.webp", alt: "Trissy character artwork", note: "A polished touch for your story.", tone: "character-rose" },
+  { name: "Genshin", image: "/genshin-anime.webp", alt: "Genshin, an anime character presenting the next step", note: "Curiosity for every new direction.", tone: "character-violet" },
+  { name: "Chinatsu", image: "/chinatsu-anime.webp", alt: "Chinatsu, an anime character welcoming visitors", note: "A warm welcome at every step.", tone: "character-peach" },
+  { name: "Violettee", image: "/violettee-anime.webp", alt: "Violettee, an anime character pointing toward new opportunities", note: "Confidence for bold career moves.", tone: "character-amber" },
+  { name: "Trissy", image: "/trissy-anime.webp", alt: "Trissy, an anime character presenting a career folder", note: "A polished touch for your story.", tone: "character-rose" },
 ];
 
 const Home = () => {

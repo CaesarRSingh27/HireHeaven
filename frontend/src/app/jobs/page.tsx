@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Briefcase, Filter, MapPin, Search, X } from "lucide-react";
 import Loading from "@/components/loading";
 import JobCard from "@/components/job-card";
+import Image from "next/image";
 import {
   Dialog,
   DialogContent,
@@ -128,8 +129,23 @@ const JobsPage = () => {
                   </button>
                 </div>
               )}
+
             </div>
           )}
+
+          <section className="jobs-character-guide" aria-label="Violettee's job search tip">
+            <div className="jobs-character-art">
+              <Image src="/violettee-anime.webp" alt="Violettee pointing toward the job search" fill sizes="(max-width: 760px) 38vw, 220px" />
+            </div>
+            <div className="jobs-character-copy">
+              <span className="about-eyebrow"><Search size={14} /> Your Next Move</span>
+              <h2>Violettee has a point.</h2>
+              <p>Tell her what kind of role you’re looking for. A few filters can bring the right opportunities into focus.</p>
+              <button className="jobs-guide-link" type="button" onClick={clickEvent}>Explore job filters <Filter size={15} /></button>
+            </div>
+            <span className="jobs-guide-spark jobs-guide-spark-one" aria-hidden="true">✦</span>
+            <span className="jobs-guide-spark jobs-guide-spark-two" aria-hidden="true">✧</span>
+          </section>
 
           {loading ? (
             <Loading />
@@ -154,6 +170,7 @@ const JobsPage = () => {
               )}
             </>
           )}
+
         </div>
 
         <Dialog>

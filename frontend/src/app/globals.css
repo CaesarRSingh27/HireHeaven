@@ -1287,9 +1287,10 @@ label,
 .about-photo-label {
   position: absolute;
   z-index: 1;
-  right: 1rem;
+  right: auto;
   bottom: 1rem;
   left: 1rem;
+  max-width: min(68%, 25rem);
   display: flex;
   align-items: center;
   gap: 0.8rem;
@@ -1506,17 +1507,41 @@ label,
 .character-showcase-card:hover { transform: translateY(-5px) rotate(-0.4deg); box-shadow: 7px 8px 0 color-mix(in oklch, var(--foreground) 68%, transparent); }
 .character-showcase-art { position: relative; aspect-ratio: 1.22; overflow: hidden; background: color-mix(in oklch, var(--secondary) 75%, var(--card)); isolation: isolate; }
 .character-showcase-art::after { position: absolute; inset: 45% 0 0; background: linear-gradient(transparent, rgb(18 19 35 / 18%)); content: ""; pointer-events: none; }
-.character-showcase-art img { object-fit: cover; object-position: center; transition: transform 450ms cubic-bezier(0.2, 0.75, 0.25, 1); }
-.character-showcase-card:hover .character-showcase-art img { transform: scale(1.045); }
+.character-showcase-art img { object-fit: contain; object-position: center bottom; transition: transform 450ms cubic-bezier(0.2, 0.75, 0.25, 1); }
+.character-showcase-card:hover .character-showcase-art img { transform: translateY(-4px) scale(1.025); }
 .character-showcase-index { position: absolute; z-index: 1; top: 0.7rem; left: 0.7rem; display: grid; width: 2rem; height: 2rem; place-items: center; color: var(--foreground); background: color-mix(in oklch, var(--card) 82%, transparent); border: 1px solid color-mix(in oklch, var(--foreground) 28%, transparent); border-radius: 50%; backdrop-filter: blur(8px); font-size: 0.68rem; font-weight: 800; }
 .character-showcase-star { position: absolute; z-index: 1; right: 0.8rem; bottom: 0.35rem; color: #fff2bb; font-size: 1.5rem; text-shadow: 0 2px 12px rgb(0 0 0 / 50%); animation: character-float 3s ease-in-out infinite; }
 .character-showcase-copy { min-height: 6.7rem; padding: 0.9rem 1rem 1rem; }
 .character-showcase-copy h3 { margin: 0; font-size: 1.15rem; }
 .character-showcase-copy p { margin: 0.3rem 0 0; color: var(--muted-foreground); font-size: 0.82rem; line-height: 1.5; }
-.character-violet .character-showcase-art { background: #9d9bb7; }
-.character-peach .character-showcase-art { background: #c2ae9f; }
-.character-amber .character-showcase-art { background: #ad7950; }
-.character-rose .character-showcase-art { background: #403346; }
+.character-violet .character-showcase-art { background: radial-gradient(ellipse at 60% 42%, #faf7ff 0, #ded8f4 45%, #a9a5c5 100%); }
+.character-peach .character-showcase-art { background: radial-gradient(ellipse at 45% 42%, #fffaf1 0, #f1ddcb 48%, #c9ab96 100%); }
+.character-amber .character-showcase-art { background: radial-gradient(ellipse at 60% 42%, #fff6e8 0, #ebc9a3 48%, #b67e57 100%); }
+.character-rose .character-showcase-art { background: radial-gradient(ellipse at 50% 42%, #faf2ff 0, #d0bddc 48%, #716078 100%); }
+
+.jobs-character-guide { position: relative; display: grid; min-height: 13.5rem; grid-template-columns: minmax(8rem, 0.36fr) minmax(0, 1fr); align-items: center; gap: clamp(0.6rem, 2vw, 1.8rem); overflow: hidden; margin: 1.6rem 0 2rem; padding: 0.7rem clamp(1rem, 3vw, 2rem); background: radial-gradient(ellipse at 22% 50%, #e6dcff 0, transparent 38%), linear-gradient(110deg, #f5f0ff, #fff8f2); border: 1px solid #d9cbed; border-radius: 1.5rem; box-shadow: 5px 5px 0 rgb(31 29 47 / 22%); }
+.jobs-character-art { position: relative; align-self: end; width: 100%; height: 12.8rem; }
+.jobs-character-art img { object-fit: contain; object-position: center bottom; }
+.jobs-character-copy { position: relative; z-index: 1; max-width: 39rem; padding: 1.1rem 0; }
+.jobs-character-copy { color: #282236; }
+.jobs-character-copy .about-eyebrow { margin-bottom: 0.45rem; }
+.jobs-character-copy h2 { margin: 0.15rem 0 0.45rem; font-family: var(--font-display), sans-serif; font-size: clamp(1.35rem, 2.5vw, 2rem); }
+.jobs-character-copy p { max-width: 35rem; margin: 0 0 0.8rem; color: #615874; line-height: 1.65; }
+.jobs-guide-link { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0; color: var(--primary); background: none; border: 0; font: inherit; font-weight: 750; cursor: pointer; }
+.jobs-guide-link:hover { text-decoration: underline; text-underline-offset: 0.22rem; }
+.jobs-guide-spark { position: absolute; color: #8f73e9; font-size: 1.6rem; animation: character-float 2.8s ease-in-out infinite; }
+.jobs-guide-spark-one { top: 1.25rem; left: 1.6rem; }
+.jobs-guide-spark-two { right: 1.6rem; bottom: 1rem; font-size: 2rem; animation-delay: -1.1s; }
+
+.contact-character-guide { position: relative; display: flex; min-height: 10.5rem; align-items: center; overflow: hidden; margin: 1rem 0 1.25rem; padding: 1rem 1rem 1rem 8.8rem; background: linear-gradient(115deg, #fff2eb 0%, #f7edff 100%); border: 1px solid color-mix(in oklch, var(--primary) 23%, var(--border)); border-radius: 1.2rem; }
+.contact-character-copy { position: relative; z-index: 1; max-width: 18rem; color: #362c4a; }
+.contact-character-copy > span { color: var(--primary); font-size: 0.75rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+.contact-character-copy p { margin: 0.4rem 0 0; color: #615874; font-size: 0.9rem; font-weight: 650; line-height: 1.55; }
+.contact-character-guide img { position: absolute; bottom: 0; left: 0.2rem; width: 8.7rem; height: 10rem; object-fit: contain; object-position: center bottom; filter: drop-shadow(0 4px 10px rgb(69 48 85 / 18%)); }
+.contact-character-spark { position: absolute; top: 0.9rem; left: 6.5rem; color: #9d7af0; font-size: 1.35rem; animation: character-float 2.7s ease-in-out infinite; }
+
+.about-character-guide { position: absolute; z-index: 2; right: -0.8rem; bottom: -1.6rem; width: clamp(8rem, 19vw, 14rem); height: 88%; object-fit: contain; object-position: center bottom; filter: drop-shadow(0 8px 12px rgb(34 26 44 / 25%)); pointer-events: none; }
+.about-character-note { position: absolute; z-index: 3; top: 1.15rem; right: auto; left: 1.2rem; max-width: 9rem; padding: 0.65rem 0.8rem; color: #332843; background: #fffdf4; border: 1px solid #c9b5ed; border-radius: 1rem 1rem 0.2rem 1rem; box-shadow: 3px 3px 0 rgb(39 31 55 / 20%); font-size: 0.72rem; font-weight: 750; line-height: 1.4; transform: rotate(2deg); }
 
 @keyframes character-float {
   0%, 100% { transform: translateY(0) rotate(-0.15deg); }
@@ -1653,6 +1678,12 @@ label,
   .about-value-card { min-height: 0; }
   .about-value-card h3 { margin-top: 1.5rem; }
   .character-showcase-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .jobs-character-guide { grid-template-columns: minmax(5.5rem, 0.34fr) minmax(0, 1fr); gap: 0.45rem; padding-inline: 0.75rem; }
+  .jobs-character-art { height: 10.8rem; }
+  .about-character-guide { right: -0.3rem; width: clamp(7rem, 32vw, 12rem); height: 78%; }
+  .about-character-note { left: 0.65rem; max-width: 7.5rem; }
+  .contact-character-guide { padding-left: 7.5rem; }
+  .contact-character-guide img { left: -0.3rem; width: 7.8rem; }
   .contact-layout { grid-template-columns: 1fr; }
 }
 
@@ -1681,6 +1712,13 @@ label,
   .character-showcase-copy { min-height: 6.4rem; padding: 0.75rem; }
   .character-showcase-copy h3 { font-size: 1rem; }
   .character-showcase-copy p { font-size: 0.73rem; }
+  .jobs-character-guide { grid-template-columns: minmax(5rem, 0.36fr) minmax(0, 1fr); min-height: 11.5rem; }
+  .jobs-character-art { height: 10rem; }
+  .jobs-character-copy h2 { font-size: 1.25rem; }
+  .jobs-character-copy p { font-size: 0.82rem; }
+  .about-character-guide { right: -0.35rem; width: 7rem; height: 70%; }
+  .about-character-note { top: 0.8rem; left: 0.55rem; max-width: 6rem; font-size: 0.65rem; }
+  .about-photo-label { max-width: 62%; padding: 0.65rem; }
   .contact-page { width: calc(100% - 2rem); padding-top: 2.8rem; }
   .contact-hours p { font-size: 0.78rem; }
   .reze-assistant { right: 0.8rem; bottom: 0.8rem; }

@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { Clock3, Mail, MapPin, MessageCircle, Phone, Send, Sparkles } from "lucide-react";
+import Image from "next/image";
 
 const emailAddress = "caesarkrish@gmail.com";
 const whatsappNumber = "917376433661";
@@ -38,6 +39,15 @@ export default function ContactPage() {
             <div><span className="contact-kicker">Get In Touch</span><h2>We’d Love To Hear From You</h2></div>
           </div>
           <p className="contact-intro">Reach out whenever you need a hand. We’ll help point you in the right direction.</p>
+
+          <div className="contact-character-guide">
+            <div className="contact-character-copy">
+              <span>Chinatsu’s note</span>
+              <p>Have a question? I’ll help you find the right place to start.</p>
+            </div>
+            <Image src="/chinatsu-anime.webp" alt="Chinatsu welcoming visitors and presenting the contact details" width={210} height={315} />
+            <span className="contact-character-spark" aria-hidden="true">✦</span>
+          </div>
 
           <a className="contact-detail-row" href="https://maps.google.com/?q=12%2F6A+Dashashwamedh+Ghat%2C+Varanasi%2C+India+221002" target="_blank" rel="noreferrer">
             <span className="contact-icon"><MapPin size={19} /></span>
