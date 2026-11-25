@@ -585,7 +585,7 @@ label,
 .hero-art-panel {
   position: relative;
   display: grid;
-  min-height: 29rem;
+  min-height: 32rem;
   place-items: center;
   overflow: hidden;
   background:
@@ -613,11 +613,12 @@ label,
   width: auto;
   max-width: min(100%, 31rem);
   max-height: 28rem;
+  align-self: end;
   overflow: visible;
   object-fit: contain;
   object-position: center bottom;
   transform-origin: 50% 88%;
-  animation: guide-idle 5.2s ease-in-out infinite;
+  animation: guide-idle 4.4s ease-in-out infinite;
   filter: drop-shadow(0 20px 20px color-mix(in oklch, var(--foreground) 14%, transparent));
 }
 
@@ -682,8 +683,8 @@ label,
 .guide-spark-two { top: 55%; right: 12%; font-size: 1rem; animation-delay: -1.4s; }
 
 @keyframes guide-idle {
-  0%, 100% { transform: translateY(0) rotate(-0.25deg); }
-  50% { transform: translateY(-7px) rotate(0.25deg); }
+  0%, 100% { transform: translateY(0) rotate(-0.35deg) scale(1); }
+  50% { transform: translateY(-11px) rotate(0.35deg) scale(1.008); }
 }
 
 @keyframes guide-orbit { to { transform: rotate(360deg); } }
@@ -716,21 +717,22 @@ label,
 }
 
 .floating-card-match {
-  top: 15%;
-  right: 2%;
+  top: 4%;
+  right: 3%;
 }
 
 .floating-card-role {
-  bottom: 13%;
-  left: 2%;
+  bottom: 5%;
+  left: 3%;
   animation-delay: -2s;
 }
 
 .hero-art-note {
   position: absolute;
   z-index: 2;
-  top: 8%;
-  left: 5%;
+  top: 4%;
+  left: 3%;
+  max-width: 35%;
   display: flex;
   flex-direction: column;
   gap: 0.05rem;
@@ -740,13 +742,13 @@ label,
   border: 2px solid color-mix(in oklch, var(--foreground) 86%, transparent);
   border-radius: 0.8rem 0.8rem 0.8rem 0.2rem;
   box-shadow: 3px 3px 0 color-mix(in oklch, var(--foreground) 78%, transparent);
-  transform: rotate(-4deg);
+  transform: rotate(-2deg);
 }
 
 .hero-art-note span,
 .hero-art-note strong {
   font-family: var(--font-handwriting), "Comic Sans MS", cursive;
-  font-size: 1.4rem;
+  font-size: 1.05rem;
   font-weight: 600;
   line-height: 1;
   letter-spacing: -0.02em;
@@ -754,7 +756,7 @@ label,
 }
 
 .hero-art-note strong {
-  font-size: 1.65rem;
+  font-size: 1.2rem;
   font-weight: 700;
 }
 
@@ -1129,10 +1131,13 @@ label,
   .hero-description { margin-inline: auto; }
   .hero-actions, .hero-proof { justify-content: center; }
   .hero-art { width: min(100%, 30rem); margin-inline: auto; }
-  .hero-art-panel { min-height: 21rem; }
+  .hero-art-panel { min-height: 26rem; }
   .talent-character { max-height: 20rem; max-width: 100%; }
-  .floating-card-match { top: 10%; right: 0; }
-  .floating-card-role { bottom: 8%; left: 0; }
+  .hero-art-note { top: 2%; left: 2%; }
+  .hero-art-note span { font-size: 0.9rem; }
+  .hero-art-note strong { font-size: 1rem; }
+  .floating-card-match { top: 2%; right: 2%; }
+  .floating-card-role { bottom: 3%; left: 2%; }
 
   .about-hero { grid-template-columns: 1fr; gap: 2.6rem; }
   .about-hero-copy { max-width: 42rem; }
@@ -1144,7 +1149,7 @@ label,
 }
 
 @media (max-width: 420px) {
-  .hero-art-panel { min-height: 18rem; border-radius: 1.6rem; }
+  .hero-art-panel { min-height: 23rem; border-radius: 1.6rem; }
   .talent-character { max-height: 17rem; }
   .floating-card { gap: 0.5rem; padding: 0.65rem 0.7rem; }
   .floating-icon { width: 2.1rem; height: 2.1rem; }
