@@ -1,6 +1,37 @@
 # HireHeaven - Microservice Job Portal
 
-Next.js frontend + five Node/Express (TypeScript) services, Postgres (Neon), Redis, Kafka, behind an nginx gateway.
+HireHeaven brings job discovery, candidate profiles, recruiter tools, resume feedback, and career guidance into one application. It includes a responsive interface with light and dark themes, a custom H emblem and wordmark, and Reze, the website's AI assistant.
+
+Built with Next.js 16, React 19, Tailwind CSS 4, five Node/Express TypeScript services, Postgres (Neon), Redis, Kafka, and an nginx gateway.
+
+## Features and navigation
+
+| Page | What you can do |
+|---|---|
+| Home, `/` | Explore the platform and open AI career guidance and resume analysis |
+| About, `/about` | Learn about HireHeaven's mission, candidate journey, and values |
+| Find a job, `/jobs` | Browse and filter openings, open job details, and apply |
+| Account, `/account` | Manage your profile, resume, skills, and applications, or access recruiter tools |
+| Company, `/company/[id]` | View a company's details |
+| Register / sign in, `/register` and `/login` | Use email and password or Google, LinkedIn, and GitHub through Clerk |
+| Contact us, `/contact` | Find contact details and prepare a message in WhatsApp |
+| Subscription, `/subscribe` | Access the Razorpay subscription checkout |
+
+Recruiters can create company profiles, post jobs, and review applicants through the account area. Social registration lets users start with a minimal profile and add the remaining details later.
+
+### Reze assistant
+
+Click Reze's floating avatar to open the chat panel. Reze answers questions about navigating HireHeaven, finding jobs, candidate profiles, recruiter tools, career guidance, and resume analysis.
+
+The frontend sends up to 12 recent messages to `POST /api/utils/chat`. Replies use Gemini through the utils service. Configure `GEMINI_API_KEY` in the root Docker environment, or `API_KEY_GEMINI` in `services/utils/.env` for local service development. Reze provides guidance based on the site's features and cannot inspect live accounts, applications, or job inventory. Chat history is held in the component's memory and clears when the page reloads.
+
+### Contact messages
+
+The contact page uses **caesarkrish@gmail.com** and **+91 7376433661** for WhatsApp. Submitting the form opens WhatsApp with the visitor's name, email, and message filled in. The visitor must press **Send in WhatsApp** to deliver it.
+
+### Design and assets
+
+The interface supports light and dark themes, responsive layouts, custom typography, and illustrated character accents. The three journey cards on the About page use text and icons. The HireHeaven emblem is stored in `frontend/public/hireheaven-mark.svg` and is also used as the browser icon.
 
 ```
 Browser --> nginx :80/:443 --+--> frontend (Next.js)      :3000
@@ -45,6 +76,38 @@ Start order is enforced by healthchecks: `kafka, redis, utils -> auth -> job -> 
 2. For each service: `cd services/<name> && cp .env.example .env && npm install && npm run dev`.
 3. Frontend: `cd frontend && cp .env.example .env.local` (uncomment the per-service URLs) `&& npm install && npm run dev`.
 
+## Project structure
+
+```text
+frontend/            Next.js interface, routes, components, and public assets
+services/auth/       Email/password, social sign-in, and account authentication
+services/user/       Profiles, resumes, and user data
+services/job/        Companies, jobs, and applications
+services/utils/      Uploads, email consumer, Gemini tools, and Reze chat
+services/payment/    Razorpay orders, verification, and webhooks
+deploy/nginx/        Gateway and HTTPS configuration
+db/                  Schema reference and migrations
+scripts/             Environment secret generation
+docs/                OAuth setup and reference guides
+```
+
+## Updating a running local installation
+
+If an ignored root `.env` already exists, use it when restarting the stack. The secret generation scripts create a new file and refuse to overwrite an existing one.
+
+```powershell
+# Rebuild the frontend after UI or public configuration changes
+docker compose up -d --build --no-deps frontend
+
+# Rebuild all services after changes across the application
+docker compose up -d --build
+
+# Inspect running services and recent logs
+docker compose ps
+docker compose logs --tail=100 frontend auth utils
+```
+
+Keep credentials in the ignored environment files. Commit source code and placeholder configuration from `.env.example`.
 ## Configuration
 
 | Variable | Used by | Notes |
