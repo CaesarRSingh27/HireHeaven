@@ -42,7 +42,7 @@ const NavBar = () => {
         <Link href="/" className="site-brand" aria-label="HireHeaven home" onClick={closeMenu}>
           <Image className="site-brand-mark" src="/hireheaven-mark.svg" width={40} height={40} alt="" priority />
           <span className="site-brand-copy">
-            <span className="site-brand-wordmark">HireHeaven</span>
+            <span className="site-brand-wordmark"><span className="brand-initial">H</span>ire<span className="brand-initial">H</span>eaven</span>
             <span className="site-brand-tagline">Careers, elevated</span>
           </span>
         </Link>

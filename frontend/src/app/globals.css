@@ -257,10 +257,25 @@ label,
 }
 
 .site-brand-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 0.16rem; }
-.site-brand-wordmark { display: inline-block; background: linear-gradient(108deg, #5736bf 0%, #8965e8 49%, #ae6d35 100%); background-clip: text; color: transparent; font-family: var(--font-display), sans-serif; font-size: 1.28rem; font-style: italic; font-weight: 800; letter-spacing: -0.085em; line-height: 0.95; -webkit-background-clip: text; }
+.site-brand-wordmark {
+  display: inline-block;
+  color: var(--foreground);
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.38rem;
+  font-weight: 850;
+  letter-spacing: -0.055em;
+  line-height: 1;
+}
+.brand-initial {
+  display: inline-block;
+  width: 0.80em;
+  color: transparent;
+  background: var(--foreground);
+  mask: url("/hireheaven-mark.svg") center / contain no-repeat;
+}
 .site-brand-tagline { color: color-mix(in oklch, var(--muted-foreground) 85%, var(--foreground)); font-family: var(--font-ui), sans-serif; font-size: 0.49rem; font-weight: 850; letter-spacing: 0.17em; line-height: 1; text-transform: uppercase; }
 .site-brand:hover .site-brand-wordmark { filter: drop-shadow(0 3px 10px color-mix(in oklch, var(--primary) 26%, transparent)); }
-.dark .site-brand-wordmark { background-image: linear-gradient(108deg, #d9ceff 0%, #b29aff 55%, #f5cc8c 100%); }
+
 .dark .site-brand-tagline { color: #a9a3bc; }
 .site-brand:focus-visible { border-radius: 0.6rem; outline: 2px solid var(--ring); outline-offset: 5px; }
 .site-brand-mark { width: 3rem; height: 3rem; object-fit: contain; filter: drop-shadow(0 4px 8px color-mix(in oklch, var(--primary) 20%, transparent)); transition: transform 180ms ease, filter 180ms ease; }
