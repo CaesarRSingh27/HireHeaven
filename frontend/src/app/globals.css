@@ -589,7 +589,8 @@ label,
   place-items: center;
   overflow: hidden;
   background:
-    radial-gradient(ellipse at 50% 60%, color-mix(in oklch, var(--primary) 15%, transparent), transparent 52%),
+    radial-gradient(ellipse at 50% 55%, color-mix(in oklch, #b4233d 20%, transparent), transparent 53%),
+    radial-gradient(ellipse at 50% 60%, color-mix(in oklch, var(--primary) 12%, transparent), transparent 58%),
     color-mix(in oklch, var(--card) 86%, var(--secondary));
   border: 2px solid color-mix(in oklch, var(--foreground) 78%, transparent);
   border-radius: 2rem;

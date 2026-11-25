@@ -1,4 +1,4 @@
-import { ArrowRight, BriefcaseBusiness, Building2, Check, Compass, Search, Sparkles } from "lucide-react";
+import { ArrowRight, BriefcaseBusiness, Check, Compass, Search, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -6,25 +6,21 @@ import { Button } from "./ui/button";
 
 function TalentIllustration() {
   return (
-    <div className="hero-art" aria-label="Aarav, the HireHeaven career guide">
+    <div className="hero-art" aria-label="Mikasa, the HireHeaven career guide">
       <div className="hero-art-panel">
         <div className="guide-orbit guide-orbit-one" aria-hidden="true" />
         <div className="guide-orbit guide-orbit-two" aria-hidden="true" />
         <Image
           className="talent-character"
-          src="/hireheaven-guide.png"
-          alt="Aarav, the friendly HireHeaven career guide"
-          width={1122}
-          height={1402}
+          src="/mikasa-guide.png"
+          alt="Mikasa, the animated HireHeaven career guide"
+          width={1536}
+          height={1024}
           priority
         />
-        <div className="guide-lapel-pin" aria-label="HireHeaven guide badge">
-          <Building2 size={15} strokeWidth={2.2} />
-          <span />
-        </div>
 
         <div className="hero-art-note" aria-hidden="true">
-          <span>Meet Aarav</span>
+          <span>Meet Mikasa</span>
           <strong>Your Career Guide</strong>
           <i />
         </div>
