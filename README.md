@@ -57,6 +57,7 @@ Start order is enforced by healthchecks: `kafka, redis, utils -> auth -> job -> 
 | `SUBSCRIPTION_PRICE_INR` | payment | default 119 |
 | `CLOUDINARY_*`, `SMTP_*`, `GEMINI_API_KEY` | utils | |
 | `GOOGLE_CLIENT_ID` / `_SECRET`, `LINKEDIN_CLIENT_ID` / `_SECRET` | auth | Optional OAuth sign-in credentials; keep secrets in the ignored root `.env` |
+| `CLERK_SECRET_KEY`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | frontend + auth | Clerk development sign-in; the publishable key is public, keep the secret key only in `.env` |
 | `OAUTH_CALLBACK_BASE_URL` | auth | Public app origin used to build provider callback URLs; defaults to `http://localhost` |
 | `CORS_ORIGINS` | all services | optional; irrelevant behind nginx (same origin) |
 
@@ -64,7 +65,7 @@ Start order is enforced by healthchecks: `kafka, redis, utils -> auth -> job -> 
 
 ### Google and LinkedIn sign-in
 
-Social sign-in creates a minimal account without requiring a password, phone number, bio, or resume up front. See [OAuth provider setup](docs/oauth-sign-in.md) for provider credentials and callback URLs. Until those credentials are added, the social buttons remain disabled and password/email sign-in continues to work.
+Social sign-in creates a minimal account without requiring a password, phone number, bio, or resume up front. Clerk's development instance provides shared Google and LinkedIn OAuth credentials; configure its keys in the ignored environment files. See [OAuth provider setup](docs/oauth-sign-in.md). Direct Google/LinkedIn OAuth credentials remain available as an alternative.
 
 ### Resume PDF delivery (Cloudinary)
 

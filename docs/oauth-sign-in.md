@@ -1,6 +1,23 @@
 # Google and LinkedIn sign-in
 
-HireHeaven's auth microservice supports OAuth 2.0 authorization-code sign-in for Google and LinkedIn OpenID Connect. Provider secrets stay on the auth service; they are never passed to the frontend.
+## Recommended: Clerk development instance
+
+The frontend can use Clerk's free development instance for both Google and LinkedIn sign-in. Clerk supplies shared OAuth credentials for development, so a separate Google Cloud OAuth client and LinkedIn developer app are not required for local use. The auth microservice verifies the Clerk session, links the verified identity to the existing Postgres user, and issues the same HireHeaven JWT used by the other services.
+
+1. Create a Clerk application and enable **Google** and **LinkedIn** under **Configure → SSO connections** for sign-up and sign-in. Keep it in the development environment.
+2. Copy the **Publishable key** and **Secret key** from Clerk's API Keys page.
+3. For Docker, set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` in the ignored root `.env`. For host-based development, set the publishable key in `frontend/.env.local` and the secret key in `services/auth/.env`.
+4. Rebuild/restart the frontend and auth service:
+
+```sh
+docker compose up -d --build frontend auth
+```
+
+The development shared OAuth credentials are intended for testing. Clerk requires custom provider credentials for production; configure those in Clerk before deploying. The Clerk free plan has usage and feature limits; check the current [pricing page](https://clerk.com/pricing).
+
+## Direct provider credentials (alternative)
+
+HireHeaven's auth microservice also supports direct OAuth 2.0 authorization-code sign-in for Google and LinkedIn OpenID Connect. Provider secrets stay on the auth service; they are never passed to the frontend. This path is used when Clerk is not configured.
 
 ## Local Docker setup
 

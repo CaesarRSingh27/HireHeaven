@@ -8,6 +8,7 @@ import {
 } from "../controllers/auth.js";
 import uploadFile from "../middleware/multer.js";
 import { oauthCallback, oauthProviders, startOAuth } from "../controllers/oauth.js";
+import { exchangeClerkSession } from "../controllers/clerk.js";
 
 const router = express.Router();
 
@@ -26,6 +27,7 @@ const forgotLimiter = limiter(5, 60 * 60 * 1000); // 5 / hour / IP
 router.post("/register", authLimiter, uploadFile, registerUser);
 router.post("/login", authLimiter, loginUser);
 router.get("/oauth/providers", oauthProviders);
+router.post("/oauth/clerk/exchange", authLimiter, exchangeClerkSession);
 router.get("/oauth/:provider", authLimiter, startOAuth);
 router.get("/oauth/:provider/callback", authLimiter, oauthCallback);
 router.post("/forgot", forgotLimiter, forgotPassword);
