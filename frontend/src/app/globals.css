@@ -1157,6 +1157,27 @@ label,
   text-transform: capitalize;
 }
 
+.home-journey, .home-audience { width: min(100% - 3rem, 76rem); margin-inline: auto; }
+.home-journey { padding: clamp(3.5rem, 7vw, 6rem) 0 clamp(4rem, 8vw, 7rem); }
+.home-section-heading { max-width: 45rem; margin: 0 auto 2.4rem; text-align: center; }
+.home-section-heading h2, .home-audience h2 { margin: 1rem 0 0.75rem; font-size: clamp(2.2rem, 4.8vw, 3.8rem); line-height: 1.04; }
+.home-section-heading h2 em, .home-audience h2 em { color: var(--primary); font-family: var(--font-handwriting), cursive; font-size: 1.12em; font-style: normal; font-weight: 700; letter-spacing: -0.04em; }
+.home-section-heading > p, .home-audience-copy > p { max-width: 40rem; margin: 0 auto; color: var(--muted-foreground); font-size: 1.03rem; line-height: 1.8; }
+.home-journey-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.1rem; }
+.home-journey-card, .about-journey-card { min-height: 14.5rem; padding: clamp(1.2rem, 2.5vw, 1.7rem); background: color-mix(in oklch, var(--card) 90%, var(--secondary)); border: 1.5px solid color-mix(in oklch, var(--foreground) 70%, transparent); border-radius: 1.35rem; box-shadow: 5px 5px 0 color-mix(in oklch, var(--foreground) 70%, transparent); transition: transform 180ms ease, box-shadow 180ms ease; }
+.home-journey-card:hover, .about-journey-card:hover { transform: translate(-2px, -3px); box-shadow: 8px 8px 0 color-mix(in oklch, var(--foreground) 70%, transparent); }
+.home-journey-card:nth-child(2), .about-journey-card:nth-child(2) { background: color-mix(in oklch, oklch(0.92 0.07 52) 48%, var(--card)); }
+.home-journey-card:nth-child(3), .about-journey-card:nth-child(3) { background: color-mix(in oklch, oklch(0.91 0.06 164) 42%, var(--card)); }
+.home-journey-top, .about-journey-top { display: flex; align-items: center; justify-content: space-between; color: var(--primary); }
+.home-journey-top > span, .about-journey-top > span { color: var(--muted-foreground); font-size: 0.76rem; font-weight: 800; letter-spacing: 0.14em; }
+.home-journey-card h3, .about-journey-card h3 { margin: 2rem 0 0.55rem; font-size: 1.25rem; }
+.home-journey-card p, .about-journey-card p { margin: 0; color: var(--muted-foreground); line-height: 1.7; }
+.home-audience { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 2rem; overflow: hidden; margin-bottom: clamp(4rem, 8vw, 7rem); padding: clamp(1.7rem, 4vw, 3rem); background: linear-gradient(120deg, color-mix(in oklch, var(--secondary) 74%, var(--card)), color-mix(in oklch, var(--accent) 36%, var(--card))); border: 1.5px solid color-mix(in oklch, var(--foreground) 72%, transparent); border-radius: 1.65rem; box-shadow: 6px 6px 0 color-mix(in oklch, var(--foreground) 70%, transparent); }
+.home-audience-copy { position: relative; z-index: 1; max-width: 43rem; }
+.home-audience h2 { max-width: 15ch; }
+.home-audience-copy > p { margin-inline: 0; }
+.home-audience-actions { position: relative; z-index: 1; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.8rem; flex: 0 0 auto; }
+
 .about-page {
   position: relative;
   overflow: hidden;
@@ -1166,6 +1187,7 @@ label,
 .about-hero,
 .about-story,
 .about-values,
+.about-journey,
 .about-cta {
   width: min(100%, 74rem);
   margin-inline: auto;
@@ -1341,6 +1363,11 @@ label,
 .about-story-copy p + p { margin-top: 1rem; }
 
 .about-values { padding-block: clamp(4rem, 8vw, 7rem); }
+
+.about-journey { padding-block: clamp(1rem, 3vw, 2rem) clamp(4rem, 8vw, 7rem); }
+.about-journey .about-section-heading { margin-bottom: 2rem; }
+.about-journey-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.1rem; }
+.about-journey-card { min-height: 13rem; }
 
 .about-section-heading { max-width: 43rem; margin: 0 auto 2.2rem; text-align: center; }
 .about-section-heading h2 { font-size: clamp(2rem, 4vw, 3.25rem); }
@@ -1556,6 +1583,11 @@ label,
   .about-visual-wrap { width: min(100%, 40rem); margin-inline: auto; }
   .about-story { grid-template-columns: 1fr; gap: 1rem; }
   .about-values-grid { grid-template-columns: 1fr; }
+  .home-journey-grid, .about-journey-grid { grid-template-columns: 1fr; }
+  .home-journey-card, .about-journey-card { min-height: 0; }
+  .home-journey-card h3, .about-journey-card h3 { margin-top: 1.3rem; }
+  .home-audience { align-items: flex-start; flex-direction: column; }
+  .home-audience-actions { justify-content: flex-start; }
   .about-value-card { min-height: 0; }
   .about-value-card h3 { margin-top: 1.5rem; }
   .contact-layout { grid-template-columns: 1fr; }
@@ -1579,6 +1611,7 @@ label,
   .resume-guide-note { max-width: 88%; gap: 0.45rem; padding-right: 0.55rem; }
   .resume-guide-note small { font-size: 0.51rem; }
   .about-page { padding-inline: 1rem; }
+  .home-journey, .home-audience { width: calc(100% - 2rem); }
   .contact-page { width: calc(100% - 2rem); padding-top: 2.8rem; }
   .contact-hours p { font-size: 0.78rem; }
   .about-stamp { top: -0.6rem; right: -0.2rem; width: 5.2rem; height: 5.2rem; font-size: 0.88rem; }

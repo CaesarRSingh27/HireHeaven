@@ -1,4 +1,4 @@
-import { ArrowRight, BriefcaseBusiness, Compass, HeartHandshake, Sparkles, Target } from "lucide-react";
+import { ArrowRight, BriefcaseBusiness, Compass, FileCheck2, HeartHandshake, Search, Sparkles, Target, UsersRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -23,6 +23,12 @@ const values = [
     description: "Explore new opportunities, build your profile, and make progress at your pace.",
     tone: "about-value-mint",
   },
+];
+
+const journey = [
+  { icon: Search, title: "Discover Possibility", text: "Explore open roles and learn about the teams behind them, with the details you need to decide what feels right." },
+  { icon: FileCheck2, title: "Put Your Best Forward", text: "Create a profile that reflects your strengths and make your resume easier to understand at a glance." },
+  { icon: UsersRound, title: "Make A Human Connection", text: "Bring candidates and hiring teams closer through a more considered place to meet." },
 ];
 
 const About = () => (
@@ -77,6 +83,28 @@ const About = () => (
           From discovering roles to presenting your experience, HireHeaven helps make each step
           feel more human, more useful, and easier to act on.
         </p>
+        <p>
+          We believe a career move is more than a search result. It’s a chance to grow, contribute,
+          and find a team where your work matters. That belief shapes the tools we build and the
+          way we bring opportunities into view.
+        </p>
+      </div>
+    </section>
+
+    <section className="about-journey" aria-labelledby="about-journey-title">
+      <div className="about-section-heading">
+        <span className="about-eyebrow"><Compass size={15} /> The HireHeaven Experience</span>
+        <h2 id="about-journey-title">A Little More Clarity At Every Step.</h2>
+        <p>Useful tools, thoughtful details, and room to move at your own pace.</p>
+      </div>
+      <div className="about-journey-grid">
+        {journey.map(({ icon: Icon, title, text }, index) => (
+          <article className="about-journey-card" key={title}>
+            <div className="about-journey-top"><span>0{index + 1}</span><Icon size={21} /></div>
+            <h3>{title}</h3>
+            <p>{text}</p>
+          </article>
+        ))}
       </div>
     </section>
 
@@ -102,7 +130,7 @@ const About = () => (
       <div className="about-cta-copy">
         <span className="about-eyebrow"><Sparkles size={15} /> Your Next Chapter</span>
         <h2>Ready To See What’s Out There?</h2>
-        <p>Start exploring roles and find an opportunity that feels right for you.</p>
+        <p>Start exploring roles, build your profile, and find an opportunity that feels right for you.</p>
       </div>
       <Link href="/jobs" className="about-cta-link">
         <Button variant="outline" size="lg" className="gap-2">Find A Job <ArrowRight size={18} /></Button>
