@@ -79,7 +79,7 @@ const CarrerGuide = () => {
     setOpen(false);
   };
   return (
-    <section className="max-w-7xl mx-auto px-4 py-16 tool-section career-section">
+    <section id="career-guidance" className="max-w-7xl mx-auto px-4 py-16 tool-section career-section">
       <div className="career-feature-shell">
         <div className="career-feature-art">
           <Image

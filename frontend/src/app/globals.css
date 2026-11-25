@@ -1166,6 +1166,18 @@ label,
 .home-journey-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.1rem; }
 .home-journey-card, .about-journey-card { min-height: 14.5rem; padding: clamp(1.2rem, 2.5vw, 1.7rem); background: color-mix(in oklch, var(--card) 90%, var(--secondary)); border: 1.5px solid color-mix(in oklch, var(--foreground) 70%, transparent); border-radius: 1.35rem; box-shadow: 5px 5px 0 color-mix(in oklch, var(--foreground) 70%, transparent); transition: transform 180ms ease, box-shadow 180ms ease; }
 .home-journey-card:hover, .about-journey-card:hover { transform: translate(-2px, -3px); box-shadow: 8px 8px 0 color-mix(in oklch, var(--foreground) 70%, transparent); }
+.home-journey-card { position: relative; display: flex; min-height: 19rem; flex-direction: column; overflow: hidden; padding: clamp(1.35rem, 2.5vw, 1.8rem); border-radius: 1.55rem; box-shadow: 5px 5px 0 color-mix(in oklch, var(--foreground) 62%, transparent); }
+.home-journey-card::before { position: absolute; top: 0; left: 1.55rem; width: 3.4rem; height: 0.28rem; background: var(--journey-accent, var(--primary)); border-radius: 0 0 999px 999px; content: ""; }
+.home-journey-grid > .home-journey-card:nth-child(1) { --journey-accent: #8e78ff; background: radial-gradient(ellipse at 100% 0%, color-mix(in oklch, #a89aff 16%, var(--card)), transparent 48%), var(--card); }
+.home-journey-grid > .home-journey-card:nth-child(2) { --journey-accent: #ee9d75; background: radial-gradient(ellipse at 100% 0%, color-mix(in oklch, #ffc49e 24%, var(--card)), transparent 48%), color-mix(in oklch, oklch(0.92 0.07 52) 34%, var(--card)); }
+.home-journey-grid > .home-journey-card:nth-child(3) { --journey-accent: #65b9a4; background: radial-gradient(ellipse at 100% 0%, color-mix(in oklch, #91ddc3 22%, var(--card)), transparent 48%), color-mix(in oklch, oklch(0.91 0.06 164) 30%, var(--card)); }
+.home-journey-kicker { margin-top: 1.05rem; color: var(--journey-accent, var(--primary)); font-size: 0.68rem; font-weight: 850; letter-spacing: 0.16em; }
+.home-journey-icon { display: grid; width: 2.8rem; height: 2.8rem; place-items: center; color: var(--journey-accent, var(--primary)); background: color-mix(in oklch, var(--journey-accent, var(--primary)) 13%, var(--card)); border: 1px solid color-mix(in oklch, var(--journey-accent, var(--primary)) 30%, transparent); border-radius: 1rem; box-shadow: 0 5px 16px color-mix(in oklch, var(--journey-accent, var(--primary)) 12%, transparent); }
+.home-journey-grid .home-journey-card h3 { max-width: 14ch; margin: 0.55rem 0 0.65rem; font-family: var(--font-display), sans-serif; font-size: clamp(1.35rem, 2vw, 1.7rem); font-weight: 700; letter-spacing: -0.045em; line-height: 1.14; }
+.home-journey-grid .home-journey-card p { margin: 0 0 1.15rem; color: var(--muted-foreground); font-size: 0.93rem; line-height: 1.75; }
+.home-journey-action { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; margin-top: auto; padding-top: 0.9rem; color: var(--foreground); border-top: 1px solid color-mix(in oklch, var(--foreground) 15%, transparent); font-size: 0.81rem; font-weight: 780; text-decoration: none; }
+.home-journey-action svg { flex: 0 0 auto; color: var(--journey-accent, var(--primary)); transition: transform 160ms ease; }
+.home-journey-action:hover svg { transform: translateX(4px); }
 .home-journey-card:nth-child(2), .about-journey-card:nth-child(2) { background: color-mix(in oklch, oklch(0.92 0.07 52) 48%, var(--card)); }
 .home-journey-card:nth-child(3), .about-journey-card:nth-child(3) { background: color-mix(in oklch, oklch(0.91 0.06 164) 42%, var(--card)); }
 .home-journey-top, .about-journey-top { display: flex; align-items: center; justify-content: space-between; color: var(--primary); }

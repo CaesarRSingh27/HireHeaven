@@ -10,9 +10,9 @@ import Link from "next/link";
 import React from "react";
 
 const journeySteps = [
-  { number: "01", icon: Search, title: "Explore With Intention", text: "Browse opportunities by role, location, and the kind of work you want to do next." },
-  { number: "02", icon: FileCheck2, title: "Show Your Strengths", text: "Build a profile that tells your story and make your resume ready for its next reader." },
-  { number: "03", icon: Compass, title: "Choose Your Next Step", text: "Use thoughtful career guidance to turn your skills into a direction you can act on." },
+  { number: "01", label: "DISCOVER", icon: Search, title: "Find work that fits.", text: "Explore openings by role and location, and find opportunities that match your strengths and ambitions.", action: "Explore open roles", href: "/jobs" },
+  { number: "02", label: "MAKE YOUR MARK", icon: FileCheck2, title: "Let your experience speak.", text: "Build a standout profile and give your resume the polish it needs to make a memorable first impression.", action: "Create your profile", href: "/register" },
+  { number: "03", label: "MOVE FORWARD", icon: Compass, title: "Turn possibility into a plan.", text: "Connect your strengths to new directions with career guidance designed around what you can do next.", action: "Find your direction", href: "#career-guidance" },
 ];
 
 const Home = () => {
@@ -23,16 +23,18 @@ const Home = () => {
       <Hero />
       <section className="home-journey" aria-labelledby="home-journey-title">
         <div className="home-section-heading">
-          <span className="about-eyebrow"><Sparkles size={15} /> A More Thoughtful Job Search</span>
-          <h2 id="home-journey-title">A Clearer Way To Find Your <em>Next.</em></h2>
-          <p>From first search to next step, HireHeaven brings the tools and opportunities together in one welcoming place.</p>
+          <span className="about-eyebrow"><Sparkles size={15} /> Your Next Chapter Starts Here</span>
+          <h2 id="home-journey-title">Make your next move <em>matter.</em></h2>
+          <p>From the first search to a confident next step, find the tools and support to move your career forward.</p>
         </div>
         <div className="home-journey-grid">
-          {journeySteps.map(({ number, icon: Icon, title, text }) => (
+          {journeySteps.map(({ number, label, icon: Icon, title, text, action, href }) => (
             <article className="home-journey-card" key={number}>
-              <div className="home-journey-top"><span>{number}</span><Icon size={21} /></div>
+              <div className="home-journey-top"><span>{number}</span><span className="home-journey-icon"><Icon size={20} /></span></div>
+              <span className="home-journey-kicker">{label}</span>
               <h3>{title}</h3>
               <p>{text}</p>
+              <Link className="home-journey-action" href={href}>{action}<ArrowRight size={16} /></Link>
             </article>
           ))}
         </div>
