@@ -1496,6 +1496,28 @@ label,
 @keyframes reze-pop { from { transform: translateY(0.6rem) scale(0.98); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
 @keyframes reze-rotate { to { transform: rotate(360deg); } }
 
+.character-showcase { width: min(100% - 3rem, 76rem); margin: 0 auto; padding: clamp(3rem, 7vw, 6rem) 0 clamp(4rem, 8vw, 7rem); }
+.character-showcase-heading { max-width: 44rem; margin: 0 auto 2.3rem; text-align: center; }
+.character-showcase-heading h2 { margin: 1rem 0 0.75rem; font-size: clamp(2.3rem, 4.8vw, 3.8rem); line-height: 1.05; }
+.character-showcase-heading h2 em { color: var(--primary); font-family: var(--font-handwriting), cursive; font-size: 1.12em; font-style: normal; letter-spacing: -0.04em; }
+.character-showcase-heading > p { margin: 0 auto; color: var(--muted-foreground); font-size: 1.02rem; line-height: 1.75; }
+.character-showcase-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+.character-showcase-card { overflow: hidden; background: color-mix(in oklch, var(--card) 90%, var(--secondary)); border: 1.5px solid color-mix(in oklch, var(--foreground) 70%, transparent); border-radius: 1.35rem; box-shadow: 4px 4px 0 color-mix(in oklch, var(--foreground) 68%, transparent); transition: transform 200ms ease, box-shadow 200ms ease; }
+.character-showcase-card:hover { transform: translateY(-5px) rotate(-0.4deg); box-shadow: 7px 8px 0 color-mix(in oklch, var(--foreground) 68%, transparent); }
+.character-showcase-art { position: relative; aspect-ratio: 1.22; overflow: hidden; background: color-mix(in oklch, var(--secondary) 75%, var(--card)); isolation: isolate; }
+.character-showcase-art::after { position: absolute; inset: 45% 0 0; background: linear-gradient(transparent, rgb(18 19 35 / 18%)); content: ""; pointer-events: none; }
+.character-showcase-art img { object-fit: cover; object-position: center; transition: transform 450ms cubic-bezier(0.2, 0.75, 0.25, 1); }
+.character-showcase-card:hover .character-showcase-art img { transform: scale(1.045); }
+.character-showcase-index { position: absolute; z-index: 1; top: 0.7rem; left: 0.7rem; display: grid; width: 2rem; height: 2rem; place-items: center; color: var(--foreground); background: color-mix(in oklch, var(--card) 82%, transparent); border: 1px solid color-mix(in oklch, var(--foreground) 28%, transparent); border-radius: 50%; backdrop-filter: blur(8px); font-size: 0.68rem; font-weight: 800; }
+.character-showcase-star { position: absolute; z-index: 1; right: 0.8rem; bottom: 0.35rem; color: #fff2bb; font-size: 1.5rem; text-shadow: 0 2px 12px rgb(0 0 0 / 50%); animation: character-float 3s ease-in-out infinite; }
+.character-showcase-copy { min-height: 6.7rem; padding: 0.9rem 1rem 1rem; }
+.character-showcase-copy h3 { margin: 0; font-size: 1.15rem; }
+.character-showcase-copy p { margin: 0.3rem 0 0; color: var(--muted-foreground); font-size: 0.82rem; line-height: 1.5; }
+.character-violet .character-showcase-art { background: #9d9bb7; }
+.character-peach .character-showcase-art { background: #c2ae9f; }
+.character-amber .character-showcase-art { background: #ad7950; }
+.character-rose .character-showcase-art { background: #403346; }
+
 @keyframes character-float {
   0%, 100% { transform: translateY(0) rotate(-0.15deg); }
   50% { transform: translateY(-4px) rotate(0.15deg); }
@@ -1630,6 +1652,7 @@ label,
   .home-audience-actions { justify-content: flex-start; }
   .about-value-card { min-height: 0; }
   .about-value-card h3 { margin-top: 1.5rem; }
+  .character-showcase-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .contact-layout { grid-template-columns: 1fr; }
 }
 
@@ -1652,6 +1675,12 @@ label,
   .resume-guide-note small { font-size: 0.51rem; }
   .about-page { padding-inline: 1rem; }
   .home-journey, .home-audience { width: calc(100% - 2rem); }
+  .character-showcase { width: calc(100% - 2rem); }
+  .character-showcase-grid { gap: 0.7rem; }
+  .character-showcase-art { aspect-ratio: 1.05; }
+  .character-showcase-copy { min-height: 6.4rem; padding: 0.75rem; }
+  .character-showcase-copy h3 { font-size: 1rem; }
+  .character-showcase-copy p { font-size: 0.73rem; }
   .contact-page { width: calc(100% - 2rem); padding-top: 2.8rem; }
   .contact-hours p { font-size: 0.78rem; }
   .reze-assistant { right: 0.8rem; bottom: 0.8rem; }
