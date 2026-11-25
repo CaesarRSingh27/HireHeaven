@@ -7,6 +7,7 @@ import {
   ArrowUpRight,
   BriefcaseBusiness,
   Building2,
+  Mail,
   Home,
   Info,
   LogOut,
@@ -24,6 +25,7 @@ const navigation = [
   { href: "/", label: "Home", icon: Home },
   { href: "/jobs", label: "Find a job", icon: BriefcaseBusiness },
   { href: "/about", label: "About", icon: Info },
+  { href: "/contact", label: "Contact", icon: Mail },
 ];
 
 const NavBar = () => {
