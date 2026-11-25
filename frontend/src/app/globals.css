@@ -609,15 +609,94 @@ label,
 .talent-character {
   position: relative;
   z-index: 1;
-  width: min(100%, 31rem);
+  display: block;
+  width: auto;
+  max-width: min(100%, 31rem);
+  max-height: 28rem;
   overflow: visible;
-  animation: character-float 4.8s ease-in-out infinite;
+  object-fit: contain;
+  object-position: center bottom;
+  transform-origin: 50% 88%;
+  animation: guide-idle 5.2s ease-in-out infinite;
   filter: drop-shadow(0 20px 20px color-mix(in oklch, var(--foreground) 14%, transparent));
 }
 
-.character-shadow {
-  transform-origin: center;
-  animation: shadow-breathe 4.8s ease-in-out infinite;
+.guide-orbit {
+  position: absolute;
+  z-index: 0;
+  width: 24rem;
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in oklch, var(--primary) 17%, transparent);
+  border-radius: 50%;
+  animation: guide-orbit 24s linear infinite;
+}
+
+.guide-orbit-one { top: 15%; left: 16%; }
+.guide-orbit-two {
+  top: 15%;
+  left: 16%;
+  width: 20rem;
+  border-style: dashed;
+  border-color: color-mix(in oklch, var(--accent-foreground) 16%, transparent);
+  animation-direction: reverse;
+  animation-duration: 32s;
+}
+
+.guide-lapel-pin {
+  position: absolute;
+  z-index: 2;
+  top: 68%;
+  left: 66%;
+  display: grid;
+  width: 2.05rem;
+  height: 2.05rem;
+  place-items: center;
+  color: var(--primary);
+  background: color-mix(in oklch, var(--card) 94%, var(--secondary));
+  border: 2px solid color-mix(in oklch, var(--foreground) 78%, transparent);
+  border-radius: 50%;
+  box-shadow: 2px 2px 0 color-mix(in oklch, var(--foreground) 66%, transparent);
+  animation: pin-glint 4s ease-in-out infinite;
+}
+
+.guide-lapel-pin span {
+  position: absolute;
+  top: 0.12rem;
+  right: 0.12rem;
+  width: 0.42rem;
+  height: 0.42rem;
+  background: oklch(0.7 0.15 157);
+  border: 1px solid var(--card);
+  border-radius: 50%;
+}
+
+.guide-spark {
+  position: absolute;
+  z-index: 1;
+  color: oklch(0.75 0.15 67);
+  font-size: 1.45rem;
+  animation: spark-drift 3.4s ease-in-out infinite;
+}
+
+.guide-spark-one { top: 34%; left: 17%; }
+.guide-spark-two { top: 55%; right: 12%; font-size: 1rem; animation-delay: -1.4s; }
+
+@keyframes guide-idle {
+  0%, 100% { transform: translateY(0) rotate(-0.25deg); }
+  50% { transform: translateY(-7px) rotate(0.25deg); }
+}
+
+@keyframes guide-orbit { to { transform: rotate(360deg); } }
+
+@keyframes pin-glint {
+  0%, 76%, 100% { transform: scale(1); }
+  82% { transform: scale(1.12); }
+  88% { transform: scale(1); }
+}
+
+@keyframes spark-drift {
+  0%, 100% { opacity: 0.55; transform: translateY(0) rotate(0); }
+  50% { opacity: 1; transform: translateY(-5px) rotate(12deg); }
 }
 
 .floating-card {
@@ -1051,7 +1130,7 @@ label,
   .hero-actions, .hero-proof { justify-content: center; }
   .hero-art { width: min(100%, 30rem); margin-inline: auto; }
   .hero-art-panel { min-height: 21rem; }
-  .talent-character { width: min(100%, 25rem); }
+  .talent-character { max-height: 20rem; max-width: 100%; }
   .floating-card-match { top: 10%; right: 0; }
   .floating-card-role { bottom: 8%; left: 0; }
 
@@ -1066,6 +1145,7 @@ label,
 
 @media (max-width: 420px) {
   .hero-art-panel { min-height: 18rem; border-radius: 1.6rem; }
+  .talent-character { max-height: 17rem; }
   .floating-card { gap: 0.5rem; padding: 0.65rem 0.7rem; }
   .floating-icon { width: 2.1rem; height: 2.1rem; }
   .floating-card strong { font-size: 0.78rem; }
