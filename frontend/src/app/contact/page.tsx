@@ -3,7 +3,8 @@
 import { FormEvent, useState } from "react";
 import { Clock3, Mail, MapPin, MessageCircle, Phone, Send, Sparkles } from "lucide-react";
 
-const emailAddress = "info@coffeeshopcaesar.com";
+const emailAddress = "caesarkrish@gmail.com";
+const whatsappNumber = "917376433661";
 
 export default function ContactPage() {
   const [notice, setNotice] = useState("");
@@ -14,10 +15,11 @@ export default function ContactPage() {
     const name = String(form.get("name") || "").trim();
     const email = String(form.get("email") || "").trim();
     const message = String(form.get("message") || "").trim();
-    const subject = encodeURIComponent(`HireHeaven message from ${name}`);
-    const body = encodeURIComponent(`${message}\n\nFrom: ${name}\nEmail: ${email}`);
-    setNotice("Your email app is opening with your message ready to send.");
-    window.location.href = `mailto:${emailAddress}?subject=${subject}&body=${body}`;
+    const whatsappMessage = encodeURIComponent(
+      `Hello HireHeaven, I have a message for you.\n\n${message}\n\nFrom: ${name}\nEmail: ${email}`,
+    );
+    setNotice("WhatsApp is opening with your message ready. Press Send in WhatsApp to deliver it.");
+    window.open(`https://wa.me/${whatsappNumber}?text=${whatsappMessage}`, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -45,9 +47,9 @@ export default function ContactPage() {
             <span className="contact-icon"><Mail size={19} /></span>
             <span><small>Email Us</small><strong>{emailAddress}</strong></span>
           </a>
-          <a className="contact-detail-row" href="tel:+919651170946">
+          <a className="contact-detail-row" href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noreferrer">
             <span className="contact-icon"><Phone size={19} /></span>
-            <span><small>Call Us</small><strong>+91 9651170946</strong></span>
+            <span><small>WhatsApp Us</small><strong>+91 7376433661</strong></span>
           </a>
 
           <div className="contact-hours">
@@ -73,7 +75,7 @@ export default function ContactPage() {
           <textarea id="contact-message" name="message" placeholder="Tell us how we can help…" rows={5} required />
           <button className="contact-submit" type="submit">Send Message <Send size={17} /></button>
           {notice && <p className="contact-notice" role="status">{notice}</p>}
-          <small className="contact-form-footnote">This opens your email app with the message addressed to {emailAddress}.</small>
+          <small className="contact-form-footnote">Your message opens in WhatsApp addressed to +91 7376433661. Press Send in WhatsApp to deliver it.</small>
         </form>
       </section>
     </main>
