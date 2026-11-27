@@ -2004,114 +2004,163 @@ label,
 @media(max-width:1100px) { .workspace-pricing { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:1100px) { .workspace-pricing .workspace-card, .workspace-pricing .workspace-card:nth-child(4), .workspace-pricing .workspace-card:nth-child(5) { grid-column:auto; } }
 
-/* A fuller, clockwise company orbit with a bold, purpose-built HireHeaven mark. */
+/* Restrained half-orbit: company marks follow the visible 6-to-12 arc clockwise. */
 .company-orbit {
-  height:clamp(24rem,39vw,31rem);
+  height:clamp(19rem,31vw,23rem);
   overflow:hidden;
   container-type:inline-size;
-  background:radial-gradient(ellipse at 56% 48%,color-mix(in oklch,var(--primary) 8%,transparent),transparent 62%);
+  background:radial-gradient(ellipse at 50% 50%,color-mix(in oklch,var(--primary) 5%,transparent),transparent 66%);
 }
-.company-orbit-arch, .company-orbit-track {
+.company-orbit-arch, .company-orbit-track-clip {
   position:absolute;
   right:auto;
   bottom:auto;
   top:50%;
   left:50%;
-  width:min(88cqw,29rem);
+  width:min(92cqw,24rem);
   height:auto;
   aspect-ratio:1;
+  transform:translate(-50%,-50%);
 }
 .company-orbit-arch {
-  transform:translate(-50%,-50%);
+  clip-path:inset(0 50% 0 0);
+  border:1px solid color-mix(in oklch,var(--primary) 32%,transparent);
+  border-radius:50%;
   border-color:color-mix(in oklch,var(--primary) 30%,transparent);
-  box-shadow:0 0 0 1rem color-mix(in oklch,var(--primary) 5%,transparent),0 0 0 2rem color-mix(in oklch,var(--primary) 3%,transparent),inset 0 0 2.5rem color-mix(in oklch,var(--primary) 3%,transparent);
+  box-shadow:0 0 0 .75rem color-mix(in oklch,var(--primary) 4%,transparent);
+}
+.company-orbit-track-clip {
+  inset:0;
+  width:auto;
+  height:auto;
+  aspect-ratio:auto;
+  transform:none;
+  /* Keep the logo layer full-width so cards are not cropped at the arc midpoint. */
+  clip-path:none;
+  overflow:visible;
 }
 .company-orbit-track {
-  inset:auto;
-  transform-origin:center;
-  animation:orbit-track-clockwise 38s linear infinite;
+  position:absolute;
+  inset:0;
+  width:auto;
+  height:auto;
+  aspect-ratio:auto;
+  transform:none;
+  animation:none;
+}
+.company-orbit-runner {
+  position:absolute;
+  top:97%;
+  left:50%;
+  z-index:1;
+  width:0;
+  height:0;
+  animation:orbit-runner-clockwise 9s linear infinite;
+}
+.company-orbit-runner::after {
+  position:absolute;
+  top:0;
+  left:0;
+  width:.62rem;
+  height:.62rem;
+  border:2px solid var(--card);
+  border-radius:50%;
+  background:var(--primary);
+  box-shadow:0 0 0 .3rem color-mix(in oklch,var(--primary) 16%,transparent),0 0 18px color-mix(in oklch,var(--primary) 65%,transparent);
+  content:"";
+  transform:translate(-50%,-50%);
 }
 .company-orbit-stop {
   position:absolute;
-  top:50%;
-  left:50%;
+  top:var(--stop-y);
+  left:var(--stop-x);
+  z-index:1;
   display:block;
   width:0;
   height:0;
-  transform:rotate(var(--angle)) translateX(calc(min(88cqw, 29rem) / 2));
+  transform:translate(-50%,-50%);
   animation:none;
 }
-.company-orbit-stop-1 { --angle:90deg; }
-.company-orbit-stop-2 { --angle:150deg; }
-.company-orbit-stop-3 { --angle:210deg; }
-.company-orbit-stop-4 { --angle:270deg; }
-.company-orbit-stop-5 { --angle:330deg; }
-.company-orbit-stop-6 { --angle:30deg; }
+.company-orbit-stop-1 { --stop-x:50%; --stop-y:97%; }
+.company-orbit-stop-2 { --stop-x:25%; --stop-y:84%; }
+.company-orbit-stop-3 { --stop-x:8%; --stop-y:65%; }
+.company-orbit-stop-4 { --stop-x:8%; --stop-y:35%; }
+.company-orbit-stop-5 { --stop-x:25%; --stop-y:16%; }
+.company-orbit-stop-6 { --stop-x:50%; --stop-y:3%; }
 .company-orbit-upright {
   position:absolute;
   top:0;
   left:0;
   display:grid;
   justify-items:center;
-  gap:.5rem;
-  width:6rem;
-  transform:translate(-50%,-50%) rotate(calc(-1 * var(--angle)));
-  animation:orbit-label-counter-clockwise 38s linear infinite;
+  gap:.32rem;
+  width:5.25rem;
+  transform:translate(-50%,-50%);
+  animation:none;
 }
 .company-orbit-logo {
-  width:4.2rem;
-  height:4.2rem;
+  display:grid;
+  width:3.25rem;
+  height:3.25rem;
+  place-items:center;
   border:1px solid color-mix(in oklch,var(--foreground) 14%,transparent);
-  border-radius:1.3rem;
+  border-radius:1rem;
   background:#fff;
-  box-shadow:0 10px 26px color-mix(in oklch,var(--foreground) 14%,transparent),0 0 0 .35rem color-mix(in oklch,var(--card) 75%,transparent);
+  box-shadow:0 7px 18px color-mix(in oklch,var(--foreground) 12%,transparent),0 0 0 .22rem color-mix(in oklch,var(--card) 76%,transparent);
   transition:transform 260ms cubic-bezier(.2,.75,.25,1),box-shadow 260ms ease;
 }
-.company-orbit-logo img { width:2.75rem; height:2.75rem; object-fit:contain; }
-.company-orbit-logo.itc img { width:2.5rem; height:2.75rem; }
-.company-orbit-logo.adobe img { width:2.25rem; height:2.75rem; }
-.company-orbit-logo.infosys img { width:2.8rem; height:2.8rem; }
-.company-orbit-name { padding:.2rem .55rem; border:1px solid color-mix(in oklch,var(--foreground) 10%,transparent); border-radius:999px; background:color-mix(in oklch,var(--card) 90%,transparent); box-shadow:0 4px 12px color-mix(in oklch,var(--foreground) 7%,transparent); color:var(--foreground); font-size:.72rem; font-weight:800; letter-spacing:.01em; white-space:nowrap; }
+.company-orbit-logo img { width:2.15rem; height:2.15rem; object-fit:contain; }
+.company-orbit-logo.itc img { width:1.95rem; height:2.25rem; }
+.company-orbit-logo.adobe img { width:1.8rem; height:2.15rem; }
+.company-orbit-logo.infosys img { width:2.25rem; height:2.25rem; }
+.company-orbit-name { padding:.12rem .48rem; border:1px solid color-mix(in oklch,var(--foreground) 9%,transparent); border-radius:999px; background:color-mix(in oklch,var(--card) 91%,transparent); color:var(--muted-foreground); font-size:.66rem; font-weight:750; letter-spacing:.015em; white-space:nowrap; }
 .company-orbit-stop:hover .company-orbit-logo { transform:scale(1.14) rotate(-5deg); box-shadow:0 15px 32px color-mix(in oklch,var(--primary) 22%,transparent),0 0 0 .42rem color-mix(in oklch,var(--card) 72%,transparent); }
-.company-orbit:has(.company-orbit-stop:hover) .company-orbit-track { animation-play-state:paused; }
+.company-orbit:has(.company-orbit-stop:hover) .company-orbit-runner { animation-play-state:paused; }
 .company-orbit-core {
   top:50%;
   bottom:auto;
   left:50%;
   z-index:2;
-  width:9.2rem;
-  height:9.2rem;
-  gap:.42rem;
-  border:1px solid color-mix(in oklch,var(--foreground) 14%,transparent);
-  border-radius:2.5rem;
-  background:color-mix(in oklch,var(--card) 92%,var(--secondary));
-  box-shadow:0 0 0 .8rem color-mix(in oklch,var(--card) 58%,transparent),0 18px 48px color-mix(in oklch,var(--foreground) 16%,transparent);
-  transform:translate(-50%,-50%) rotate(-4deg);
+  width:6.4rem;
+  height:6.4rem;
+  gap:.12rem;
+  border:1px solid color-mix(in oklch,var(--primary) 26%,transparent);
+  border-radius:50%;
+  background:color-mix(in oklch,var(--card) 96%,var(--secondary));
+  box-shadow:0 0 0 .52rem color-mix(in oklch,var(--primary) 5%,transparent),0 12px 32px color-mix(in oklch,var(--foreground) 11%,transparent);
+  transform:translate(-50%,-50%);
   transition:transform 320ms cubic-bezier(.2,.75,.25,1),box-shadow 320ms ease;
 }
-.company-orbit-core img { width:5.8rem; height:5.8rem; }
-.company-orbit-core small { font-size:.55rem; font-weight:850; letter-spacing:.16em; }
-.company-orbit:hover .company-orbit-core { transform:translate(-50%,-50%) rotate(0) scale(1.045); box-shadow:0 0 0 .95rem color-mix(in oklch,var(--primary) 8%,transparent),0 24px 58px color-mix(in oklch,var(--foreground) 19%,transparent); }
-@keyframes orbit-track-clockwise { from { transform:translate(-50%,-50%) rotate(0deg); } to { transform:translate(-50%,-50%) rotate(360deg); } }
+.company-orbit-core img { width:3.7rem; height:3.7rem; }
+.company-orbit-core small { color:var(--muted-foreground); font-size:.42rem; font-weight:850; letter-spacing:.13em; }
+.company-orbit:hover .company-orbit-core { transform:translate(-50%,-50%) scale(1.035); box-shadow:0 0 0 .62rem color-mix(in oklch,var(--primary) 7%,transparent),0 16px 36px color-mix(in oklch,var(--foreground) 14%,transparent); }
+@keyframes orbit-runner-clockwise {
+  0% { left:50%; top:97%; opacity:0; }
+  8% { opacity:1; }
+  24% { left:25%; top:84%; }
+  42% { left:8%; top:65%; }
+  58% { left:8%; top:35%; }
+  76% { left:25%; top:16%; }
+  92% { left:50%; top:3%; opacity:1; }
+  100% { left:50%; top:3%; opacity:0; }
+}
 @keyframes orbit-label-counter-clockwise { from { transform:translate(-50%,-50%) rotate(calc(-1 * var(--angle))); } to { transform:translate(-50%,-50%) rotate(calc(-360deg - var(--angle))); } }
 .dark .company-orbit-logo { background:#fff; box-shadow:0 10px 28px #0008,0 0 0 .35rem color-mix(in oklch,var(--card) 72%,transparent); }
 .dark .company-orbit-core { background:color-mix(in oklch,var(--card) 85%,#28233b); }
 @media(max-width:760px) {
-  .company-orbit { height:22rem; }
-  .company-orbit-arch,.company-orbit-track { width:min(91cqw,21rem); }
-  .company-orbit-logo { width:3.65rem; height:3.65rem; border-radius:1.1rem; }
-  .company-orbit-logo img { width:2.35rem; height:2.35rem; }
-  .company-orbit-logo.itc img { width:2.1rem; height:2.4rem; }
-  .company-orbit-logo.adobe img { width:1.95rem; height:2.4rem; }
-  .company-orbit-stop { transform:rotate(var(--angle)) translateX(calc(min(91cqw, 21rem) / 2)); }
-  .company-orbit-upright { width:5rem; transform:translate(-50%,-50%) rotate(calc(-1 * var(--angle))); }
-  .company-orbit-core { width:7.5rem; height:7.5rem; border-radius:2.1rem; }
-  .company-orbit-core img { width:4.7rem; height:4.7rem; }
-  .company-orbit-core small { font-size:.47rem; }
+  .company-orbit { height:19rem; }
+  .company-orbit-arch { width:min(86cqw,19rem); }
+  .company-orbit-logo { width:2.8rem; height:2.8rem; border-radius:.85rem; }
+  .company-orbit-logo img { width:1.85rem; height:1.85rem; }
+  .company-orbit-logo.itc img { width:1.7rem; height:1.95rem; }
+  .company-orbit-logo.adobe img { width:1.55rem; height:1.85rem; }
+  .company-orbit-core { width:5.5rem; height:5.5rem; }
+  .company-orbit-core img { width:3.15rem; height:3.15rem; }
+  .company-orbit-core small { font-size:.36rem; }
   @keyframes orbit-label-counter-clockwise { from { transform:translate(-50%,-50%) rotate(calc(-1 * var(--angle))); } to { transform:translate(-50%,-50%) rotate(calc(-360deg - var(--angle))); } }
 }
 @media(prefers-reduced-motion:reduce) {
-  .company-orbit-track,.company-orbit-upright { animation:none!important; }
+  .company-orbit-runner,.company-orbit-upright { animation:none!important; }
 }
 @media(max-width:600px) { .workspace-pricing { grid-template-columns:1fr; } .workspace-pricing .workspace-card { min-height:0; } }
 

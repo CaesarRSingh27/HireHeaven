@@ -17,19 +17,22 @@ export default function CompanyOrbit() {
       </div>
       <div className="company-orbit" role="img" aria-label="ITC, NVIDIA, Razorpay, Infosys, Tata and Adobe company marks orbiting HireHeaven">
         <div className="company-orbit-arch" />
-        <div className="company-orbit-track">
-          {companies.map(({ name, src, tone }, index) => (
-            <div
-              className={`company-orbit-stop company-orbit-stop-${index + 1}`}
-              key={name}
-              title={name}
-            >
-              <span className="company-orbit-upright">
-                <span className={`company-orbit-logo ${tone}`}><img src={src} alt="" /></span>
-                <span className="company-orbit-name">{name}</span>
-              </span>
-            </div>
-          ))}
+        <div className="company-orbit-track-clip">
+          <div className="company-orbit-track">
+            {companies.map(({ name, src, tone }, index) => (
+              <div
+                className={`company-orbit-stop company-orbit-stop-${index + 1}`}
+                key={name}
+                title={name}
+              >
+                <span className="company-orbit-upright">
+                  <span className={`company-orbit-logo ${tone}`}><img src={src} alt="" /></span>
+                  <span className="company-orbit-name">{name}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+          <span className="company-orbit-runner" aria-hidden="true" />
         </div>
         <div className="company-orbit-core"><img src="/hireheaven-mark.svg" alt="" /><small>HIREHEAVEN</small></div>
       </div>
