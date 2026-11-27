@@ -12,7 +12,7 @@ export default function CompanyOrbit() {
     <section className="company-orbit-section" aria-label="Companies across the opportunity landscape">
       <div className="company-orbit-copy">
         <span className="about-eyebrow">A wider world of work</span>
-        <h2>Possibility has <em>many paths.</em></h2>
+        <h2>Possibility Has <em>Many Paths.</em></h2>
         <p>Explore opportunities across the names and industries shaping what comes next.</p>
       </div>
       <div className="company-orbit" role="img" aria-label="ITC, NVIDIA, Razorpay, Infosys, Tata and Adobe company marks orbiting HireHeaven">
