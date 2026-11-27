@@ -168,7 +168,7 @@ router.put("/admin/companies/:companyId/verify", handle(async (req, res) => {
   if (typeof req.body.verified !== "boolean") throw new ErrorHandler(400, "Choose whether to verify this company");
   const [company] = await sql`UPDATE companies SET is_verified=${req.body.verified},
     verified_at=CASE WHEN ${req.body.verified} THEN now() ELSE NULL END,
-    verified_by=CASE WHEN ${req.body.verified} THEN ${req.user!.user_id} ELSE NULL END
+    verified_by=CASE WHEN ${req.body.verified} THEN ${req.user!.user_id}::integer ELSE NULL END
     WHERE company_id=${companyId} RETURNING company_id,is_verified,verified_at`;
   if (!company) throw new ErrorHandler(404, "Company not found");
   res.json(company);
@@ -184,7 +184,7 @@ router.put("/admin/users/:userId/suspension", handle(async (req, res) => {
   if (suspended && note.length < 5) throw new ErrorHandler(400, "Add a short reason before suspending this account");
   const [account] = await sql`UPDATE users SET is_suspended=${suspended},suspension_note=${note},
     suspended_at=CASE WHEN ${suspended} THEN now() ELSE NULL END,
-    suspended_by=CASE WHEN ${suspended} THEN ${req.user!.user_id} ELSE NULL END
+    suspended_by=CASE WHEN ${suspended} THEN ${req.user!.user_id}::integer ELSE NULL END
     WHERE user_id=${userId} AND role<>'admin'
     RETURNING user_id,name,is_suspended,suspension_note`;
   if (!account) throw new ErrorHandler(404, "Non-admin account not found");
