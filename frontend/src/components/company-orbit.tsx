@@ -7,6 +7,10 @@ const companies = [
   { name: "Adobe", src: "/company-logos/adobe.svg", tone: "adobe" },
   { name: "OpenAI", src: "/company-logos/openai.svg", tone: "openai" },
   { name: "Anthropic", src: "/company-logos/anthropic.svg", tone: "anthropic" },
+  { name: "Google", src: "/company-logos/google.svg", tone: "google" },
+  { name: "Microsoft", src: "/company-logos/microsoft.svg", tone: "microsoft" },
+  { name: "Amazon", src: "/company-logos/amazon.svg", tone: "amazon" },
+  { name: "Meta", src: "/company-logos/meta.svg", tone: "meta" },
 ];
 
 export default function CompanyOrbit() {
@@ -17,7 +21,7 @@ export default function CompanyOrbit() {
         <h2>Possibility Has <em>Many Paths.</em></h2>
         <p>Explore opportunities across the names and industries shaping what comes next.</p>
       </div>
-      <div className="company-orbit" role="group" aria-label="Company logos orbiting HireHeaven: ITC, NVIDIA, Razorpay, Infosys, Tata, Adobe, OpenAI and Anthropic">
+      <div className="company-orbit" role="group" aria-label="Company logos orbiting HireHeaven: ITC, NVIDIA, Razorpay, Infosys, Tata, Adobe, OpenAI, Anthropic, Google, Microsoft, Amazon and Meta">
         <div className="company-orbit-arch" />
         <div className="company-orbit-track-clip">
           <div className="company-orbit-track">

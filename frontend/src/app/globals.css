@@ -2206,16 +2206,20 @@ label,
   width:0;
   height:0;
   transform:none;
-  animation:company-icon-clockwise 24s linear infinite;
+  animation:company-icon-clockwise 30s linear infinite;
 }
 .company-orbit-stop-1 { animation-delay:0s; }
-.company-orbit-stop-2 { animation-delay:-3s; }
-.company-orbit-stop-3 { animation-delay:-6s; }
-.company-orbit-stop-4 { animation-delay:-9s; }
-.company-orbit-stop-5 { animation-delay:-12s; }
-.company-orbit-stop-6 { animation-delay:-15s; }
-.company-orbit-stop-7 { animation-delay:-18s; }
-.company-orbit-stop-8 { animation-delay:-21s; }
+.company-orbit-stop-2 { animation-delay:-2.5s; }
+.company-orbit-stop-3 { animation-delay:-5s; }
+.company-orbit-stop-4 { animation-delay:-7.5s; }
+.company-orbit-stop-5 { animation-delay:-10s; }
+.company-orbit-stop-6 { animation-delay:-12.5s; }
+.company-orbit-stop-7 { animation-delay:-15s; }
+.company-orbit-stop-8 { animation-delay:-17.5s; }
+.company-orbit-stop-9 { animation-delay:-20s; }
+.company-orbit-stop-10 { animation-delay:-22.5s; }
+.company-orbit-stop-11 { animation-delay:-25s; }
+.company-orbit-stop-12 { animation-delay:-27.5s; }
 .company-orbit-upright {
   position:absolute;
   top:0;
@@ -2229,8 +2233,8 @@ label,
 }
 .company-orbit-logo {
   display:grid;
-  width:2.85rem;
-  height:2.85rem;
+  width:2.4rem;
+  height:2.4rem;
   place-items:center;
   border:1px solid color-mix(in oklch,var(--foreground) 14%,transparent);
   border-radius:.9rem;
@@ -2244,6 +2248,10 @@ label,
 .company-orbit-logo.infosys img { width:82%; height:82%; }
 .company-orbit-logo.openai img { width:73%; height:73%; }
 .company-orbit-logo.anthropic img { width:62%; height:76%; }
+.company-orbit-logo.microsoft img { width:68%; height:68%; }
+.company-orbit-logo.amazon img { width:78%; height:68%; }
+.company-orbit-logo.google img { width:70%; height:70%; }
+.company-orbit-logo.meta img { width:72%; height:72%; }
 .company-orbit-name { display:none; }
 .company-orbit-stop:hover .company-orbit-logo { transform:scale(1.12); box-shadow:0 14px 28px color-mix(in oklch,var(--primary) 20%,transparent),0 0 0 .35rem color-mix(in oklch,var(--card) 75%,transparent); }
 .company-orbit-runner { display:none; }
@@ -2305,7 +2313,7 @@ label,
   .company-orbit-arch,
   .company-orbit-track-clip,
   .company-orbit-core { left:55%; }
-  .company-orbit-logo { width:2.5rem; height:2.5rem; border-radius:.78rem; }
+  .company-orbit-logo { width:2rem; height:2rem; border-radius:.68rem; }
   .company-orbit-upright { width:2.6rem; height:2.6rem; }
   .company-orbit-core { width:5.5rem; height:5.5rem; }
   .company-orbit-core img { width:3.15rem; height:3.15rem; }
