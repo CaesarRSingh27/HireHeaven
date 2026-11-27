@@ -22,6 +22,7 @@ export default function MotionCard({
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
+    if (!("IntersectionObserver" in window)) { setVisible(true); return; }
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {

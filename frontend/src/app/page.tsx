@@ -46,15 +46,19 @@ const Home = () => {
       <CarrerGuide />
       <ResumeAnalyzer />
       <section className="home-audience" aria-labelledby="home-audience-title">
-        <MotionCard as="div" className="home-audience-copy">
+        <div className="home-audience-copy">
           <span className="about-eyebrow"><UsersRound size={15} /> Good Things Happen When People Connect</span>
           <h2 id="home-audience-title">Your Next Chapter Starts With A <em>Connection.</em></h2>
           <p>Whether you’re ready to find your next role or bring the right person onto your team, start with a simple next step.</p>
-        </MotionCard>
-        <MotionCard as="div" className="home-audience-actions" delay={100}>
+          <div className="home-audience-highlights"><span>✦ Explore possibilities</span><span>✦ Meet your next team</span></div>
+        </div>
+        <div className="home-audience-side">
+          <div className="home-audience-illustration" aria-hidden="true"><span>✦</span><strong>Better<br /><em>together.</em></strong><i>↗</i></div>
+          <div className="home-audience-actions">
           <Link href="/jobs"><Button size="lg" className="gap-2">Find A Job <ArrowRight size={18} /></Button></Link>
           <Link href="/register"><Button size="lg" variant="outline" className="gap-2">Meet Your Next Hire <ArrowRight size={18} /></Button></Link>
-        </MotionCard>
+          </div>
+        </div>
       </section>
     </div>
   );

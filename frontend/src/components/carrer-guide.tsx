@@ -106,7 +106,7 @@ const CarrerGuide = () => {
         </div>
 
         <div className="career-feature-copy">
-          <div className="feature-overline"><span>01</span> THE CAREER COMPASS</div>
+          <div className="feature-overline">THE CAREER COMPASS</div>
           <h2 className="feature-display-title">
             Find a path that feels <em>like yours.</em>
           </h2>

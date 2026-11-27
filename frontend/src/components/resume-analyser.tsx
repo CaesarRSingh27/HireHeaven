@@ -118,7 +118,7 @@ const ResumeAnalyzer = () => {
     <section className="max-w-7xl mx-auto px-4 py-16 tool-section resume-section">
       <div className="resume-feature-shell">
         <div className="resume-feature-copy">
-          <div className="feature-overline resume-overline"><span>02</span> THE RESUME STUDIO</div>
+          <div className="feature-overline resume-overline">THE RESUME STUDIO</div>
           <h2 className="feature-display-title">
             Make your experience <em>stand out.</em>
           </h2>
