@@ -1,10 +1,10 @@
 const companies = [
-  { name: "ITC", mark: "ITC", tone: "itc" },
+  { name: "ITC", src: "/company-logos/itc.svg", tone: "itc" },
   { name: "NVIDIA", src: "/company-logos/nvidia.svg", tone: "nvidia" },
   { name: "Razorpay", src: "/company-logos/razorpay.svg", tone: "razorpay" },
   { name: "Infosys", src: "/company-logos/infosys.svg", tone: "infosys" },
   { name: "Tata", src: "/company-logos/tata.svg", tone: "tata" },
-  { name: "Adobe", mark: "A", tone: "adobe" },
+  { name: "Adobe", src: "/company-logos/adobe.svg", tone: "adobe" },
 ];
 
 export default function CompanyOrbit() {
@@ -18,22 +18,20 @@ export default function CompanyOrbit() {
       <div className="company-orbit" role="img" aria-label="ITC, NVIDIA, Razorpay, Infosys, Tata and Adobe company marks orbiting HireHeaven">
         <div className="company-orbit-arch" />
         <div className="company-orbit-track">
-          {companies.map(({ name, mark, src, tone }, index) => (
+          {companies.map(({ name, src, tone }, index) => (
             <div
               className={`company-orbit-stop company-orbit-stop-${index + 1}`}
               key={name}
               title={name}
             >
               <span className="company-orbit-upright">
-                <span className={`company-orbit-logo ${tone}`}>
-                  {src ? <img src={src} alt="" /> : mark}
-                </span>
+                <span className={`company-orbit-logo ${tone}`}><img src={src} alt="" /></span>
                 <span className="company-orbit-name">{name}</span>
               </span>
             </div>
           ))}
         </div>
-        <div className="company-orbit-core"><span>HH</span><small>OPPORTUNITY</small></div>
+        <div className="company-orbit-core"><img src="/hireheaven-mark.svg" alt="" /><small>HIREHEAVEN</small></div>
       </div>
     </section>
   );

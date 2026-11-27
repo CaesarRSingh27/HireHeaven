@@ -1965,7 +1965,41 @@ label,
 .workspace-pricing .workspace-card > a, .workspace-pricing .workspace-card > button { margin-top:auto; }
 .workspace-pricing .workspace-card > p { min-height:3.4rem; }
 .workspace-pricing ul { padding-left: 1.1rem; list-style: disc; font-size: .9rem; line-height: 1.8; margin-bottom: 1.4rem; flex: 1; }
+/* One circle defines both the line and the path of each company mark. */
+.company-orbit { height: clamp(18rem, 32vw, 22rem); }
+.company-orbit-arch, .company-orbit-track { position:absolute; width:min(75%, 26rem); height:auto; aspect-ratio:1; left:50%; top:auto; bottom:4rem; right:auto; }
+.company-orbit-arch { transform:translate(-50%, 50%); }
+.company-orbit-track { inset:auto auto 4rem 50%; transform-origin:center; animation:orbit-track-turn 30s linear infinite; }
+.company-orbit-stop { left:50%; top:50%; width:0; height:0; display:block; transform:rotate(var(--angle)); animation:none; }
+.company-orbit-stop-1 { --angle:0deg; }
+.company-orbit-stop-2 { --angle:60deg; }
+.company-orbit-stop-3 { --angle:120deg; }
+.company-orbit-stop-4 { --angle:180deg; }
+.company-orbit-stop-5 { --angle:240deg; }
+.company-orbit-stop-6 { --angle:300deg; }
+.company-orbit-upright { position:absolute; left:0; top:0; width:5.5rem; transform:translate(-50%,-50%) translateX(calc(min(75cqw, 26rem) / 2)) rotate(calc(-1 * var(--angle))); animation:orbit-counter-turn 30s linear infinite; }
+.company-orbit { container-type:inline-size; }
+.company-orbit-logo.infosys { width:3.15rem; min-width:0; padding:0; }
+.company-orbit-logo img { width:70%; height:70%; object-fit:contain; }
+.company-orbit-core { bottom:4rem; transform:translate(-50%,50%); z-index:2; }
+.company-orbit-core img { width:2rem; height:2rem; }
+@keyframes orbit-track-turn { from { transform:translate(-50%,50%) rotate(0deg); } to { transform:translate(-50%,50%) rotate(-360deg); } }
+@keyframes orbit-counter-turn { from { transform:translate(-50%,-50%) translateX(calc(min(75cqw, 26rem) / 2)) rotate(calc(-1 * var(--angle))); } to { transform:translate(-50%,-50%) translateX(calc(min(75cqw, 26rem) / 2)) rotate(calc(360deg - var(--angle))); } }
+.hero-title-accent { font-family:var(--font-handwriting),cursive; font-size:1.05em; font-weight:700; letter-spacing:-.035em; line-height:1.05; }
+.workspace-pricing { grid-template-columns:repeat(6,minmax(0,1fr)); }
+.workspace-pricing .workspace-card { grid-column:span 2; }
+.workspace-pricing .workspace-card:nth-child(4) { grid-column:2 / span 2; }
+.workspace-pricing .workspace-card:nth-child(5) { grid-column:4 / span 2; }
+.hero-copy > * { animation:brand-page-arrive 700ms cubic-bezier(.2,.75,.25,1) both; }
+.hero-copy > :nth-child(2) { animation-delay:90ms; }
+.hero-copy > :nth-child(3) { animation-delay:180ms; }
+.hero-copy > :nth-child(4) { animation-delay:270ms; }
+.hero-copy > :nth-child(5) { animation-delay:360ms; }
+.about-story, .about-visual-wrap { animation-fill-mode:backwards; }
+.home-journey-card:hover .home-journey-icon, .about-journey-card:hover .about-journey-top svg, .about-value-card:hover .about-value-topline svg { transform:translateY(-4px) rotate(-9deg) scale(1.08); }
+.home-journey-icon { transition:transform 350ms cubic-bezier(.2,.8,.2,1); }
 @media(max-width:1100px) { .workspace-pricing { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:1100px) { .workspace-pricing .workspace-card, .workspace-pricing .workspace-card:nth-child(4), .workspace-pricing .workspace-card:nth-child(5) { grid-column:auto; } }
 @media(max-width:600px) { .workspace-pricing { grid-template-columns:1fr; } .workspace-pricing .workspace-card { min-height:0; } }
 .workspace-price { font-size: 2.8rem; letter-spacing: -.06em; font-family: var(--font-display),sans-serif; }
 .workspace-plan-status { color: var(--muted-foreground); line-height: 1.7; margin-block: 1.5rem; font-size: .85rem; }
