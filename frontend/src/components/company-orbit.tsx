@@ -1,9 +1,9 @@
 const companies = [
   { name: "ITC", mark: "ITC", tone: "itc" },
-  { name: "NVIDIA", mark: "N", tone: "nvidia" },
-  { name: "Razorpay", mark: "R", tone: "razorpay" },
-  { name: "Infosys", mark: "Infosys", tone: "infosys" },
-  { name: "Tata", mark: "T", tone: "tata" },
+  { name: "NVIDIA", src: "/company-logos/nvidia.svg", tone: "nvidia" },
+  { name: "Razorpay", src: "/company-logos/razorpay.svg", tone: "razorpay" },
+  { name: "Infosys", src: "/company-logos/infosys.svg", tone: "infosys" },
+  { name: "Tata", src: "/company-logos/tata.svg", tone: "tata" },
   { name: "Adobe", mark: "A", tone: "adobe" },
 ];
 
@@ -15,16 +15,21 @@ export default function CompanyOrbit() {
         <h2>Possibility has <em>many paths.</em></h2>
         <p>Explore opportunities across the names and industries shaping what comes next.</p>
       </div>
-      <div className="company-orbit" aria-hidden="true">
+      <div className="company-orbit" role="img" aria-label="ITC, NVIDIA, Razorpay, Infosys, Tata and Adobe company marks orbiting HireHeaven">
         <div className="company-orbit-arch" />
         <div className="company-orbit-track">
-          {companies.map(({ name, mark, tone }, index) => (
+          {companies.map(({ name, mark, src, tone }, index) => (
             <div
               className={`company-orbit-stop company-orbit-stop-${index + 1}`}
               key={name}
+              title={name}
             >
-              <span className={`company-orbit-logo ${tone}`}>{mark}</span>
-              <span className="company-orbit-name">{name}</span>
+              <span className="company-orbit-upright">
+                <span className={`company-orbit-logo ${tone}`}>
+                  {src ? <img src={src} alt="" /> : mark}
+                </span>
+                <span className="company-orbit-name">{name}</span>
+              </span>
             </div>
           ))}
         </div>
