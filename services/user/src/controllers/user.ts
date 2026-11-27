@@ -332,6 +332,9 @@ export const applyForJob = TryCatch(async (req: AuthenticatedRequest, res) => {
   try {
     [newApplication] =
       await sql`INSERT INTO applications (job_id, applicant_id, applicant_email, resume, subscribed) VALUES (${job_id}, ${applicant_id}, ${user?.email}, ${resume}, ${isSubscribed}) RETURNING *`;
+    await sql`INSERT INTO application_events(application_id,status,note,created_at)
+      VALUES(${newApplication.application_id},'Submitted','Application sent',${newApplication.applied_at})
+      ON CONFLICT DO NOTHING`;
   } catch (error: any) {
     if (error.code === "23505") {
       throw new ErrorHandler(409, "you have already applied to this job.");

@@ -1,10 +1,12 @@
 "use client";
 
 import axios from "axios";
+import Cookies from "js-cookie";
 import Image from "next/image";
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { Bot, LoaderCircle, MessageCircle, Send, Sparkles, X } from "lucide-react";
 import { utils_service } from "@/context/AppContext";
+import { workspaceApi } from "@/lib/workspace";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
 
@@ -40,8 +42,18 @@ export default function RezeChat() {
     setIsSending(true);
 
     try {
+      let liveContext: unknown;
+      const asksForLiveInfo = /\b(jobs?|openings?|roles?|positions?|applications?|applied|shortlisted|interviews?|hired|rejected)\b/i.test(content);
+      if (Cookies.get("token") && asksForLiveInfo) {
+        try {
+          liveContext = (await workspaceApi("/reze-context", "POST", { question: content })).data;
+        } catch {
+          // Keep Reze useful even if the optional account context is unavailable.
+        }
+      }
       const { data } = await axios.post(`${utils_service}/api/utils/chat`, {
         messages: conversation.slice(-12).map(({ role, content: message }) => ({ role, content: message })),
+        ...(liveContext ? { liveContext } : {}),
       });
       setMessages((current) => [...current, { role: "assistant", content: data.reply }]);
     } catch (error: any) {

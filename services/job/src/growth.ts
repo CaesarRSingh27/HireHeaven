@@ -5,6 +5,7 @@ import { sql } from "./utils/db.js";
 import { isAuth, type AuthenticatedRequest } from "./middlewares/auth.js";
 import { TryCatch } from "./utils/TryCatch.js";
 import ErrorHandler from "./utils/errorHandler.js";
+import { publishToTopic } from "./producer.js";
 
 const router = express.Router();
 const handle = (
@@ -26,6 +27,14 @@ const candidate = (req: AuthenticatedRequest) => {
   if (req.user?.role !== "jobseeker")
     throw new ErrorHandler(403, "Candidate access required");
 };
+const html = (value: string) => value.replace(/[&<>"']/g, (char) => ({
+  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+})[char]!);
+const mail = (to: string, subject: string, heading: string, body: string) =>
+  publishToTopic("send-mail", {
+    to, subject,
+    html: `<div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;padding:28px;color:#171827"><h2>${html(heading)}</h2><p style="line-height:1.7">${body}</p><p><a href="${html(process.env.PUBLIC_URL || "http://localhost")}/workspace">Open your HireHeaven workspace</a></p></div>`,
+  });
 async function premium(userId: number, plan: string) {
   const [row] =
     await sql`SELECT 1 FROM growth_entitlements WHERE user_id=${userId} AND plan=${plan} AND expires_at>now()`;
@@ -130,12 +139,22 @@ router.get(
       AND COALESCE(j.location,'') ILIKE '%'||a.location||'%'
     JOIN companies c USING(company_id) WHERE a.user_id=${userId} ORDER BY j.created_at DESC LIMIT 50`;
     const updates =
-      await sql`SELECT a.application_id,a.status,j.title FROM applications a JOIN jobs j USING(job_id)
-    WHERE a.applicant_id=${userId} AND a.status<>'Submitted' ORDER BY a.applied_at DESC LIMIT 50`;
+      await sql`SELECT a.application_id,a.status,j.title,a.applied_at,
+        COALESCE((SELECT json_agg(json_build_object('status',e.status,'note',e.note,'created_at',e.created_at) ORDER BY e.created_at)
+          FROM application_events e WHERE e.application_id=a.application_id), '[]'::json) AS timeline
+        FROM applications a JOIN jobs j USING(job_id)
+        WHERE a.applicant_id=${userId} ORDER BY a.applied_at DESC LIMIT 100`;
     const [portfolio] =
       await sql`SELECT * FROM portfolios WHERE user_id=${userId}`;
     const interviews =
       await sql`SELECT * FROM interview_sessions WHERE user_id=${userId} ORDER BY created_at DESC LIMIT 20`;
+    const meetings = req.user!.role === "jobseeker"
+      ? await sql`SELECT m.id,m.application_id,m.scheduled_at,m.status,m.meeting_url,j.title AS job_title,u.name AS recruiter_name
+          FROM interview_meetings m JOIN applications a USING(application_id) JOIN jobs j USING(job_id)
+          JOIN users u ON u.user_id=m.recruiter_id WHERE m.candidate_id=${userId} ORDER BY m.scheduled_at LIMIT 30`
+      : await sql`SELECT m.id,m.application_id,m.scheduled_at,m.status,m.meeting_url,j.title AS job_title,u.name AS candidate_name
+          FROM interview_meetings m JOIN applications a USING(application_id) JOIN jobs j USING(job_id)
+          JOIN users u ON u.user_id=m.candidate_id WHERE m.recruiter_id=${userId} ORDER BY m.scheduled_at LIMIT 30`;
     const registrations =
       await sql`SELECT r.*,d.title,d.college FROM placement_registrations r JOIN placement_drives d ON d.id=r.drive_id WHERE r.user_id=${userId}`;
     await sql`INSERT INTO growth_events(user_id,event) VALUES(${userId},'workspace_visit')`;
@@ -148,6 +167,7 @@ router.get(
       updates,
       portfolio: portfolio ?? null,
       interviews,
+      meetings,
       registrations,
     });
   }),
@@ -177,16 +197,45 @@ router.post(
     candidate(req);
     const title = text(req.body.title, 120),
       location = text(req.body.location, 120);
+    const emailEnabled = req.body.email_enabled === true;
+    const frequency = req.body.frequency === "weekly" ? "weekly" : "daily";
     if (!title && !location)
       throw new ErrorHandler(400, "Enter a role or location for your alert");
     const [count] =
       await sql`SELECT count(*) FROM job_alerts WHERE user_id=${req.user!.user_id}`;
     if (Number(count.count) >= 20)
       throw new ErrorHandler(400, "You can keep up to 20 alerts");
-    await sql`INSERT INTO job_alerts(user_id,title,location) VALUES(${req.user!.user_id},${title},${location}) ON CONFLICT DO NOTHING`;
-    res.json({ message: "Alert saved. New matches appear in your workspace." });
+    await sql`INSERT INTO job_alerts(user_id,title,location,email_enabled,frequency,next_digest_at)
+      VALUES(${req.user!.user_id},${title},${location},${emailEnabled},${frequency},
+        CASE WHEN ${emailEnabled} THEN now()+CASE WHEN ${frequency}='weekly' THEN interval '7 days' ELSE interval '1 day' END ELSE NULL END)
+      ON CONFLICT(user_id,title,location) DO UPDATE SET email_enabled=EXCLUDED.email_enabled,
+        frequency=EXCLUDED.frequency,next_digest_at=EXCLUDED.next_digest_at`;
+    res.json({ message: emailEnabled ? `Alert saved. ${frequency === "weekly" ? "Weekly" : "Daily"} email digests are on.` : "Alert saved. New matches appear in your workspace." });
   }),
 );
+
+// Reze's live context is fetched only after authentication; application data
+// is scoped to the signed-in candidate and never exposed to another account.
+router.post("/reze-context", handle(async (req, res) => {
+  const question = text(req.body.question, 500).toLowerCase();
+  const terms = [...new Set(question.match(/[a-z0-9+#.-]{3,}/g) ?? [])]
+    .filter((term) => !["what", "where", "when", "how", "can", "the", "for", "and", "with", "about", "show", "find", "jobs", "job", "openings", "please"].includes(term))
+    .slice(0, 6);
+  const jobs = await sql`SELECT j.job_id,j.title,j.location,j.job_type,j.work_location,c.name AS company_name
+    FROM jobs j JOIN companies c USING(company_id)
+    WHERE j.is_active=true AND (${terms}::text[] = '{}'::text[] OR EXISTS(
+      SELECT 1 FROM unnest(${terms}::text[]) AS term WHERE j.title ILIKE '%'||term||'%'
+        OR COALESCE(j.location,'') ILIKE '%'||term||'%' OR c.name ILIKE '%'||term||'%'))
+    ORDER BY j.featured_until DESC NULLS LAST,j.created_at DESC LIMIT 6`;
+  const isCandidate = req.user!.role === "jobseeker";
+  const asksApplications = /my application|my applications|application status|did i apply|have i applied|shortlist|interview status|my interview|rejected|hired/.test(question);
+  const applications = isCandidate && asksApplications
+    ? await sql`SELECT a.application_id,a.status,a.applied_at,j.title,c.name AS company_name
+        FROM applications a JOIN jobs j USING(job_id) JOIN companies c USING(company_id)
+        WHERE a.applicant_id=${req.user!.user_id} ORDER BY a.applied_at DESC LIMIT 12`
+    : [];
+  res.json({ jobs, applications });
+}));
 router.delete(
   "/alerts/:id",
   handle(async (req, res) => {
@@ -388,9 +437,70 @@ router.get(
     (SELECT a.applicant_id FROM applications a JOIN jobs j USING(job_id) WHERE j.posted_by_recuriter_id=${userId})
     AND EXISTS(SELECT 1 FROM growth_events previous WHERE previous.user_id=e.user_id AND previous.created_at::date<e.created_at::date)`
       : [];
-    res.json({ jobs, applications, funnel, analytics, engagement, pro });
+    const meetings = await sql`SELECT m.id,m.application_id,m.scheduled_at,m.status,m.meeting_url,
+      j.title AS job_title,u.name AS candidate_name FROM interview_meetings m
+      JOIN applications a USING(application_id) JOIN jobs j USING(job_id)
+      JOIN users u ON u.user_id=m.candidate_id WHERE m.recruiter_id=${userId}
+      ORDER BY m.scheduled_at DESC LIMIT 50`;
+    res.json({ jobs, applications, funnel, analytics, engagement, meetings, pro });
   }),
 );
+
+router.post("/meetings", handle(async (req, res) => {
+  recruiter(req);
+  const applicationId = id(req.body.application_id);
+  const scheduledAt = new Date(String(req.body.scheduled_at ?? ""));
+  const meetingUrl = text(req.body.meeting_url, 500);
+  const hoursAhead = (scheduledAt.getTime() - Date.now()) / 3600000;
+  if (!Number.isFinite(scheduledAt.getTime()) || hoursAhead < 1 || hoursAhead > 24 * 90)
+    throw new ErrorHandler(400, "Choose a time between 1 hour and 90 days from now");
+  if (meetingUrl && (!/^https:\/\//i.test(meetingUrl) || /[\s<>]/.test(meetingUrl)))
+    throw new ErrorHandler(400, "Meeting links must use HTTPS");
+  const [application] = await sql`SELECT a.application_id,a.applicant_id,a.applicant_email,a.status,j.title,j.posted_by_recuriter_id
+    FROM applications a JOIN jobs j USING(job_id) WHERE a.application_id=${applicationId}`;
+  if (!application) throw new ErrorHandler(404, "Application not found");
+  if (application.posted_by_recuriter_id !== req.user!.user_id)
+    throw new ErrorHandler(403, "You can only schedule interviews for your own openings");
+  if (["Rejected", "Hired"].includes(application.status))
+    throw new ErrorHandler(409, "This application is already closed");
+  const [pendingMeeting] = await sql`SELECT 1 FROM interview_meetings
+    WHERE application_id=${applicationId} AND status IN ('Proposed','Accepted')`;
+  if (pendingMeeting) throw new ErrorHandler(409, "Cancel or resolve the current interview invite first");
+  const [meeting] = await sql`INSERT INTO interview_meetings(application_id,recruiter_id,candidate_id,scheduled_at,meeting_url)
+    VALUES(${applicationId},${req.user!.user_id},${application.applicant_id},${scheduledAt.toISOString()},${meetingUrl}) RETURNING id,application_id,scheduled_at,status,meeting_url`;
+  const [updated] = await sql`UPDATE applications SET status='Interview' WHERE application_id=${applicationId} AND status IN ('Submitted','Shortlisted') RETURNING status`;
+  if (updated) await sql`INSERT INTO application_events(application_id,status,note)
+    VALUES(${applicationId},'Interview','Interview time proposed by the hiring team')`;
+  await mail(application.applicant_email, `Interview invitation · ${application.title}`, "An interview has been proposed", `The hiring team has proposed <strong>${html(scheduledAt.toLocaleString("en-IN", { dateStyle: "full", timeStyle: "short", timeZone: "Asia/Kolkata" }))}</strong> for <strong>${html(application.title)}</strong>. Open your workspace to accept or decline.${meetingUrl ? `<br><br><a href="${html(meetingUrl)}">Open meeting link</a>` : ""}`);
+  res.status(201).json(meeting);
+}));
+
+router.post("/meetings/:id/respond", handle(async (req, res) => {
+  candidate(req);
+  if (typeof req.body.accepted !== "boolean") throw new ErrorHandler(400, "Choose accept or decline");
+  const nextStatus = req.body.accepted ? "Accepted" : "Declined";
+  const [meeting] = await sql`UPDATE interview_meetings SET status=${nextStatus},updated_at=now()
+    WHERE id=${id(req.params.id)} AND candidate_id=${req.user!.user_id} AND status='Proposed'
+    RETURNING id,application_id,scheduled_at,status,meeting_url,recruiter_id`;
+  if (!meeting) throw new ErrorHandler(404, "This interview invite is no longer available");
+  const [recruiterUser] = await sql`SELECT email FROM users WHERE user_id=${meeting.recruiter_id}`;
+  const [job] = await sql`SELECT j.title FROM jobs j JOIN applications a USING(job_id) WHERE a.application_id=${meeting.application_id}`;
+  if (recruiterUser && job) await mail(recruiterUser.email, `Interview ${nextStatus.toLowerCase()} · ${job.title}`,
+    `Your interview invite was ${nextStatus.toLowerCase()}`, `${html(req.user!.name)} has ${nextStatus.toLowerCase()} the proposed interview for <strong>${html(job.title)}</strong>.`);
+  res.json(meeting);
+}));
+
+router.post("/meetings/:id/cancel", handle(async (req, res) => {
+  recruiter(req);
+  const [meeting] = await sql`UPDATE interview_meetings SET status='Cancelled',updated_at=now()
+    WHERE id=${id(req.params.id)} AND recruiter_id=${req.user!.user_id} AND status IN ('Proposed','Accepted')
+    RETURNING id,application_id,scheduled_at,status,candidate_id`;
+  if (!meeting) throw new ErrorHandler(404, "This interview can no longer be cancelled");
+  const [candidateUser] = await sql`SELECT email FROM users WHERE user_id=${meeting.candidate_id}`;
+  const [job] = await sql`SELECT j.title FROM jobs j JOIN applications a USING(job_id) WHERE a.application_id=${meeting.application_id}`;
+  if (candidateUser && job) await mail(candidateUser.email, `Interview cancelled · ${job.title}`, "Interview update", `The proposed interview for <strong>${html(job.title)}</strong> has been cancelled by the hiring team.`);
+  res.json(meeting);
+}));
 
 router.post(
   "/drives",

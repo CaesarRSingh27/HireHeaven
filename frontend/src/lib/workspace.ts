@@ -38,11 +38,12 @@ export interface Overview {
   entitlements: { plan: string; expires_at: string }[];
   usage: { feature: string; count: number }[];
   saved: Job[];
-  alerts: { id: number; title: string; location: string }[];
+  alerts: { id: number; title: string; location: string; email_enabled: boolean; frequency: "daily" | "weekly" }[];
   matches: { job_id: number; title: string; company_name: string }[];
-  updates: { application_id: number; status: string; title: string }[];
+  updates: { application_id: number; status: string; title: string; applied_at: string; timeline: { status: string; note: string; created_at: string }[] }[];
   portfolio: Portfolio | null;
   interviews: Interview[];
+  meetings: { id: number; application_id: number; scheduled_at: string; status: string; meeting_url: string; job_title: string; recruiter_name?: string; candidate_name?: string }[];
   registrations: {
     drive_id: number;
     title: string;
@@ -78,4 +79,5 @@ export interface HiringData {
   pro: boolean;
   analytics: { week: string; applications: number }[];
   engagement: { returning_applicants: number }[];
+  meetings: NonNullable<Overview["meetings"]>;
 }

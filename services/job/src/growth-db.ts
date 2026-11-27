@@ -4,6 +4,17 @@ export async function initGrowthDb() {
   await sql`ALTER TYPE application_status ADD VALUE IF NOT EXISTS 'Shortlisted'`;
   await sql`ALTER TYPE application_status ADD VALUE IF NOT EXISTS 'Interview'`;
   await sql`ALTER TABLE applications ADD COLUMN IF NOT EXISTS recruiter_note TEXT NOT NULL DEFAULT ''`;
+  await sql`CREATE TABLE IF NOT EXISTS application_events (
+    id BIGSERIAL PRIMARY KEY,
+    application_id INTEGER NOT NULL REFERENCES applications(application_id) ON DELETE CASCADE,
+    status TEXT NOT NULL,
+    note TEXT NOT NULL DEFAULT '',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`;
+  await sql`CREATE INDEX IF NOT EXISTS application_events_application_date ON application_events(application_id,created_at)`;
+  await sql`INSERT INTO application_events(application_id,status,note,created_at)
+    SELECT a.application_id,'Submitted',CASE WHEN a.status::text='Submitted' THEN 'Application sent' ELSE 'Application sent; earlier status history is unavailable' END,a.applied_at FROM applications a
+    WHERE NOT EXISTS (SELECT 1 FROM application_events e WHERE e.application_id=a.application_id)`;
   await sql`ALTER TABLE jobs ADD COLUMN IF NOT EXISTS required_skills TEXT[] NOT NULL DEFAULT '{}'`;
   await sql`ALTER TABLE jobs ADD COLUMN IF NOT EXISTS experience_years INTEGER`;
   await sql`ALTER TABLE jobs ALTER COLUMN experience_years DROP NOT NULL`;
@@ -21,7 +32,13 @@ export async function initGrowthDb() {
   await sql`CREATE TABLE IF NOT EXISTS job_alerts (
     id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     title TEXT NOT NULL DEFAULT '', location TEXT NOT NULL DEFAULT '',
+    email_enabled BOOLEAN NOT NULL DEFAULT false,
+    frequency TEXT NOT NULL DEFAULT 'daily' CHECK(frequency IN ('daily','weekly')),
+    next_digest_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ DEFAULT now(), UNIQUE(user_id,title,location))`;
+  await sql`ALTER TABLE job_alerts ADD COLUMN IF NOT EXISTS email_enabled BOOLEAN NOT NULL DEFAULT false`;
+  await sql`ALTER TABLE job_alerts ADD COLUMN IF NOT EXISTS frequency TEXT NOT NULL DEFAULT 'daily'`;
+  await sql`ALTER TABLE job_alerts ADD COLUMN IF NOT EXISTS next_digest_at TIMESTAMPTZ`;
   await sql`CREATE TABLE IF NOT EXISTS portfolios (
     user_id INTEGER PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
     headline TEXT NOT NULL DEFAULT '', projects JSONB NOT NULL DEFAULT '[]',
@@ -37,6 +54,20 @@ export async function initGrowthDb() {
     question TEXT NOT NULL, answer TEXT NOT NULL DEFAULT '', feedback TEXT NOT NULL DEFAULT '',
     created_at TIMESTAMPTZ DEFAULT now())`;
   await sql`ALTER TABLE interview_sessions ADD COLUMN IF NOT EXISTS feedback_started_at TIMESTAMPTZ`;
+  await sql`CREATE TABLE IF NOT EXISTS interview_meetings (
+    id SERIAL PRIMARY KEY,
+    application_id INTEGER NOT NULL REFERENCES applications(application_id) ON DELETE CASCADE,
+    recruiter_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    candidate_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    scheduled_at TIMESTAMPTZ NOT NULL,
+    status TEXT NOT NULL DEFAULT 'Proposed' CHECK(status IN ('Proposed','Accepted','Declined','Cancelled','Completed')),
+    meeting_url TEXT NOT NULL DEFAULT '',
+    reminder_sent_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`;
+  await sql`CREATE INDEX IF NOT EXISTS interview_meetings_candidate_date ON interview_meetings(candidate_id,scheduled_at)`;
+  await sql`CREATE INDEX IF NOT EXISTS interview_meetings_recruiter_date ON interview_meetings(recruiter_id,scheduled_at)`;
   await sql`CREATE TABLE IF NOT EXISTS job_views (
     job_id INTEGER NOT NULL REFERENCES jobs(job_id) ON DELETE CASCADE,
     visitor TEXT NOT NULL, viewed_on DATE NOT NULL DEFAULT CURRENT_DATE,

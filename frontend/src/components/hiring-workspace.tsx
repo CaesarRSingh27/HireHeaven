@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import axios from "axios";
@@ -168,11 +168,32 @@ export default function HiringWorkspace() {
                           update(applicant, applicant.status, note)
                         }
                       />
+                      <details className="workspace-schedule-details">
+                        <summary>Propose an interview time</summary>
+                        <ScheduleInterviewForm applicant={applicant} reload={load} />
+                      </details>
                     </article>
                   ))}
               </div>
             ))}
         </div>
+      </section>
+      <section className="workspace-card" id="interviews">
+        <span className="workspace-kicker">Interview calendar</span>
+        <h2>Keep every conversation moving.</h2>
+        {!data.meetings.length && <p>Interview proposals and confirmations will appear here.</p>}
+        {data.meetings.map((meeting) => (
+          <article className="workspace-row workspace-meeting-row" key={meeting.id}>
+            <div><strong>{meeting.job_title}</strong><small>{meeting.candidate_name} · {new Date(meeting.scheduled_at).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</small><span className="workspace-chip">{meeting.status}</span></div>
+            <div className="workspace-meeting-actions">
+              {meeting.meeting_url && <a href={meeting.meeting_url} target="_blank" rel="noreferrer">Open meeting ↗</a>}
+              {meeting.status === "Proposed" || meeting.status === "Accepted" ? <button type="button" onClick={async () => {
+                try { await workspaceApi(`/meetings/${meeting.id}/cancel`, "POST"); toast.success("Interview cancelled"); await load(); }
+                catch (error) { toast.error(errorMessage(error)); }
+              }}>Cancel</button> : null}
+            </div>
+          </article>
+        ))}
       </section>
       <section className="workspace-card">
         <span className="workspace-kicker">Recruiter analytics</span>
@@ -272,6 +293,36 @@ export default function HiringWorkspace() {
       </section>
     </div>
   );
+}
+
+function ScheduleInterviewForm({ applicant, reload }: { applicant: Applicant; reload: () => Promise<void> }) {
+  const [busy, setBusy] = useState(false);
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const fields = new FormData(form);
+    setBusy(true);
+    try {
+      await workspaceApi("/meetings", "POST", {
+        application_id: applicant.application_id,
+        scheduled_at: new Date(String(fields.get("scheduled_at"))).toISOString(),
+        meeting_url: fields.get("meeting_url"),
+      });
+      toast.success(`Interview invite sent to ${applicant.applicant_name}`);
+      form.reset();
+      await reload();
+    } catch (error) {
+      toast.error(errorMessage(error));
+    } finally {
+      setBusy(false);
+    }
+  }
+  return <form onSubmit={submit} className="workspace-form">
+    <label>Time<input name="scheduled_at" type="datetime-local" required /></label>
+    <label>Meeting link (optional)<input name="meeting_url" type="url" placeholder="https://meet.example.com/…" /></label>
+    <button disabled={busy}>{busy ? "Sending invite…" : "Send interview invite"}</button>
+    <small>The candidate can accept or decline. Invitations and 24-hour reminders use the configured email service.</small>
+  </form>;
 }
 
 function ApplicantNote({

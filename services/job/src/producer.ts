@@ -42,7 +42,7 @@ export const connectKafka = async (): Promise<void> => {
 export const publishToTopic = async (topic: string, message: any) => {
   if (!producer) {
     console.log("kafka producer is not initialized");
-    return;
+    return false;
   }
 
   try {
@@ -50,8 +50,10 @@ export const publishToTopic = async (topic: string, message: any) => {
       topic,
       messages: [{ value: JSON.stringify(message) }],
     });
+    return true;
   } catch (error) {
     console.log("Failed to publish message to kafka", error);
+    return false;
   }
 };
 

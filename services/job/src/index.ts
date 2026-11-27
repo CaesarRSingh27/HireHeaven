@@ -3,6 +3,7 @@ import app from "./app.js";
 import dotenv from "dotenv";
 import { sql } from "./utils/db.js";
 import { connectKafka, disconnectKafka } from "./producer.js";
+import { startNotificationScheduler, stopNotificationScheduler } from "./notifications.js";
 
 dotenv.config();
 
@@ -95,6 +96,7 @@ async function initDB() {
 }
 
 initDB().then(() => {
+  startNotificationScheduler();
   const server = app.listen(process.env.PORT, () => {
     console.log(
       `Job service is running on http://localhost:${process.env.PORT}`
@@ -103,6 +105,7 @@ initDB().then(() => {
 
   const shutdown = async (signal: string) => {
     console.log(`${signal} received, shutting down job service`);
+    stopNotificationScheduler();
     server.close();
     await disconnectKafka().catch(() => {});
     process.exit(0);

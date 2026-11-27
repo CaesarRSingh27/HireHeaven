@@ -57,7 +57,10 @@ export default function CandidateWorkspace({
     const fields = new FormData(event.currentTarget);
     setBusy(true);
     try {
-      await workspaceApi("/alerts", "POST", Object.fromEntries(fields));
+      await workspaceApi("/alerts", "POST", {
+        ...Object.fromEntries(fields),
+        email_enabled: fields.get("email_enabled") === "on",
+      });
       toast.success("Job alert saved");
       await reload();
     } catch (error) {
@@ -188,12 +191,22 @@ export default function CandidateWorkspace({
                 maxLength={120}
               />
             </label>
+            <label>
+              Email digest
+              <select name="frequency" defaultValue="daily">
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+              </select>
+            </label>
+            <label className="workspace-checkbox">
+              <input name="email_enabled" type="checkbox" /> Email me when matching roles are found
+            </label>
             <button disabled={busy}>Save alert</button>
           </form>
           {data.alerts.map((item) => (
             <div className="workspace-row" key={item.id}>
               <span>
-                {item.title || "Any role"} · {item.location || "Anywhere"}
+                {item.title || "Any role"} · {item.location || "Anywhere"}{item.email_enabled ? ` · ${item.frequency} email` : " · in-app only"}
               </span>
               <button onClick={() => void remove(`/alerts/${item.id}`)}>
                 Remove
@@ -212,16 +225,44 @@ export default function CandidateWorkspace({
         </section>
       </div>
       <section className="workspace-card">
-        <h2>Application updates.</h2>
-        <p>See where your conversations are heading.</p>
+        <span className="workspace-kicker">Your application journey</span>
+        <h2>Every next step, in one place.</h2>
+        <p>Follow each role from the day you applied through every recruiter update.</p>
         {!data.updates.length && (
           <p>Status changes from recruiters will appear here.</p>
         )}
         {data.updates.map((update) => (
-          <div className="workspace-row" key={update.application_id}>
-            <strong>{update.title}</strong>
-            <span className="workspace-chip">{update.status}</span>
-          </div>
+          <article className="workspace-tracker-card" key={update.application_id}>
+            <div className="workspace-row workspace-tracker-heading">
+              <strong>{update.title}</strong>
+              <span className="workspace-chip">{update.status}</span>
+            </div>
+            <small>Applied {new Date(update.applied_at).toLocaleDateString()}</small>
+            <ol className="workspace-timeline">
+              {update.timeline.map((event, index) => (
+                <li key={`${event.created_at}-${index}`}>
+                  <span className="workspace-timeline-dot" />
+                  <span><strong>{event.status}</strong><small>{event.note}</small></span>
+                  <time dateTime={event.created_at}>{new Date(event.created_at).toLocaleDateString()}</time>
+                </li>
+              ))}
+            </ol>
+          </article>
+        ))}
+      </section>
+      <section className="workspace-card" id="interview-schedule">
+        <span className="workspace-kicker">Interview calendar</span>
+        <h2>Make room for what’s next.</h2>
+        <p>Review invitations from hiring teams and keep the details close.</p>
+        {!data.meetings.length && <p>Interview invitations and meeting details will appear here.</p>}
+        {data.meetings.map((meeting) => (
+          <article className="workspace-row workspace-meeting-row" key={meeting.id}>
+            <div><strong>{meeting.job_title}</strong><small>{meeting.recruiter_name ? `With ${meeting.recruiter_name} · ` : ""}{new Date(meeting.scheduled_at).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</small><span className="workspace-chip">{meeting.status}</span></div>
+            <div className="workspace-meeting-actions">
+              {meeting.meeting_url && <a href={meeting.meeting_url} target="_blank" rel="noreferrer">Open meeting ↗</a>}
+              {meeting.status === "Proposed" && <><button type="button" onClick={() => void respondToMeeting(meeting.id, true, reload)}>Accept</button><button type="button" onClick={() => void respondToMeeting(meeting.id, false, reload)}>Decline</button></>}
+            </div>
+          </article>
         ))}
       </section>
       <section className="workspace-card" id="interview">
@@ -445,6 +486,16 @@ export default function CandidateWorkspace({
       </section>
     </div>
   );
+}
+
+async function respondToMeeting(id: number, accepted: boolean, reload: () => Promise<void>) {
+  try {
+    await workspaceApi(`/meetings/${id}/respond`, "POST", { accepted });
+    toast.success(accepted ? "Interview accepted" : "Interview declined");
+    await reload();
+  } catch (error) {
+    toast.error(errorMessage(error));
+  }
 }
 
 function InterviewJobPicker({

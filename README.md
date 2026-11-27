@@ -6,7 +6,7 @@ Built with Next.js 16, React 19, Tailwind CSS 4, five Node/Express TypeScript se
 
 ## Career and hiring tools
 
-The [career workspace guide](docs/career-workspace.md) covers the candidate workspace, saved jobs and in-app alerts, resume-to-job comparisons, Reze interview practice, public portfolios, recruiter pipelines and analytics, sponsored listings, and college placement drives.
+The [career workspace guide](docs/career-workspace.md) covers the candidate workspace, application timelines, email job digests, interview scheduling, live Reze context, saved jobs, resume-to-job comparisons, interview practice, public portfolios, recruiter pipelines, sponsored listings, and college placement drives.
 
 Free candidates get five comparisons and three interview questions with feedback per calendar month. One-time plans are Career Plus (INR 199 / 30 days), Recruiter Pro (INR 1,499 / 30 days), Featured job (INR 299 / 7 days), and Campus (INR 2,999 / 30 days). Prices are served by the payment service, and paid access activates after signed Razorpay verification.
 
@@ -21,7 +21,7 @@ Free candidates get five comparisons and three interview questions with feedback
 | Company, `/company/[id]` | View a company's details |
 | Register / sign in, `/register` and `/login` | Use email and password or Google, LinkedIn, and GitHub through Clerk |
 | Contact us, `/contact` | Find contact details and prepare a message in WhatsApp |
-| Workspace, `/workspace` | Save jobs, manage alerts and portfolios, practise interviews, manage hiring, or organise campus placements |
+| Workspace, `/workspace` | Track applications, receive job digests, manage portfolios, practise or schedule interviews, manage hiring, or organise campus placements |
 | Public portfolios, `/talent/[slug]` | View a candidate’s opted-in projects, skills, and profile |
 | Subscription, `/subscribe` | Access the Razorpay subscription checkout |
 
@@ -31,7 +31,11 @@ Recruiters can create company profiles, post jobs, and review applicants through
 
 Click Reze's floating avatar to open the chat panel. Reze answers questions about navigating HireHeaven, finding jobs, candidate profiles, recruiter tools, career guidance, and resume analysis.
 
-The frontend sends up to 12 recent messages to `POST /api/utils/chat`. Replies use Gemini through the utils service. Configure `GEMINI_API_KEY` in the root Docker environment, or `API_KEY_GEMINI` in `services/utils/.env` for local service development. Reze provides guidance based on the site's features and cannot inspect live accounts, applications, or job inventory. General assistant chat history is held in the component's memory and clears when the page reloads. Interview practice sessions in the workspace are saved to Postgres.
+The frontend sends up to 12 recent messages to `POST /api/utils/chat`. For signed-in users, it also requests current openings and (when asked) that candidate's own application statuses from the authenticated job service. Only selected listing and status fields are passed to Gemini; Reze cannot see recruiter records or another user's applications. Configure `GEMINI_API_KEY` in the root Docker environment, or `API_KEY_GEMINI` in `services/utils/.env` for local service development. General assistant chat history is held in the component's memory and clears when the page reloads. Interview practice sessions and scheduled interview appointments are saved to Postgres.
+
+### Application timelines, interview calendar, and email alerts
+
+Candidates can follow a timeline for every application, accept or decline recruiter-proposed interview times, and optionally get daily or weekly matching-job email digests. Recruiters can propose an interview appointment with an optional HTTPS meeting link from an applicant card. Both sides receive interview invitations/response notices and a reminder about 24 hours before the appointment. These messages use the existing SMTP/Kafka service; configure valid SMTP credentials to deliver them. Alert emails are opt-in.
 
 ### Contact messages
 
@@ -164,7 +168,7 @@ Then set `PUBLIC_URL=https://$DOMAIN` in `.env` and `docker compose up -d`.
 ## Database
 
 Each service creates and indexes its own tables on start (`CREATE ... IF NOT EXISTS`). `db/schema.sql` is the consolidated reference.
-If your database predates this version run `db/migrations/001_openings_integer.sql` once. The auth service applies the OAuth account migration at startup; its SQL is also available in `db/migrations/002_oauth_accounts.sql`. Career and hiring additions are applied by the job and payment services at startup and documented in `db/migrations/003_career_workspace.sql`.
+If your database predates this version run `db/migrations/001_openings_integer.sql` once. The auth service applies the OAuth account migration at startup; its SQL is also available in `db/migrations/002_oauth_accounts.sql`. Career and hiring additions are applied by the job and payment services at startup and documented in `db/migrations/003_career_workspace.sql` and `db/migrations/004_application_timeline_notifications_interviews.sql`.
 
 ## CI / CD
 
@@ -181,7 +185,7 @@ If your database predates this version run `db/migrations/001_openings_integer.s
 
 - All DB-backed services share one Postgres database and read each other's tables (a "distributed monolith"); splitting per service would need APIs or events between them.
 - The JWT lives in a JS-readable cookie (no logout revocation, 15 day expiry). An httpOnly cookie + refresh tokens would be stronger.
-- No email verification, no admin role, and no company edit endpoint. Job alerts appear in-app. Gemini tools require an available model and quota.
+- No email verification, admin role, or company edit endpoint. SMTP delivery depends on configured credentials. Gemini tools require an available model and quota.
 - Kafka and Redis are single-node containers (fine for a small deployment, not highly available).
 
 ## Reference guides

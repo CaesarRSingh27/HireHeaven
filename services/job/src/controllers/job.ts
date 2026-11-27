@@ -488,6 +488,11 @@ export const updateApplication = TryCatch(
     const [updatedApplication] =
       await sql`UPDATE applications SET status = ${req.body.status}, recruiter_note = COALESCE(${req.body.recruiter_note ?? null}, recruiter_note) WHERE application_id = ${id} RETURNING *`;
 
+    if (application.status !== req.body.status) {
+      await sql`INSERT INTO application_events(application_id,status,note)
+        VALUES(${id},${req.body.status},${note ? String(note).trim().slice(0, 500) : "Status updated by the hiring team"})`;
+    }
+
     const message = {
       to: application.applicant_email,
       subject: "Application Update - Job portal",

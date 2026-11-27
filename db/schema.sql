@@ -95,6 +95,14 @@ CREATE TABLE IF NOT EXISTS applications (
   UNIQUE (job_id, applicant_id)
 );
 
+CREATE TABLE IF NOT EXISTS application_events (
+  id BIGSERIAL PRIMARY KEY,
+  application_id INTEGER NOT NULL REFERENCES applications(application_id) ON DELETE CASCADE,
+  status TEXT NOT NULL,
+  note TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 -- payment service
 CREATE TABLE IF NOT EXISTS payment_orders (
   order_id VARCHAR(64) PRIMARY KEY,
@@ -148,6 +156,9 @@ CREATE TABLE IF NOT EXISTS saved_jobs (
 CREATE TABLE IF NOT EXISTS job_alerts (
     id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     title TEXT NOT NULL DEFAULT '', location TEXT NOT NULL DEFAULT '',
+    email_enabled BOOLEAN NOT NULL DEFAULT false,
+    frequency TEXT NOT NULL DEFAULT 'daily',
+    next_digest_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ DEFAULT now(), UNIQUE(user_id,title,location));
 
 CREATE TABLE IF NOT EXISTS portfolios (
@@ -168,6 +179,18 @@ CREATE TABLE IF NOT EXISTS interview_sessions (
     created_at TIMESTAMPTZ DEFAULT now());
 
 ALTER TABLE interview_sessions ADD COLUMN IF NOT EXISTS feedback_started_at TIMESTAMPTZ;
+
+CREATE TABLE IF NOT EXISTS interview_meetings (
+    id SERIAL PRIMARY KEY,
+    application_id INTEGER NOT NULL REFERENCES applications(application_id) ON DELETE CASCADE,
+    recruiter_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    candidate_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    scheduled_at TIMESTAMPTZ NOT NULL,
+    status TEXT NOT NULL DEFAULT 'Proposed' CHECK(status IN ('Proposed','Accepted','Declined','Cancelled','Completed')),
+    meeting_url TEXT NOT NULL DEFAULT '',
+    reminder_sent_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now());
 
 CREATE TABLE IF NOT EXISTS job_views (
     job_id INTEGER NOT NULL REFERENCES jobs(job_id) ON DELETE CASCADE,
@@ -193,5 +216,8 @@ CREATE TABLE IF NOT EXISTS placement_registrations (
 CREATE INDEX IF NOT EXISTS growth_events_user_date ON growth_events(user_id,created_at);
 
 CREATE INDEX IF NOT EXISTS job_alerts_user ON job_alerts(user_id);
+CREATE INDEX IF NOT EXISTS application_events_application_date ON application_events(application_id,created_at);
+CREATE INDEX IF NOT EXISTS interview_meetings_candidate_date ON interview_meetings(candidate_id,scheduled_at);
+CREATE INDEX IF NOT EXISTS interview_meetings_recruiter_date ON interview_meetings(recruiter_id,scheduled_at);
 ALTER TABLE payment_orders ADD COLUMN IF NOT EXISTS plan TEXT NOT NULL DEFAULT 'legacy';
 ALTER TABLE payment_orders ADD COLUMN IF NOT EXISTS job_id INTEGER;

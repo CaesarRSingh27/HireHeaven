@@ -2040,6 +2040,22 @@ label,
 }
 .workspace-price { font-size: 2.8rem; letter-spacing: -.06em; font-family: var(--font-display),sans-serif; }
 .workspace-plan-status { color: var(--muted-foreground); line-height: 1.7; margin-block: 1.5rem; font-size: .85rem; }
+.workspace-tracker-card { margin-top:1rem; padding:1.1rem 1.2rem; border:1px solid var(--border); border-radius:1rem; background:color-mix(in oklch,var(--card) 85%,var(--secondary)); }
+.workspace-tracker-heading { margin-top:0; }
+.workspace-tracker-card > small, .workspace-meeting-row small { display:block; color:var(--muted-foreground); font-size:.78rem; margin-top:.35rem; }
+.workspace-timeline { display:grid; gap:.15rem; list-style:none; padding:0; margin:1rem 0 0; }
+.workspace-timeline li { display:grid; grid-template-columns:14px minmax(0,1fr) auto; gap:.7rem; align-items:start; position:relative; padding:.45rem 0; font-size:.82rem; }
+.workspace-timeline li:not(:last-child)::before { content:""; position:absolute; left:6px; top:1.3rem; bottom:-.45rem; width:1px; background:var(--border); }
+.workspace-timeline-dot { width:13px; height:13px; border:3px solid var(--primary); border-radius:50%; background:var(--card); margin-top:.15rem; z-index:1; }
+.workspace-timeline li small { display:block; color:var(--muted-foreground); margin-top:.18rem; }
+.workspace-timeline time { color:var(--muted-foreground); font-size:.72rem; white-space:nowrap; }
+.workspace-meeting-row { align-items:center; }
+.workspace-meeting-row > div:first-child { flex:1; }
+.workspace-meeting-actions { display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; }
+.workspace-meeting-actions a { color:var(--primary); font-size:.82rem; }
+.workspace-schedule-details { margin-top:.9rem; padding-top:.75rem; border-top:1px solid var(--border); }
+.workspace-schedule-details summary { cursor:pointer; color:var(--primary); font-size:.82rem; font-weight:650; }
+.workspace-schedule-details .workspace-form { margin-top:.8rem; }
 .workspace-account-link { padding: 1.3rem 0; }
 .workspace-pagination { display: flex; justify-content: center; align-items: center; gap: 1.2rem; margin: 2rem 0; }
 .talent-page { max-width: 1000px; }
