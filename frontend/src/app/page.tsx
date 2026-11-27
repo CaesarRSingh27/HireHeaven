@@ -8,6 +8,8 @@ import { useAppData } from "@/context/AppContext";
 import { ArrowRight, Compass, FileCheck2, Search, Sparkles, UsersRound } from "lucide-react";
 import Link from "next/link";
 import React from "react";
+import MotionCard from "@/components/motion-card";
+import CompanyOrbit from "@/components/company-orbit";
 
 const journeySteps = [
   { label: "DISCOVER", icon: Search, title: "Find work that fits.", text: "Explore openings by role and location, and find opportunities that match your strengths and ambitions.", action: "Explore open roles", href: "/jobs" },
@@ -21,6 +23,7 @@ const Home = () => {
   return (
     <div>
       <Hero />
+      <CompanyOrbit />
       <section className="home-journey" aria-labelledby="home-journey-title">
         <div className="home-section-heading">
           <span className="about-eyebrow"><Sparkles size={15} /> Your Next Chapter Starts Here</span>
@@ -29,28 +32,28 @@ const Home = () => {
         </div>
         <div className="home-journey-grid">
           {journeySteps.map(({ label, icon: Icon, title, text, action, href }) => (
-            <article className="home-journey-card" key={label}>
+            <MotionCard className="home-journey-card" key={label} delay={journeySteps.findIndex((step) => step.label === label) * 90}>
               <div className="home-journey-top"><span className="home-journey-icon"><Icon size={20} /></span></div>
               <span className="home-journey-kicker">{label}</span>
               <h3>{title}</h3>
               <p>{text}</p>
               <Link className="home-journey-action" href={href}>{action}<ArrowRight size={16} /></Link>
-            </article>
+            </MotionCard>
           ))}
         </div>
       </section>
       <CarrerGuide />
       <ResumeAnalyzer />
       <section className="home-audience" aria-labelledby="home-audience-title">
-        <div className="home-audience-copy">
+        <MotionCard as="div" className="home-audience-copy">
           <span className="about-eyebrow"><UsersRound size={15} /> Good Things Happen When People Connect</span>
           <h2 id="home-audience-title">Your Next Chapter Starts With A <em>Connection.</em></h2>
           <p>Whether you’re ready to find your next role or bring the right person onto your team, start with a simple next step.</p>
-        </div>
-        <div className="home-audience-actions">
+        </MotionCard>
+        <MotionCard as="div" className="home-audience-actions" delay={100}>
           <Link href="/jobs"><Button size="lg" className="gap-2">Find A Job <ArrowRight size={18} /></Button></Link>
           <Link href="/register"><Button size="lg" variant="outline" className="gap-2">Meet Your Next Hire <ArrowRight size={18} /></Button></Link>
-        </div>
+        </MotionCard>
       </section>
     </div>
   );

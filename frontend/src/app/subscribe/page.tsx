@@ -9,6 +9,7 @@ import useRazorpay from "@/components/scriptLoader";
 import { payment_service, useAppData } from "@/context/AppContext";
 import { workspaceApi, errorMessage } from "@/lib/workspace";
 import type { Job } from "@/type";
+import MotionCard from "@/components/motion-card";
 
 interface Plan {
   id: string;
@@ -108,7 +109,7 @@ export default function SubscriptionPage() {
       </header>
       {error && <p role="alert">{error}</p>}
       <div className="workspace-pricing">
-        <section className="workspace-card">
+        <MotionCard as="section" className="workspace-card" delay={0}>
           <span className="workspace-kicker">For everyone starting out</span>
           <h2>Free</h2>
           <strong className="workspace-price">₹0</strong>
@@ -122,9 +123,9 @@ export default function SubscriptionPage() {
             <li>Basic recruiter pipeline and notes</li>
           </ul>
           <Link href={user ? "/workspace" : "/register"}>Get started →</Link>
-        </section>
-        {plans.map((plan) => (
-          <section className="workspace-card" key={plan.id}>
+        </MotionCard>
+        {plans.map((plan, index) => (
+          <MotionCard as="section" className="workspace-card" key={plan.id} delay={(index + 1) * 90}>
             <span className="workspace-kicker">
               {plan.role === "jobseeker"
                 ? "For your next move"
@@ -179,7 +180,7 @@ export default function SubscriptionPage() {
                     : `Choose ${plan.name}`}
               </button>
             )}
-          </section>
+          </MotionCard>
         ))}
       </div>
       <p className="workspace-plan-status">

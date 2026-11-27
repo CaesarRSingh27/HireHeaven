@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { Button } from "@/components/ui/button";
+import MotionCard from "@/components/motion-card";
 
 const values = [
   {
@@ -103,11 +104,11 @@ const About = () => (
       </div>
       <div className="about-journey-grid">
           {journey.map(({ icon: Icon, title, text, action, href }, index) => (
-          <article className="about-journey-card" key={title}>
+          <MotionCard className="about-journey-card" key={title} delay={index * 90}>
             <div className="about-journey-top"><Icon size={21} /></div>
               <div className="about-journey-copy"><span className="about-journey-kicker">{["DISCOVER", "SHOW YOUR VALUE", "MOVE FORWARD"][index]}</span><h3>{title}</h3><p>{text}</p></div>
               <Link className="about-journey-action" href={href}>{action}<ArrowRight size={15} /></Link>
-          </article>
+          </MotionCard>
         ))}
       </div>
     </section>
@@ -120,11 +121,11 @@ const About = () => (
       </div>
       <div className="about-values-grid">
         {values.map(({ icon: Icon, title, description, tone }) => (
-          <article className={`about-value-card ${tone}`} key={title}>
+          <MotionCard className={`about-value-card ${tone}`} key={title} delay={values.findIndex((item) => item.title === title) * 90}>
             <div className="about-value-topline"><Icon size={21} /></div>
             <h3>{title}</h3>
             <p>{description}</p>
-          </article>
+          </MotionCard>
         ))}
       </div>
     </section>
