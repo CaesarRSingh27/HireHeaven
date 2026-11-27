@@ -4,6 +4,8 @@ import {
   addSkillToUser,
   applyForJob,
   deleteSkillFromUser,
+  downloadApplicationResume,
+  downloadMyResume,
   getAllaplications,
   getUserProfile,
   myProfile,
@@ -16,6 +18,8 @@ import uploadFile from "../middlewares/multer.js";
 const router = express.Router();
 
 router.get("/me", isAuth, myProfile);
+router.get("/resume", isAuth, downloadMyResume);
+router.get("/application/:applicationId/resume", isAuth, downloadApplicationResume);
 router.get("/:userId", isAuth, getUserProfile);
 router.put("/update/profile", isAuth, updateUserProfile);
 router.put("/update/pic", isAuth, uploadFile, updateProfilePic);

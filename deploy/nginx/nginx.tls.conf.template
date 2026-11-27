@@ -58,6 +58,7 @@ http {
     # Internal-only endpoints: backend services call these directly on the
     # docker network; they must never be reachable from the internet.
     location ~ ^/api/utils/(upload|delete)/?$ { return 404; }
+    location ^~ /api/utils/private-resumes { return 404; }
 
     location /api/auth/    { limit_req zone=api burst=40 nodelay; proxy_pass http://auth_svc; }
     location /api/user/    { limit_req zone=api burst=40 nodelay; proxy_pass http://user_svc; }

@@ -107,7 +107,8 @@ export const checkOut = TryCatch(async (req: AuthenticatedRequest, res) => {
     if (!Number.isSafeInteger(jobId) || Number(jobId) < 1)
       throw new ErrorHandler(400, "Select a job to promote");
     const [job] =
-      await sql`SELECT job_id FROM jobs WHERE job_id=${jobId} AND posted_by_recuriter_id=${req.user.user_id} AND is_active=true`;
+      await sql`SELECT job_id FROM jobs WHERE job_id=${jobId} AND posted_by_recuriter_id=${req.user.user_id} AND is_active=true
+        AND (application_deadline IS NULL OR application_deadline >= (now() AT TIME ZONE 'Asia/Kolkata')::date)`;
     if (!job) throw new ErrorHandler(404, "Choose one of your active jobs");
   }
   const amount = Math.round(
@@ -156,7 +157,8 @@ export const paymentVerification = TryCatch(
         throw new ErrorHandler(400, "Unknown or already used order");
     }
     const [updatedUser] =
-      await sql`SELECT user_id,name,email,phone_number,role,bio,resume,resume_public_id,profile_pic,profile_pic_public_id,subscription,
+      await sql`SELECT user_id,name,email,phone_number,role,bio,CASE WHEN resume IS NOT NULL THEN '/api/user/resume' END AS resume,
+    profile_pic,profile_pic_public_id,subscription,
     ARRAY(SELECT s.name FROM user_skills us JOIN skills s USING(skill_id) WHERE us.user_id=users.user_id) AS skills FROM users WHERE user_id=${req.user.user_id}`;
     res.json({ message: "Purchase activated successfully", updatedUser });
   },

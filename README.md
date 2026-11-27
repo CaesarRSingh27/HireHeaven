@@ -149,9 +149,11 @@ Keep credentials in the ignored environment files. Commit source code and placeh
 
 Social sign-in creates a minimal account without requiring a password, phone number, bio, or resume up front. Clerk's development instance provides shared Google, LinkedIn, and GitHub OAuth credentials; configure its keys in the ignored environment files. See [OAuth provider setup](docs/oauth-sign-in.md). Direct Google/LinkedIn OAuth credentials remain available as an alternative.
 
-### Resume PDF delivery (Cloudinary)
+### Private resume downloads
 
-Cloudinary Free product environments block PDF and ZIP delivery by default. To make uploaded resumes viewable, open **Product environment settings → Security** in the Cloudinary Console and enable **Allow delivery of PDF and ZIP files**. Resume links are public Cloudinary URLs, so anyone who obtains a link can view that resume. Save the setting; if a previously blocked URL still returns an error, allow time for the CDN's cached denial to expire or invalidate the asset.
+New resumes are stored as authenticated Cloudinary assets. The API downloads the file on the server and sends it only to the profile owner or, for an application, to the applicant and the recruiter who posted that job. A replacement profile resume does not change any previously submitted resume.
+
+On startup and every 30 minutes, the user service attempts to move existing Cloudinary resume assets to authenticated storage and invalidate the old public URLs. The migration needs working Cloudinary credentials for the cloud that owns those files. Check the user service logs for unavailable files and the Cloudinary console for invalidation status. An existing profile upload can be replaced with a new PDF if its original file is missing. A missing historical submission can only be recovered from its original file or a backup.
 
 ## Payments (Razorpay)
 
@@ -175,7 +177,7 @@ Then set `PUBLIC_URL=https://$DOMAIN` in `.env` and `docker compose up -d`.
 ## Database
 
 Each service creates and indexes its own tables on start (`CREATE ... IF NOT EXISTS`). `db/schema.sql` is the consolidated reference.
-If your database predates this version run `db/migrations/001_openings_integer.sql` once. The auth service applies the OAuth account migration at startup; its SQL is also available in `db/migrations/002_oauth_accounts.sql`. Career and hiring additions are applied by the job and payment services at startup and documented in `db/migrations/003_career_workspace.sql` and `db/migrations/004_application_timeline_notifications_interviews.sql`.
+If your database predates this version run `db/migrations/001_openings_integer.sql` once. The auth service applies the OAuth account migration at startup; its SQL is also available in `db/migrations/002_oauth_accounts.sql`. The job and payment services apply the career and hiring schema additions at startup. Listing deadlines, confirmation timestamps, and campus attendance are documented in `db/migrations/006_job_freshness_and_campus_attendance.sql`.
 
 ## CI / CD
 

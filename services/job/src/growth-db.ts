@@ -40,6 +40,11 @@ export async function initGrowthDb() {
   await sql`ALTER TABLE jobs ADD COLUMN IF NOT EXISTS graduation_year INTEGER`;
   await sql`ALTER TABLE jobs ADD COLUMN IF NOT EXISTS salary_period TEXT NOT NULL DEFAULT 'annual'`;
   await sql`ALTER TABLE jobs ADD COLUMN IF NOT EXISTS featured_until TIMESTAMPTZ`;
+  await sql`ALTER TABLE jobs ADD COLUMN IF NOT EXISTS application_deadline DATE`;
+  await sql`ALTER TABLE jobs ADD COLUMN IF NOT EXISTS last_confirmed_at TIMESTAMPTZ`;
+  await sql`ALTER TABLE jobs ALTER COLUMN last_confirmed_at SET DEFAULT now()`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_jobs_active_deadline ON jobs(application_deadline)
+    WHERE is_active AND application_deadline IS NOT NULL`;
   await sql`CREATE TABLE IF NOT EXISTS growth_entitlements (
     user_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     plan TEXT NOT NULL, expires_at TIMESTAMPTZ NOT NULL, PRIMARY KEY(user_id, plan))`;
@@ -104,5 +109,7 @@ export async function initGrowthDb() {
     status TEXT NOT NULL DEFAULT 'Registered', created_at TIMESTAMPTZ DEFAULT now(),
     PRIMARY KEY(drive_id,user_id))`;
   await sql`CREATE INDEX IF NOT EXISTS growth_events_user_date ON growth_events(user_id,created_at)`;
+  await sql`ALTER TABLE placement_registrations ADD COLUMN IF NOT EXISTS attendance TEXT NOT NULL DEFAULT 'Unmarked'
+    CHECK (attendance IN ('Unmarked', 'Attended', 'Absent'))`;
   await sql`CREATE INDEX IF NOT EXISTS job_alerts_user ON job_alerts(user_id)`;
 }

@@ -1,4 +1,6 @@
 "use client";
+import JobFreshness from "@/components/job-freshness";
+import { todayForJobDeadline } from "@/lib/job-dates";
 import { useParams } from "next/navigation";
 import Cookies from "js-cookie";
 import React, { useEffect, useRef, useState } from "react";
@@ -92,10 +94,12 @@ const CompanyPage = () => {
   const [experience, setExperience] = useState("0");
   const [graduation, setGraduation] = useState("");
   const [salaryPeriod, setSalaryPeriod] = useState("annual");
+  const [deadline, setDeadline] = useState("");
   const [is_active, setis_active] = useState(true);
 
   const clearInput = () => {
     setRequiredSkills(""); setExperience("0"); setGraduation(""); setSalaryPeriod("annual");
+    setDeadline("");
     settitle("");
     setdescription("");
     setrole("");
@@ -119,6 +123,7 @@ const CompanyPage = () => {
         experience_years: Number(experience),
         graduation_year: graduation ? Number(graduation) : null,
         salary_period: salaryPeriod,
+        application_deadline: deadline || null,
         location,
         openings: Number(openings),
         job_type,
@@ -170,6 +175,7 @@ const CompanyPage = () => {
     setExperience(String(job.experience_years ?? 0));
     setGraduation(job.graduation_year ? String(job.graduation_year) : "");
     setSalaryPeriod(job.salary_period ?? "annual");
+    setDeadline(job.application_deadline ?? "");
     settitle(job.title);
     setdescription(job.description);
     setrole(job.role);
@@ -202,6 +208,7 @@ const CompanyPage = () => {
         experience_years: Number(experience),
         graduation_year: graduation ? Number(graduation) : null,
         salary_period: salaryPeriod,
+        application_deadline: deadline || null,
         location,
         openings: Number(openings),
         job_type,
@@ -228,6 +235,21 @@ const CompanyPage = () => {
       setBtnLoading(false);
     }
   };
+
+  async function confirmListing(jobId: number) {
+    setBtnLoading(true);
+    try {
+      await axios.post(`${job_service}/api/job/${jobId}/confirm`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      await fetchCompany();
+      toast.success("Listing confirmed");
+    } catch (error) {
+      toast.error(axios.isAxiosError(error) ? error.response?.data?.message ?? "Could not confirm this listing" : "Could not confirm this listing");
+    } finally {
+      setBtnLoading(false);
+    }
+  }
 
   if (loading) return <Loading />;
   return (
@@ -358,6 +380,7 @@ const CompanyPage = () => {
   <label>Required skills, separated by commas<input value={requiredSkills} onChange={event => setRequiredSkills(event.target.value)} placeholder="React, TypeScript, SQL" /></label>
   <label>Minimum experience in years<input type="number" min="0" max="50" value={experience} onChange={event => setExperience(event.target.value)} /></label>
   <label>Graduation year, optional<input type="number" min="2000" max="2100" value={graduation} onChange={event => setGraduation(event.target.value)} /></label>
+  <label>Application deadline, optional (IST)<input type="date" min={todayForJobDeadline()} value={deadline} onChange={event => setDeadline(event.target.value)} /></label>
   <label>Pay period<select value={salaryPeriod} onChange={event => setSalaryPeriod(event.target.value)}><option value="annual">Annual salary</option><option value="monthly">Monthly stipend / salary</option></select></label>
 </div><div className="space-y-2">
                         <Label
@@ -539,6 +562,7 @@ const CompanyPage = () => {
                                 <span>{j.openings} openings</span>
                               </div>
                             </div>
+                            <div className="mt-3 text-muted-foreground"><JobFreshness job={j} /></div>
                           </div>
 
                           <div className="flex items-center gap-2">
@@ -554,6 +578,8 @@ const CompanyPage = () => {
 
                             {isRecruiterOwner && (
                               <>
+                                {j.is_active && <Button type="button" variant="outline" size="sm" disabled={btnLoading}
+                                  onClick={() => void confirmListing(j.job_id)}>Confirm still open</Button>}
                                 <Button
                                   onClick={() => handleOpenUpdateModal(j)}
                                   variant={"outline"}
@@ -653,6 +679,7 @@ const CompanyPage = () => {
   <label>Required skills, separated by commas<input value={requiredSkills} onChange={event => setRequiredSkills(event.target.value)} placeholder="React, TypeScript, SQL" /></label>
   <label>Minimum experience in years<input type="number" min="0" max="50" value={experience} onChange={event => setExperience(event.target.value)} /></label>
   <label>Graduation year, optional<input type="number" min="2000" max="2100" value={graduation} onChange={event => setGraduation(event.target.value)} /></label>
+  <label>Application deadline, optional (IST)<input type="date" min={is_active ? todayForJobDeadline() : undefined} value={deadline} onChange={event => setDeadline(event.target.value)} /></label>
   <label>Pay period<select value={salaryPeriod} onChange={event => setSalaryPeriod(event.target.value)}><option value="annual">Annual salary</option><option value="monthly">Monthly stipend / salary</option></select></label>
 </div><div className="space-y-2">
                   <Label

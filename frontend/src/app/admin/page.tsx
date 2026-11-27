@@ -41,7 +41,7 @@ export default function AdminPage() {
     {error && <section className="workspace-card"><p role="alert">{error}</p><button onClick={() => void load()}>Retry</button></section>}
     {!data && !error && <p role="status">Loading moderation queue…</p>}
     {data && <div className="workspace-stack">
-      <div className="workspace-summary"><div><strong>{data.reports.filter((item) => item.status === "Pending").length}</strong><span>Open reports</span></div><div><strong>{data.companies.filter((item) => !item.is_verified).length}</strong><span>Companies to verify</span></div><div><strong>{data.users.filter((item) => item.is_suspended).length}</strong><span>Suspended accounts</span></div><div><strong>{data.jobs.filter((item) => !item.is_active).length}</strong><span>Paused listings</span></div></div>
+      <div className="workspace-summary"><div><strong>{data.reports.filter((item) => item.status === "Pending").length}</strong><span>Open reports</span></div><div><strong>{data.companies.filter((item) => !item.is_verified).length}</strong><span>Companies to verify</span></div><div><strong>{data.users.filter((item) => item.is_suspended).length}</strong><span>Suspended accounts</span></div><div><strong>{data.jobs.filter((item) => item.moderation_note).length}</strong><span>Paused listings</span></div></div>
 
       <section className="workspace-card admin-section"><div className="admin-section-heading"><div><span className="workspace-kicker">Community flags</span><h2>Reported job listings</h2></div><span className="workspace-chip">{data.reports.filter((item) => item.status === "Pending").length} pending</span></div>
         {!data.reports.length && <p>No listing reports yet.</p>}
@@ -57,8 +57,17 @@ export default function AdminPage() {
         {data.users.map((account) => <article className="admin-review-row" key={account.user_id}><div className="admin-review-copy"><strong>{account.name} <span className="workspace-chip">{account.role}</span></strong><p>{account.email}</p><small>{account.is_suspended ? `Suspended: ${account.suspension_note}` : `Joined ${new Date(account.created_at).toLocaleDateString()}`}</small></div><AdminNoteAction busy={busy === `user-${account.user_id}`} label={account.is_suspended ? "Reinstate account" : "Suspend account"} actionLabel="Suspend" secondaryLabel="Cancel" disabled={account.is_suspended} onSubmit={(note) => act(`user-${account.user_id}`, `/admin/users/${account.user_id}/suspension`, "PUT", { suspended: true, note }, "Account suspended")} onSecondary={() => act(`user-${account.user_id}`, `/admin/users/${account.user_id}/suspension`, "PUT", { suspended: false }, "Account reinstated")} /></article>)}
       </section>
 
-      <section className="workspace-card admin-section"><div className="admin-section-heading"><div><span className="workspace-kicker">Listing moderation</span><h2>Active job openings</h2></div></div>
-        {data.jobs.map((job) => <article className="admin-review-row" key={job.job_id}><div className="admin-review-copy"><strong>{job.title} · {job.company_name}</strong><small>{job.moderation_note || `Posted ${new Date(job.created_at).toLocaleDateString()}`}</small></div><button disabled={busy === `job-${job.job_id}`} onClick={() => { const note = job.is_active ? window.prompt("Reason for pausing this listing (at least 5 characters):") : ""; if (job.is_active && (!note || note.trim().length < 5)) return; void act(`job-${job.job_id}`, `/admin/jobs/${job.job_id}/suspension`, "PUT", { suspended: job.is_active, note: note ?? "" }, job.is_active ? "Listing paused" : "Listing restored"); }}>{job.is_active ? "Pause listing" : "Restore listing"}</button></article>)}
+      <section className="workspace-card admin-section"><div className="admin-section-heading"><div><span className="workspace-kicker">Listing moderation</span><h2>Job listings</h2></div></div>
+        {data.jobs.map((job) => <article className="admin-review-row" key={job.job_id}>
+          <div className="admin-review-copy"><strong>{job.title} · {job.company_name}</strong><small>{job.moderation_note || `Posted ${new Date(job.created_at).toLocaleDateString()}`}</small></div>
+          {job.is_active || job.moderation_note ? (
+            <button disabled={busy === `job-${job.job_id}`} onClick={() => {
+              const note = job.is_active ? window.prompt("Reason for pausing this listing (at least 5 characters):") : "";
+              if (job.is_active && (!note || note.trim().length < 5)) return;
+              void act(`job-${job.job_id}`, `/admin/jobs/${job.job_id}/suspension`, "PUT", { suspended: job.is_active, note: note ?? "" }, job.is_active ? "Listing paused" : "Moderation pause removed");
+            }}>{job.is_active ? "Pause listing" : "Remove moderation pause"}</button>
+          ) : <span className="workspace-chip">Closed</span>}
+        </article>)}
       </section>
     </div>}
   </main>;

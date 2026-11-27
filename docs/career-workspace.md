@@ -5,6 +5,7 @@ Open `/workspace` from the navigation or account page. All records are saved to 
 ## Candidates
 
 - Save a job from its card, then return to it in the workspace.
+- Filter the job board to verified employers. Listings show the recruiter’s last confirmation and any application deadline. A deadline includes that whole day in India Standard Time.
 - Create role/location alerts. New matching listings appear in the workspace. Optionally enable daily or weekly email digests; each alert can stay in-app only.
 - Follow an application timeline with its original submission date and each recruiter status update.
 - Review proposed interview times from recruiters, accept or decline invitations, and open the optional meeting link from the workspace.
@@ -18,7 +19,9 @@ Free accounts include five comparisons and three interview questions with feedba
 ## Recruiters
 
 - Create companies and jobs through `/account`. Job forms support explicit skills, minimum experience, graduation year, and annual salary or monthly stipend.
+- Set an optional application deadline when publishing or editing a job. The system closes expired listings automatically. On the company page, **Confirm still open** refreshes the confirmation date without editing the job.
 - Use the hiring workspace to filter applicants by role, stage, name, or skills. Stages are Applied (stored as the existing `Submitted` value), Shortlisted, Interview, Hired, and Rejected.
+- Download the resume submitted to a job you posted. An applicant’s later profile uploads do not change that submission.
 - Propose interview times from an applicant card, include an optional HTTPS meeting link, and track the candidate's response in the recruiter interview calendar.
 - Add private applicant notes. Notes are accessible to the job owner and excluded from candidate application responses.
 - Basic counts show applications, hires, and recorded listing views. Recruiter Pro adds weekly application trends and returning-applicant engagement.
@@ -28,6 +31,8 @@ Free accounts include five comparisons and three interview questions with feedba
 ## Campus organisers
 
 Campus uses recruiter accounts. An active Campus plan permits publishing drives with college, eligibility, graduation year, and registration deadline. Organisers see registrations only for their own drives, can update placement stages, and can download CSV reports. Students explicitly consent before sharing their name and email. Withdrawing removes their registration from the report.
+
+In the Campus dashboard, mark attendance as Attended, Absent, or Unmarked with an active Campus plan. Filter registrations by drive or student and export the matching rows with attendance and placement status. Each drive’s placement rate is placements divided by registrations. The overall rate divides unique students placed at least once by unique registered students across your drives.
 
 ## Plans and activation
 

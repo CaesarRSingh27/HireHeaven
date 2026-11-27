@@ -2,6 +2,7 @@ import express, { json } from "express";
 import cloudinary from "cloudinary";
 import crypto from "crypto";
 import rateLimit from "express-rate-limit";
+import { privateResumeRoutes } from "./private-resumes.js";
 
 const router = express.Router();
 
@@ -15,7 +16,7 @@ const requireInternalKey: express.RequestHandler = (req, res, next) => {
   if (
     !expected ||
     typeof provided !== "string" ||
-    provided.length !== expected.length ||
+    Buffer.byteLength(provided) !== Buffer.byteLength(expected) ||
     !crypto.timingSafeEqual(Buffer.from(provided), Buffer.from(expected))
   ) {
     res.status(401).json({ message: "Unauthorized" });
@@ -23,6 +24,8 @@ const requireInternalKey: express.RequestHandler = (req, res, next) => {
   }
   next();
 };
+
+router.use("/private-resumes", privateResumeRoutes(requireInternalKey));
 
 // The AI endpoints are public (resume analyser is on the home page), so they
 // are rate limited to protect the Gemini quota.

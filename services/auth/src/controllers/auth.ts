@@ -70,15 +70,18 @@ export const registerUser = TryCatch(async (req, res, next) => {
     }
 
     const { data } = await axios.post(
-      `${process.env.UPLOAD_SERVICE}/api/utils/upload`,
+      `${process.env.UPLOAD_SERVICE}/api/utils/private-resumes/upload`,
       { buffer: fileBuffer.content },
       { headers: { "x-internal-key": process.env.INTERNAL_API_KEY as string } }
-    );
+    ).catch((error) => {
+      if (error.response?.status === 400) throw new ErrorHandler(400, "Upload a valid PDF resume");
+      throw new ErrorHandler(502, "Resume storage is temporarily unavailable");
+    });
     const [user] =
-      await sql`INSERT INTO users (name, email, password, phone_number, role, bio, resume, resume_public_id) VALUES 
-               (${name}, ${email}, ${hashPassword}, ${phoneNumber}, ${role}, ${bio}, ${data.url}, ${data.public_id}) RETURNING user_id, name, email, phone_number, role, bio, resume, created_at`;
+      await sql`INSERT INTO users (name, email, password, phone_number, role, bio, resume) VALUES
+               (${name}, ${email}, ${hashPassword}, ${phoneNumber}, ${role}, ${bio}, ${data.reference}) RETURNING user_id, name, email, phone_number, role, bio, created_at`;
 
-    registeredUser = user;
+    registeredUser = { ...user, resume: "/api/user/resume" };
   }
 
   const token = jwt.sign(
@@ -104,7 +107,9 @@ export const loginUser = TryCatch(async (req, res, next) => {
   }
 
   const user = await sql`
-  SELECT u.user_id, u.name, u.email, u.password, u.phone_number, u.role, u.bio, u.resume, u.profile_pic, u.subscription, u.is_suspended, ARRAY_AGG(s.name) FILTER (WHERE s.name IS NOT NULL) as skills FROM users u LEFT JOIN user_skills us ON u.user_id = us.user_id
+  SELECT u.user_id, u.name, u.email, u.password, u.phone_number, u.role, u.bio,
+  CASE WHEN u.resume IS NOT NULL THEN '/api/user/resume' END AS resume,
+  u.profile_pic, u.subscription, u.is_suspended, ARRAY_AGG(s.name) FILTER (WHERE s.name IS NOT NULL) as skills FROM users u LEFT JOIN user_skills us ON u.user_id = us.user_id
   LEFT JOIN skills s ON us.skill_id = s.skill_id
   WHERE u.email = ${email} GROUP BY u.user_id;
   `;

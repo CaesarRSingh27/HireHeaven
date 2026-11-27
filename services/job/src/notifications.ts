@@ -17,6 +17,7 @@ export async function processNotifications() {
   if (running) return;
   running = true;
   try {
+    await sql`UPDATE jobs SET is_active=false WHERE is_active AND application_deadline < (now() AT TIME ZONE 'Asia/Kolkata')::date`;
     const alerts = await sql`SELECT a.id,a.user_id,a.title,a.location,a.frequency,a.next_digest_at,u.email
       FROM job_alerts a JOIN users u USING(user_id)
       WHERE a.email_enabled=true AND a.next_digest_at<=now()
@@ -26,6 +27,7 @@ export async function processNotifications() {
       const since = new Date(new Date(alert.next_digest_at).getTime() - (alert.frequency === "weekly" ? 7 : 1) * 86400000);
       const matches = await sql`SELECT j.job_id,j.title,j.location,c.name AS company_name FROM jobs j
         JOIN companies c USING(company_id) WHERE j.is_active=true AND j.created_at>=${since.toISOString()}
+        AND (j.application_deadline IS NULL OR j.application_deadline >= (now() AT TIME ZONE 'Asia/Kolkata')::date)
         AND (${alert.title}='' OR j.title ILIKE '%'||${alert.title}||'%')
         AND (${alert.location}='' OR COALESCE(j.location,'') ILIKE '%'||${alert.location}||'%')
         ORDER BY j.created_at DESC LIMIT 8`;
@@ -64,6 +66,7 @@ export function startNotificationScheduler() {
   if (timer) return;
   timer = setInterval(() => void processNotifications(), 60_000);
   timer.unref?.();
+  void processNotifications();
 }
 
 export function stopNotificationScheduler() {

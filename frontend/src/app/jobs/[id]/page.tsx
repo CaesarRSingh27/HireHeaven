@@ -1,5 +1,7 @@
 "use client";
 import JobMatch from "@/components/job-match";
+import ResumeDownload from "@/components/resume-download";
+import JobFreshness from "@/components/job-freshness";
 import { workspaceApi } from "@/lib/workspace";
 import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
@@ -154,8 +156,10 @@ const JobPage = () => {
                       </h1>
                       <div className="flex items-center gap-2 text-base opacity-70 mb-2 text-white">
                         <Building2 size={18} />
-                        <span>Company Name</span>
+                        <Link href={`/company/${job.company_id}`} className="hover:underline">{job.company_name}</Link>
+                        {job.company_verified && <span className="inline-flex gap-1 items-center"><CheckCircle2 size={14} /> Verified employer</span>}
                       </div>
+                      <div className="mt-3 text-white"><JobFreshness job={job} /></div>
                     </div>
 
                     {user && user.role === "jobseeker" && (
@@ -291,13 +295,7 @@ const JobPage = () => {
                     </div>
 
                     <div className="flex gap-3 mb-3">
-                      <Link
-                        target="_blank"
-                        href={e.resume}
-                        className="text-blue-500 hover:underline text-sm"
-                      >
-                        View Resume
-                      </Link>
+                      <ResumeDownload applicationId={e.application_id} className="text-blue-500 hover:underline text-sm" />
 
                       <Link
                         target="_blank"

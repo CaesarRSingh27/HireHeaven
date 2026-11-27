@@ -13,6 +13,7 @@ import {
   type HiringData,
 } from "@/lib/workspace";
 import CalendarActions from "@/components/calendar-actions";
+import ResumeDownload from "@/components/resume-download";
 
 const stages = ["Submitted", "Shortlisted", "Interview", "Hired", "Rejected"];
 export default function HiringWorkspace() {
@@ -143,13 +144,7 @@ export default function HiringWorkspace() {
                       <p>
                         {applicant.skills.join(" · ") || "No skills listed"}
                       </p>
-                      <a
-                        href={applicant.resume}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Open resume ↗
-                      </a>
+                      <ResumeDownload applicationId={applicant.application_id} />
                       <label>
                         Stage
                         <select

@@ -26,7 +26,7 @@ import {
   RefreshCcw,
   UserIcon,
 } from "lucide-react";
-import Link from "next/link";
+import ResumeDownload from "@/components/resume-download";
 import { useRouter } from "next/navigation";
 import React, { ChangeEvent, useRef, useState } from "react";
 import toast from "react-hot-toast";
@@ -256,7 +256,7 @@ const Info: React.FC<AccontProps> = ({ user, isYourAccount }) => {
           </div>
 
           {/* Resume section */}
-          {user.role === "jobseeker" && user.resume && (
+          {isYourAccount && user.role === "jobseeker" && (
             <div className="mt-8">
               <h2 className="text-lg font-semibold mt-4 flex items-center gap-2">
                 <NotepadText size={20} className="text-blue-600" />
@@ -269,13 +269,9 @@ const Info: React.FC<AccontProps> = ({ user, isYourAccount }) => {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium">Resume Document</p>
-                  <Link
-                    href={user.resume}
-                    className="text-sm text-blue-500 hover:underline"
-                    target="_blank"
-                  >
-                    View Resume PDF
-                  </Link>
+                  {user.resume ? (
+                    <ResumeDownload className="text-sm text-blue-500 hover:underline" />
+                  ) : <p className="text-sm text-muted-foreground">No resume uploaded</p>}
                 </div>
                 {/* edit button */}
 
@@ -285,7 +281,7 @@ const Info: React.FC<AccontProps> = ({ user, isYourAccount }) => {
                   onClick={handleResumeClick}
                   className="gap-2"
                 >
-                  Update
+                  {user.resume ? "Update" : "Upload PDF"}
                 </Button>
                 <input
                   type="file"

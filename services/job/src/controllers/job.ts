@@ -11,6 +11,15 @@ const JOB_TYPES = ["Full-time", "Part-time", "Contract", "Internship"];
 const WORK_LOCATIONS = ["On-site", "Remote", "Hybrid"];
 const APPLICATION_STATUSES = ["Submitted", "Shortlisted", "Interview", "Rejected", "Hired"];
 
+function parseDeadline(value: unknown): string | null {
+  if (value === undefined || value === null || value === "") return null;
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const date = new Date(value);
+    if (!Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value && !value.startsWith("0000")) return value;
+  }
+  throw new ErrorHandler(400, "Enter a valid application deadline");
+}
+
 const internalHeaders = () => ({
   headers: { "x-internal-key": process.env.INTERNAL_API_KEY as string },
 });
@@ -212,8 +221,12 @@ export const createJob = TryCatch(async (req: AuthenticatedRequest, res) => {
   }
 
   validateRequirements(req.body);
+  const deadline = parseDeadline(req.body.application_deadline);
   const [newJob] =
-    await sql`INSERT INTO jobs (title, description, salary, location, role, job_type, work_location, company_id, posted_by_recuriter_id, openings, required_skills, experience_years, graduation_year, salary_period) VALUES (${title.trim()}, ${description.trim()}, ${salaryAmount}, ${location.trim()}, ${role.trim()}, ${job_type}, ${work_location}, ${company_id}, ${user.user_id}, ${openings}, ${req.body.required_skills ?? []}::text[], ${Number(req.body.experience_years ?? 0)}, ${req.body.graduation_year ?? null}, ${req.body.salary_period ?? "annual"}) RETURNING *`;
+    await sql`INSERT INTO jobs (title, description, salary, location, role, job_type, work_location, company_id, posted_by_recuriter_id, openings, required_skills, experience_years, graduation_year, salary_period, application_deadline)
+    SELECT ${title.trim()}, ${description.trim()}, ${salaryAmount}, ${location.trim()}, ${role.trim()}, ${job_type}::job_type, ${work_location}::work_location, ${company_id}, ${user.user_id}, ${openings}, ${req.body.required_skills ?? []}::text[], ${Number(req.body.experience_years ?? 0)}, ${req.body.graduation_year ?? null}, ${req.body.salary_period ?? "annual"}, ${deadline}::date
+    WHERE ${deadline}::date IS NULL OR ${deadline}::date >= (now() AT TIME ZONE 'Asia/Kolkata')::date RETURNING *`;
+  if (!newJob) throw new ErrorHandler(400, "The application deadline cannot be in the past");
 
   res.json({
     message: "Job posted successfully",
@@ -249,7 +262,7 @@ export const updateJob = TryCatch(async (req: AuthenticatedRequest, res) => {
   } = req.body;
 
   const [existingJob] =
-    await sql`SELECT posted_by_recuriter_id FROM jobs WHERE job_id = ${req.params.jobId}`;
+    await sql`SELECT posted_by_recuriter_id, moderation_note FROM jobs WHERE job_id = ${req.params.jobId}`;
 
   if (!existingJob) {
     throw new ErrorHandler(404, "Job not found");
@@ -278,6 +291,12 @@ export const updateJob = TryCatch(async (req: AuthenticatedRequest, res) => {
   }
 
   validateRequirements(req.body);
+  if (is_active !== undefined && typeof is_active !== "boolean")
+    throw new ErrorHandler(400, "Choose whether applications are open");
+  if (is_active === true && existingJob.moderation_note)
+    throw new ErrorHandler(409, "This listing was paused by moderation");
+  const hasDeadline = req.body.application_deadline !== undefined;
+  const deadline = parseDeadline(req.body.application_deadline);
   // COALESCE keeps the stored value for any field the client did not send
   const [updatedJob] = await sql`UPDATE jobs SET
   required_skills=COALESCE(${req.body.required_skills ?? null}::text[],required_skills),
@@ -292,14 +311,32 @@ export const updateJob = TryCatch(async (req: AuthenticatedRequest, res) => {
   job_type = COALESCE(${job_type ?? null}, job_type),
   work_location = COALESCE(${work_location ?? null}, work_location),
   openings = COALESCE(${openings ?? null}, openings),
-  is_active = COALESCE(${is_active ?? null}, is_active)
-  WHERE job_id = ${req.params.jobId} RETURNING *;
+  application_deadline = CASE WHEN ${hasDeadline} THEN ${deadline}::date ELSE application_deadline END,
+  last_confirmed_at = CASE WHEN ${is_active ?? null}::boolean IS TRUE THEN now() ELSE last_confirmed_at END,
+  is_active = COALESCE(${is_active ?? null}::boolean, is_active)
+  WHERE job_id = ${req.params.jobId} AND posted_by_recuriter_id = ${user.user_id}
+    AND (${is_active ?? null}::boolean IS NOT TRUE OR moderation_note = '')
+    AND (COALESCE(${is_active ?? null}::boolean, is_active) IS NOT TRUE
+      OR COALESCE((CASE WHEN ${hasDeadline} THEN ${deadline}::date ELSE application_deadline END)
+        >= (now() AT TIME ZONE 'Asia/Kolkata')::date, true))
+  RETURNING *;
   `;
+  if (!updatedJob) throw new ErrorHandler(409, "To keep applications open, set a current deadline and make sure the listing is not paused by moderation");
 
   res.json({
     message: "Job updated successfully",
     job: updatedJob,
   });
+});
+
+export const confirmJob = TryCatch(async (req: AuthenticatedRequest, res) => {
+  if (req.user?.role !== "recruiter") throw new ErrorHandler(403, "Recruiter access required");
+  const [job] = await sql`UPDATE jobs SET last_confirmed_at = now()
+    WHERE job_id = ${req.params.jobId} AND posted_by_recuriter_id = ${req.user.user_id}
+      AND is_active AND (application_deadline IS NULL OR application_deadline >= (now() AT TIME ZONE 'Asia/Kolkata')::date)
+    RETURNING last_confirmed_at`;
+  if (!job) throw new ErrorHandler(404, "No open listing you can confirm was found");
+  res.json(job);
 });
 
 export const getAllCompany = TryCatch(
@@ -321,7 +358,9 @@ export const getCompanyDetails = TryCatch(
 
     const [companyData] = await sql`SELECT c.*, COALESCE (
      (
-       SELECT json_agg(j.*) FROM jobs j WHERE j.company_id = c.company_id
+       SELECT json_agg(to_jsonb(j) || jsonb_build_object('is_active',
+         j.is_active IS TRUE AND (j.application_deadline IS NULL OR j.application_deadline >= (now() AT TIME ZONE 'Asia/Kolkata')::date)))
+       FROM jobs j WHERE j.company_id = c.company_id
       ),
       '[]'::json
     ) AS jobs
@@ -348,7 +387,10 @@ export const getAllActiveJobs = TryCatch(async (req, res) => {
     const value = req.query[name];
     if (value !== undefined && value !== "" && (typeof value !== "string" || !Number.isFinite(Number(value)) || Number(value)<0 || (name !== "min_salary" && !Number.isInteger(Number(value))))) throw new ErrorHandler(400, "Enter a valid numeric filter");
   }
-  let querySting = `SELECT j.job_id, j.title, j.description, j.salary, j.location, j.job_type, j.role, j.work_location, j.created_at, j.is_active, j.required_skills, j.experience_years, j.graduation_year, j.salary_period, j.featured_until, c.name AS company_name, c.logo AS company_logo, c.company_id AS company_id, c.is_verified AS company_verified FROM jobs j JOIN companies c ON j.company_id = c.company_id WHERE j.is_active = true`;
+  if (req.query.verified_only !== undefined && !["", "true", "false"].includes(String(req.query.verified_only)))
+    throw new ErrorHandler(400, "Choose whether to show only verified companies");
+  let querySting = `SELECT j.job_id, j.title, j.description, j.salary, j.location, j.job_type, j.role, j.work_location, j.created_at, j.is_active, j.required_skills, j.experience_years, j.graduation_year, j.salary_period, j.featured_until, j.application_deadline, j.last_confirmed_at, c.name AS company_name, c.logo AS company_logo, c.company_id AS company_id, c.is_verified AS company_verified FROM jobs j JOIN companies c ON j.company_id = c.company_id WHERE j.is_active = true AND (j.application_deadline IS NULL OR j.application_deadline >= (now() AT TIME ZONE 'Asia/Kolkata')::date)`;
+  if (req.query.verified_only === "true") querySting += " AND c.is_verified = true";
 
   const values = [];
 
@@ -400,13 +442,16 @@ export const getAllActiveJobs = TryCatch(async (req, res) => {
 
 export const getSingleJob = TryCatch(async (req, res) => {
   const [job] =
-    await sql`SELECT * FROM jobs WHERE job_id = ${req.params.jobId}`;
+    await sql`SELECT to_jsonb(j) || jsonb_build_object(
+      'is_active', j.is_active IS TRUE AND (j.application_deadline IS NULL OR j.application_deadline >= (now() AT TIME ZONE 'Asia/Kolkata')::date),
+      'company_verified', c.is_verified, 'company_name', c.name, 'company_logo', c.logo
+    ) AS details FROM jobs j JOIN companies c USING (company_id) WHERE j.job_id = ${req.params.jobId}`;
 
   if (!job) {
     throw new ErrorHandler(404, "Job not found");
   }
 
-  res.json(job);
+  res.json(job.details);
 });
 
 export const getAllApplicationForJob = TryCatch(
@@ -436,7 +481,9 @@ export const getAllApplicationForJob = TryCatch(
     }
 
     const applications =
-      await sql`SELECT * FROM applications WHERE job_id = ${jobId} ORDER BY subscribed DESC, applied_at ASC`;
+      await sql`SELECT application_id,job_id,applicant_id,applicant_email,status,applied_at,subscribed,recruiter_note,updated_at,
+        '/api/user/application/' || application_id || '/resume' AS resume
+        FROM applications WHERE job_id = ${jobId} ORDER BY subscribed DESC, applied_at ASC`;
 
     res.json(applications);
   }
@@ -486,7 +533,10 @@ export const updateApplication = TryCatch(
       throw new ErrorHandler(400, "Notes must be at most 4000 characters");
     }
     const [updatedApplication] =
-      await sql`UPDATE applications SET status = ${req.body.status}, recruiter_note = COALESCE(${req.body.recruiter_note ?? null}, recruiter_note), updated_at=now() WHERE application_id = ${id} RETURNING *`;
+      await sql`UPDATE applications SET status = ${req.body.status}, recruiter_note = COALESCE(${req.body.recruiter_note ?? null}, recruiter_note), updated_at=now()
+      WHERE application_id = ${id}
+      RETURNING application_id,job_id,applicant_id,applicant_email,status,applied_at,subscribed,recruiter_note,updated_at,
+        '/api/user/application/' || application_id || '/resume' AS resume`;
 
     if (application.status !== req.body.status) {
       await sql`INSERT INTO application_events(application_id,status,note)

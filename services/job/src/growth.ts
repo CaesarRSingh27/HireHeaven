@@ -198,7 +198,9 @@ router.put("/admin/jobs/:jobId/suspension", handle(async (req, res) => {
   if (typeof suspended !== "boolean") throw new ErrorHandler(400, "Choose whether to pause this listing");
   const note = suspended ? text(req.body.note, 500) : "";
   if (suspended && note.length < 5) throw new ErrorHandler(400, "Add a short reason before pausing this listing");
-  const [job] = await sql`UPDATE jobs SET is_active=${!suspended},moderation_note=${note}
+  const [job] = await sql`UPDATE jobs SET
+    is_active=NOT ${suspended} AND (application_deadline IS NULL OR application_deadline >= (now() AT TIME ZONE 'Asia/Kolkata')::date),
+    moderation_note=${note}
     WHERE job_id=${jobId} RETURNING job_id,title,is_active,moderation_note`;
   if (!job) throw new ErrorHandler(404, "Listing not found");
   res.json(job);
@@ -222,13 +224,16 @@ router.get(
     const usage =
       await sql`SELECT feature,count FROM growth_usage WHERE user_id=${userId} AND month=date_trunc('month',now())::date`;
     const saved =
-      await sql`SELECT j.*,c.name AS company_name,c.logo AS company_logo FROM saved_jobs s JOIN jobs j USING(job_id)
+      await sql`SELECT j.*,c.name AS company_name,c.logo AS company_logo,c.is_verified AS company_verified,
+    (j.is_active IS TRUE AND (j.application_deadline IS NULL OR j.application_deadline >= (now() AT TIME ZONE 'Asia/Kolkata')::date)) AS is_active
+    FROM saved_jobs s JOIN jobs j USING(job_id)
     JOIN companies c USING(company_id) WHERE s.user_id=${userId} ORDER BY s.created_at DESC`;
     const alerts =
       await sql`SELECT * FROM job_alerts WHERE user_id=${userId} ORDER BY created_at DESC`;
     const matches =
       await sql`SELECT DISTINCT j.job_id,j.title,j.location,j.created_at,c.name AS company_name FROM job_alerts a
     JOIN jobs j ON j.is_active=true AND j.created_at>=a.created_at AND j.title ILIKE '%'||a.title||'%'
+      AND (j.application_deadline IS NULL OR j.application_deadline >= (now() AT TIME ZONE 'Asia/Kolkata')::date)
       AND COALESCE(j.location,'') ILIKE '%'||a.location||'%'
     JOIN companies c USING(company_id) WHERE a.user_id=${userId} ORDER BY j.created_at DESC LIMIT 50`;
   const updates =
@@ -316,7 +321,8 @@ router.post("/reze-context", handle(async (req, res) => {
     .slice(0, 6);
   const jobs = await sql`SELECT j.job_id,j.title,j.location,j.job_type,j.work_location,c.name AS company_name
     FROM jobs j JOIN companies c USING(company_id)
-    WHERE j.is_active=true AND (${terms}::text[] = '{}'::text[] OR EXISTS(
+    WHERE j.is_active=true AND (j.application_deadline IS NULL OR j.application_deadline >= (now() AT TIME ZONE 'Asia/Kolkata')::date)
+      AND (${terms}::text[] = '{}'::text[] OR EXISTS(
       SELECT 1 FROM unnest(${terms}::text[]) AS term WHERE j.title ILIKE '%'||term||'%'
         OR COALESCE(j.location,'') ILIKE '%'||term||'%' OR c.name ILIKE '%'||term||'%'))
     ORDER BY j.featured_until DESC NULLS LAST,j.created_at DESC LIMIT 6`;
@@ -508,7 +514,8 @@ router.get(
     (SELECT count(*) FROM job_views v WHERE v.job_id=j.job_id)::int AS views
     FROM jobs j JOIN companies c USING(company_id) WHERE j.posted_by_recuriter_id=${userId} ORDER BY j.created_at DESC`;
     const applications =
-      await sql`SELECT a.*,j.title AS job_title,u.name AS applicant_name,
+      await sql`SELECT a.application_id,a.job_id,a.applicant_id,a.applicant_email,a.status,a.applied_at,a.subscribed,a.recruiter_note,a.updated_at,
+    '/api/user/application/' || a.application_id || '/resume' AS resume,j.title AS job_title,u.name AS applicant_name,
     ARRAY(SELECT s.name FROM user_skills us JOIN skills s USING(skill_id) WHERE us.user_id=a.applicant_id) AS skills
     FROM applications a JOIN jobs j USING(job_id) JOIN users u ON u.user_id=a.applicant_id
     WHERE j.posted_by_recuriter_id=${userId} ORDER BY a.applied_at DESC`;
@@ -658,26 +665,34 @@ router.get(
   "/campus",
   handle(async (req, res) => {
     recruiter(req);
+    const canTrack = await premium(req.user!.user_id, "college");
     const drives =
       await sql`SELECT * FROM placement_drives WHERE owner_id=${req.user!.user_id} ORDER BY created_at DESC`;
     const students =
       await sql`SELECT r.*,u.name,u.email,d.title,d.college FROM placement_registrations r JOIN placement_drives d ON d.id=r.drive_id
     JOIN users u USING(user_id) WHERE d.owner_id=${req.user!.user_id} ORDER BY r.created_at DESC`;
-    res.json({ drives, students });
+    res.json({ drives, students, canTrack });
   }),
 );
 router.put(
   "/drives/:id/student/:userId",
   handle(async (req, res) => {
     recruiter(req);
-    if (
-      !["Registered", "Shortlisted", "Interview", "Placed"].includes(
-        req.body.status,
-      )
-    )
+    const { status, attendance } = req.body;
+    if (status === undefined && attendance === undefined)
+      throw new ErrorHandler(400, "Choose an attendance or placement status");
+    if (status !== undefined && !["Registered", "Shortlisted", "Interview", "Placed"].includes(status))
       throw new ErrorHandler(400, "Choose a valid placement status");
+    if (attendance !== undefined) {
+      if (!["Unmarked", "Attended", "Absent"].includes(attendance))
+        throw new ErrorHandler(400, "Choose a valid attendance status");
+      if (!(await premium(req.user!.user_id, "college")))
+        throw new ErrorHandler(403, "An active Campus plan is required to record attendance");
+    }
     const [row] =
-      await sql`UPDATE placement_registrations r SET status=${req.body.status} FROM placement_drives d
+      await sql`UPDATE placement_registrations r SET
+    status=COALESCE(${status ?? null},r.status), attendance=COALESCE(${attendance ?? null},r.attendance)
+    FROM placement_drives d
     WHERE d.id=r.drive_id AND d.owner_id=${req.user!.user_id} AND r.drive_id=${id(req.params.id)} AND r.user_id=${id(req.params.userId)} RETURNING r.*`;
     if (!row) throw new ErrorHandler(404, "Registration unavailable");
     res.json(row);

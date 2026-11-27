@@ -1,5 +1,6 @@
 "use client";
 import { Card } from "@/components/ui/card";
+import ResumeDownload from "@/components/resume-download";
 import { Application } from "@/type";
 import {
   Briefcase,
@@ -100,6 +101,9 @@ const AppliedJobs: React.FC<AppliedJobsProps> = ({ applications }) => {
                           </div>
                         </div>
                         <p className="mt-3 text-sm text-muted-foreground">Last updated {new Date(a.updated_at || a.applied_at).toLocaleDateString()}</p>
+                        <ResumeDownload applicationId={a.application_id} className="mt-2 text-sm text-primary hover:underline">
+                          Download submitted resume
+                        </ResumeDownload>
                       </div>
 
                       <Link

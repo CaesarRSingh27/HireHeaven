@@ -3,6 +3,7 @@ import { isAuth } from "../middlewares/auth.js";
 import uploadFile from "../middlewares/multer.js";
 import {
   createCompany,
+  confirmJob,
   createJob,
   deleteCompany,
   getAllActiveJobs,
@@ -20,6 +21,7 @@ router.post("/company/new", isAuth, uploadFile, createCompany);
 router.delete("/company/:companyId", isAuth, deleteCompany);
 router.post("/new", isAuth, createJob);
 router.put("/:jobId", isAuth, updateJob);
+router.post("/:jobId/confirm", isAuth, confirmJob);
 router.get("/company/all", isAuth, getAllCompany);
 router.get("/company/:id", getCompanyDetails);
 router.get("/all", getAllActiveJobs);

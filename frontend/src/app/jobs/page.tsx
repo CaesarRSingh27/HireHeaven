@@ -31,10 +31,12 @@ const locations: string[] = [
   "Remote",
 ];
 
+const emptyFilters = { job_type: "", work_location: "", experience: "", graduation_year: "", skill: "", min_salary: "", salary_period: "", verified_only: "" };
+
 const JobsPage = () => {
   const [loading, setLoading] = useState(true);
   const [jobs, setJobs] = useState<Job[]>([]);
-  const [extra, setExtra] = useState({ job_type: "", work_location: "", experience: "", graduation_year: "", skill: "", min_salary: "", salary_period: "" });
+  const [extra, setExtra] = useState(emptyFilters);
   const [page, setPage] = useState(1);
   const [error, setError] = useState("");
   const [hasMore, setHasMore] = useState(false);
@@ -80,7 +82,7 @@ const JobsPage = () => {
   const clearFilter = () => {
     setTitle("");
     setLocation("");
-    setExtra({ job_type: "", work_location: "", experience: "", graduation_year: "", skill: "", min_salary: "", salary_period: "" });
+    setExtra(emptyFilters);
     setPage(1);
     fetchJobs();
     ref.current?.click();
@@ -202,6 +204,12 @@ const JobsPage = () => {
 
             <div className="space-y-5 py-4 max-h-[65vh] overflow-auto">
               <div className="workspace-form">
+                <label>Employer verification
+                  <select value={extra.verified_only} onChange={event => setExtra({ ...extra, verified_only: event.target.value })}>
+                    <option value="">All employers</option>
+                    <option value="true">Verified employers only</option>
+                  </select>
+                </label>
                 <label>Job type<select value={extra.job_type} onChange={event => setExtra({ ...extra, job_type: event.target.value })}><option value="">Any type</option>{["Full-time","Part-time","Contract","Internship"].map(item => <option key={item}>{item}</option>)}</select></label>
                 <label>Work arrangement<select value={extra.work_location} onChange={event => setExtra({ ...extra, work_location: event.target.value })}><option value="">Any arrangement</option>{["On-site","Remote","Hybrid"].map(item => <option key={item}>{item}</option>)}</select></label>
                 <label>Your experience in years<input type="number" min="0" max="50" value={extra.experience} onChange={event => setExtra({ ...extra, experience: event.target.value })} placeholder="0 for fresher roles" /></label>

@@ -59,7 +59,6 @@ export interface User {
   role: "jobseeker" | "recruiter" | "admin";
   bio: string | null;
   resume: string | null;
-  resume_public_id: string | null;
   profile_pic: string | null;
   profile_pic_public_id: string | null;
   skills: string[];
@@ -119,6 +118,8 @@ export interface Job {
   graduation_year?: number | null;
   salary_period?: "annual" | "monthly";
   featured_until?: string | null;
+  application_deadline?: string | null;
+  last_confirmed_at?: string | null;
 }
 
 export interface Company {

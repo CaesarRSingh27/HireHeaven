@@ -237,6 +237,13 @@ CREATE TABLE IF NOT EXISTS placement_registrations (
 CREATE INDEX IF NOT EXISTS growth_events_user_date ON growth_events(user_id,created_at);
 
 CREATE INDEX IF NOT EXISTS job_alerts_user ON job_alerts(user_id);
+ALTER TABLE jobs ADD COLUMN IF NOT EXISTS application_deadline DATE;
+ALTER TABLE jobs ADD COLUMN IF NOT EXISTS last_confirmed_at TIMESTAMPTZ;
+ALTER TABLE jobs ALTER COLUMN last_confirmed_at SET DEFAULT now();
+CREATE INDEX IF NOT EXISTS idx_jobs_active_deadline ON jobs(application_deadline)
+  WHERE is_active AND application_deadline IS NOT NULL;
+ALTER TABLE placement_registrations ADD COLUMN IF NOT EXISTS attendance TEXT NOT NULL DEFAULT 'Unmarked'
+  CHECK (attendance IN ('Unmarked', 'Attended', 'Absent'));
 CREATE INDEX IF NOT EXISTS application_events_application_date ON application_events(application_id,created_at);
 CREATE INDEX IF NOT EXISTS interview_meetings_candidate_date ON interview_meetings(candidate_id,scheduled_at);
 CREATE INDEX IF NOT EXISTS interview_meetings_recruiter_date ON interview_meetings(recruiter_id,scheduled_at);

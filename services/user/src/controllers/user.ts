@@ -4,6 +4,7 @@ import getBuffer from "../utils/buffer.js";
 import { sql } from "../utils/db.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import { TryCatch } from "../utils/TryCatch.js";
+import { sendPrivateResume, uploadPrivateResume } from "../utils/private-resumes.js";
 
 const internalHeaders = () => ({
   headers: { "x-internal-key": process.env.INTERNAL_API_KEY as string },
@@ -25,9 +26,8 @@ const removeOldUpload = (publicId: string | null | undefined) => {
 
 export const myProfile = TryCatch(
   async (req: AuthenticatedRequest, res, next) => {
-    const user = req.user;
-
-    res.json(user);
+    const { resume, resume_public_id, ...profile } = req.user!;
+    res.json({ ...profile, resume: resume ? "/api/user/resume" : null });
   }
 );
 
@@ -56,18 +56,18 @@ export const getUserProfile = TryCatch(
 
   user.skills = user.skills || [];
 
-  // Contact details and documents are only visible to the owner or a recruiter
+  // Resume downloads are authorized separately against a specific application.
   const isSelf = req.user?.user_id === Number(userId);
   const isRecruiter = req.user?.role === "recruiter";
 
   if (!isSelf && !isRecruiter) {
     delete user.email;
     delete user.phone_number;
-    delete user.resume;
   }
 
+  user.resume = isSelf && user.resume ? "/api/user/resume" : null;
+  delete user.resume_public_id;
   if (!isSelf) {
-    delete user.resume_public_id;
     delete user.profile_pic_public_id;
   }
 
@@ -183,32 +183,35 @@ export const updateResume = TryCatch(async (req: AuthenticatedRequest, res) => {
     throw new ErrorHandler(400, "No pdf file provided");
   }
 
-  const oldPublicId = user.resume_public_id;
-
-  const fileBuffer = getBuffer(file);
-
-  if (!fileBuffer || !fileBuffer.content) {
-    throw new ErrorHandler(500, "failed to generate buffer");
-  }
-
-  const { data: uploadResult } = await axios.post(
-    `${process.env.UPLOAD_SERVICE}/api/utils/upload`,
-    {
-      buffer: fileBuffer.content,
-    },
-    internalHeaders()
-  );
+  if (user.role !== "jobseeker") throw new ErrorHandler(403, "Candidate access required");
+  const reference = await uploadPrivateResume(file);
 
   const [updatedUser] = await sql`
-    UPDATE users SET resume = ${uploadResult.url}, resume_public_id = ${uploadResult.public_id} WHERE user_id = ${user.user_id} RETURNING user_id, name, resume;
+    UPDATE users SET resume = ${reference}, resume_public_id = NULL
+    WHERE user_id = ${user.user_id} RETURNING user_id, name;
     `;
-
-  if (oldPublicId !== uploadResult.public_id) removeOldUpload(oldPublicId);
 
   res.json({
     message: "Resume updated",
-    updatedUser,
+    updatedUser: { ...updatedUser, resume: "/api/user/resume" },
   });
+});
+
+export const downloadMyResume = TryCatch(async (req: AuthenticatedRequest, res) => {
+  await sendPrivateResume(req.user!.resume, res);
+});
+
+export const downloadApplicationResume = TryCatch(async (req: AuthenticatedRequest, res) => {
+  const applicationId = Number(req.params.applicationId);
+  if (!Number.isSafeInteger(applicationId) || applicationId < 1 || applicationId > 2147483647)
+    throw new ErrorHandler(400, "Invalid application ID");
+
+  const user = req.user!;
+  const [application] = await sql`SELECT a.resume FROM applications a JOIN jobs j USING(job_id)
+    WHERE a.application_id = ${applicationId}
+      AND (a.applicant_id = ${user.user_id}
+        OR (${user.role === "recruiter"} AND j.posted_by_recuriter_id = ${user.user_id}))`;
+  await sendPrivateResume(application?.resume, res);
 });
 
 export const addSkillToUser = TryCatch(
@@ -294,29 +297,19 @@ export const applyForJob = TryCatch(async (req: AuthenticatedRequest, res) => {
 
   const applicant_id = user.user_id;
 
-  const resume = user.resume;
-
-  if (!resume) {
+  if (!user.resume) {
     throw new ErrorHandler(
       400,
       "You need to add resume in your profile to apply for this job"
     );
   }
+  if (!user.resume.startsWith("resume:"))
+    throw new ErrorHandler(409, "Your older resume is being moved to private storage. You can upload a fresh PDF to apply now.");
 
   const { job_id } = req.body;
 
-  if (!job_id) {
+  if (!Number.isSafeInteger(Number(job_id)) || Number(job_id) < 1 || Number(job_id) > 2147483647) {
     throw new ErrorHandler(400, "job id is required");
-  }
-
-  const [job] = await sql`SELECT is_active FROM jobs WHERE job_id = ${job_id}`;
-
-  if (!job) {
-    throw new ErrorHandler(404, "No jobs with this id");
-  }
-
-  if (!job.is_active) {
-    throw new ErrorHandler(400, "Job is not active");
   }
 
   const now = Date.now();
@@ -331,27 +324,43 @@ export const applyForJob = TryCatch(async (req: AuthenticatedRequest, res) => {
 
   try {
     [newApplication] =
-      await sql`INSERT INTO applications (job_id, applicant_id, applicant_email, resume, subscribed) VALUES (${job_id}, ${applicant_id}, ${user?.email}, ${resume}, ${isSubscribed}) RETURNING *`;
-    await sql`INSERT INTO application_events(application_id,status,note,created_at)
-      VALUES(${newApplication.application_id},'Submitted','Application sent',${newApplication.applied_at})
-      ON CONFLICT DO NOTHING`;
+      await sql`WITH open_job AS (
+        SELECT job_id FROM jobs WHERE job_id = ${job_id} AND is_active
+          AND (application_deadline IS NULL OR application_deadline >= (now() AT TIME ZONE 'Asia/Kolkata')::date)
+        FOR SHARE
+      ), submitted AS (
+        INSERT INTO applications (job_id, applicant_id, applicant_email, resume, subscribed)
+        SELECT j.job_id, u.user_id, u.email, u.resume, ${isSubscribed}
+        FROM open_job j CROSS JOIN users u WHERE u.user_id = ${applicant_id} AND u.resume LIKE 'resume:%'
+        RETURNING application_id, job_id, applicant_id, applicant_email, status, applied_at, updated_at, subscribed
+      ), recorded AS (
+        INSERT INTO application_events(application_id,status,note,created_at)
+        SELECT application_id,'Submitted','Application sent',applied_at FROM submitted
+      ) SELECT * FROM submitted`;
   } catch (error: any) {
     if (error.code === "23505") {
       throw new ErrorHandler(409, "you have already applied to this job.");
     }
     throw error;
   }
+  if (!newApplication) {
+    const [job] = await sql`SELECT job_id FROM jobs WHERE job_id = ${job_id}`;
+    if (!job) throw new ErrorHandler(404, "No jobs with this id");
+    throw new ErrorHandler(409, "This listing is closed or your resume is unavailable");
+  }
 
   res.json({
     message: "Applied for job successfully",
-    application: newApplication,
+    application: { ...newApplication, resume: `/api/user/application/${newApplication.application_id}/resume` },
   });
 });
 
 export const getAllaplications = TryCatch(
   async (req: AuthenticatedRequest, res) => {
     const applications = await sql`
-    SELECT a.application_id,a.job_id,a.applicant_id,a.applicant_email,a.status,a.resume,a.applied_at,a.updated_at,a.subscribed, j.title AS job_title, j.salary AS job_salary, j.location AS job_location FROM applications a JOIN jobs j ON a.job_id = j.job_id WHERE a.applicant_id = ${req.user?.user_id}
+    SELECT a.application_id,a.job_id,a.applicant_id,a.applicant_email,a.status,
+      '/api/user/application/' || a.application_id || '/resume' AS resume,
+      a.applied_at,a.updated_at,a.subscribed, j.title AS job_title, j.salary AS job_salary, j.location AS job_location FROM applications a JOIN jobs j ON a.job_id = j.job_id WHERE a.applicant_id = ${req.user?.user_id}
   `;
 
     res.json(applications);

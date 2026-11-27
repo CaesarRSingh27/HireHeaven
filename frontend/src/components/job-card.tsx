@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "./ui/button";
+import JobFreshness from "./job-freshness";
 
 interface JobCardProps {
   job: Job;
@@ -104,6 +105,7 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
             <span>₹ {job.salary} {job.salary_period === "monthly" ? "/ month" : "P.A"}</span>
           </div>
         </div>
+        <div className="text-muted-foreground"><JobFreshness job={job} /></div>
       </CardHeader>
 
       <div className="px-6 workspace-tags"><span className="workspace-chip">{job.job_type}</span><span className="workspace-chip">{job.work_location}</span>{job.experience_years === 0 && <span className="workspace-chip">Freshers welcome</span>}{user?.role === "jobseeker" && <button type="button" disabled={saving} onClick={() => void toggleSave()} className="workspace-save">{saved ? "Saved ✓" : "Save job"}</button>}</div>
@@ -147,7 +149,7 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
 
         {job.is_active === false && (
           <div className="w-full text-center text-sm text-red-600 bg-red-100 dark:bg-red-900/30 rounded-md px-3 py-2 font-medium">
-            Postion Closed
+            Applications Closed
           </div>
         )}
       </CardContent>
