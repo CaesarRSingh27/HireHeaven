@@ -1,3 +1,4 @@
+import { initGrowthDb } from "./growth-db.js";
 import app from "./app.js";
 import dotenv from "dotenv";
 import { sql } from "./utils/db.js";
@@ -81,6 +82,8 @@ async function initDB() {
     await sql`CREATE INDEX IF NOT EXISTS idx_jobs_active_created ON jobs(is_active, created_at DESC)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_applications_job_id ON applications(job_id)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_applications_applicant_id ON applications(applicant_id)`;
+
+    await initGrowthDb();
 
     console.log(
       "Job service database tables checked and created successfully."

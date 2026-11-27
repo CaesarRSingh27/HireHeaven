@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import Loading from "@/components/loading";
 import { useAppData } from "@/context/AppContext";
 import React, { useEffect } from "react";
@@ -24,6 +25,7 @@ const AccountPage = () => {
     <>
       {user && (
         <div className="w-[90%] md:w-[60%] m-auto">
+          <div className="workspace-account-link"><Link href="/workspace">Open your career & hiring workspace →</Link></div>
           <Info user={user} isYourAccount={true} />
           {user.role === "jobseeker" && (
             <Skills user={user} isYourAccount={true} />

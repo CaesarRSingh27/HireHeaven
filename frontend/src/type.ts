@@ -113,6 +113,11 @@ export interface Job {
   posted_by_recuriter_id: number;
   created_at: string;
   is_active: boolean;
+  required_skills?: string[];
+  experience_years?: number;
+  graduation_year?: number | null;
+  salary_period?: "annual" | "monthly";
+  featured_until?: string | null;
 }
 
 export interface Company {
@@ -127,7 +132,7 @@ export interface Company {
   jobs?: Job[];
 }
 
-type ApplicationStatus = "Submitted" | "Rejected" | "Hired";
+type ApplicationStatus = "Submitted" | "Shortlisted" | "Interview" | "Rejected" | "Hired";
 
 export interface Application {
   application_id: number;

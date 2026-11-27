@@ -1,4 +1,6 @@
 "use client";
+import JobMatch from "@/components/job-match";
+import { workspaceApi } from "@/lib/workspace";
 import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -61,6 +63,7 @@ const JobPage = () => {
   const [jobApplications, setJobApplications] = useState<Application[]>([]);
 
   const token = Cookies.get("token");
+  useEffect(() => { if (id) void workspaceApi(`/view/${id}`, "POST").catch(() => {}); }, [id]);
 
   async function fetchJobApplications() {
     try {
@@ -206,7 +209,7 @@ const JobPage = () => {
                         <p className="text-xs opacity-70 font-medium mb-1">
                           Salary
                         </p>
-                        <p className="font-semibold">₹{job.salary} P.A</p>
+                        <p className="font-semibold">₹{job.salary} {job.salary_period === "monthly" ? "/ month" : "P.A"}</p>
                       </div>
                     </div>
 
@@ -258,7 +261,7 @@ const JobPage = () => {
                 className="p-2 border-2 border-gray-300 rounded-md bg-background"
               >
                 <option value="All">All Status</option>
-                <option value="Submitted">Submitted</option>
+                <option value="Submitted">Applied</option><option value="Shortlisted">Shortlisted</option><option value="Interview">Interview</option>
                 <option value="Hired">Hired</option>
                 <option value="Rejected">Rejected</option>
               </select>
@@ -313,7 +316,7 @@ const JobPage = () => {
                         className="flex-1 p-2 border-2 border-gray-300 rounded-md bg-background"
                       >
                         <option value="">Update status</option>
-                        <option value="Submitted">Submitted</option>
+                        <option value="Submitted">Applied</option><option value="Shortlisted">Shortlisted</option><option value="Interview">Interview</option>
                         <option value="Hired">Hired</option>
                         <option value="Rejected">Rejected</option>
                       </select>
@@ -343,6 +346,7 @@ const JobPage = () => {
           )}
         </div>
       )}
+      <JobMatch jobId={Number(id)} />
     </div>
   );
 };

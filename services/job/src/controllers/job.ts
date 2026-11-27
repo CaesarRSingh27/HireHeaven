@@ -9,7 +9,7 @@ import { publishToTopic } from "../producer.js";
 
 const JOB_TYPES = ["Full-time", "Part-time", "Contract", "Internship"];
 const WORK_LOCATIONS = ["On-site", "Remote", "Hybrid"];
-const APPLICATION_STATUSES = ["Submitted", "Rejected", "Hired"];
+const APPLICATION_STATUSES = ["Submitted", "Shortlisted", "Interview", "Rejected", "Hired"];
 
 const internalHeaders = () => ({
   headers: { "x-internal-key": process.env.INTERNAL_API_KEY as string },
@@ -211,8 +211,9 @@ export const createJob = TryCatch(async (req: AuthenticatedRequest, res) => {
     throw new ErrorHandler(404, "Company not found");
   }
 
+  validateRequirements(req.body);
   const [newJob] =
-    await sql`INSERT INTO jobs (title, description, salary, location, role, job_type, work_location, company_id, posted_by_recuriter_id, openings) VALUES (${title.trim()}, ${description.trim()}, ${salaryAmount}, ${location.trim()}, ${role.trim()}, ${job_type}, ${work_location}, ${company_id}, ${user.user_id}, ${openings}) RETURNING *`;
+    await sql`INSERT INTO jobs (title, description, salary, location, role, job_type, work_location, company_id, posted_by_recuriter_id, openings, required_skills, experience_years, graduation_year, salary_period) VALUES (${title.trim()}, ${description.trim()}, ${salaryAmount}, ${location.trim()}, ${role.trim()}, ${job_type}, ${work_location}, ${company_id}, ${user.user_id}, ${openings}, ${req.body.required_skills ?? []}::text[], ${Number(req.body.experience_years ?? 0)}, ${req.body.graduation_year ?? null}, ${req.body.salary_period ?? "annual"}) RETURNING *`;
 
   res.json({
     message: "Job posted successfully",
@@ -276,8 +277,13 @@ export const updateJob = TryCatch(async (req: AuthenticatedRequest, res) => {
     throw new ErrorHandler(400, "Openings must be a whole number of at least 1");
   }
 
+  validateRequirements(req.body);
   // COALESCE keeps the stored value for any field the client did not send
   const [updatedJob] = await sql`UPDATE jobs SET
+  required_skills=COALESCE(${req.body.required_skills ?? null}::text[],required_skills),
+  experience_years=COALESCE(${req.body.experience_years === undefined ? null : Number(req.body.experience_years)},experience_years),
+  salary_period=COALESCE(${req.body.salary_period ?? null},salary_period),
+  graduation_year=CASE WHEN ${Object.prototype.hasOwnProperty.call(req.body,"graduation_year")} THEN ${req.body.graduation_year ?? null}::int ELSE graduation_year END,
   title = COALESCE(${title ?? null}, title),
   description = COALESCE(${description ?? null}, description),
   salary = COALESCE(${salary ?? null}, salary),
@@ -335,7 +341,14 @@ export const getAllActiveJobs = TryCatch(async (req, res) => {
     location?: string;
   };
 
-  let querySting = `SELECT j.job_id, j.title, j.description, j.salary, j.location, j.job_type, j.role, j.work_location, j.created_at, c.name AS company_name, c.logo AS company_logo, c.company_id AS company_id FROM jobs j JOIN companies c ON j.company_id = c.company_id WHERE j.is_active = true`;
+  if (req.query.job_type && !JOB_TYPES.includes(String(req.query.job_type))) throw new ErrorHandler(400, "Select a valid job type");
+  if (req.query.work_location && !WORK_LOCATIONS.includes(String(req.query.work_location))) throw new ErrorHandler(400, "Select a valid work arrangement");
+  if (req.query.salary_period && !["annual","monthly"].includes(String(req.query.salary_period))) throw new ErrorHandler(400, "Select a valid pay period");
+  for (const name of ["experience","graduation_year","min_salary","limit","page"]) {
+    const value = req.query[name];
+    if (value !== undefined && value !== "" && (typeof value !== "string" || !Number.isFinite(Number(value)) || Number(value)<0 || (name !== "min_salary" && !Number.isInteger(Number(value))))) throw new ErrorHandler(400, "Enter a valid numeric filter");
+  }
+  let querySting = `SELECT j.job_id, j.title, j.description, j.salary, j.location, j.job_type, j.role, j.work_location, j.created_at, j.is_active, j.required_skills, j.experience_years, j.graduation_year, j.salary_period, j.featured_until, c.name AS company_name, c.logo AS company_logo, c.company_id AS company_id FROM jobs j JOIN companies c ON j.company_id = c.company_id WHERE j.is_active = true`;
 
   const values = [];
 
@@ -353,10 +366,29 @@ export const getAllActiveJobs = TryCatch(async (req, res) => {
     paramIndex++;
   }
 
+  const filters: [string, unknown][] = [
+    ["j.job_type =", req.query.job_type],
+    ["j.work_location =", req.query.work_location],
+    ["j.experience_years <=", req.query.experience],
+    ["j.graduation_year =", req.query.graduation_year],
+    ["j.salary >=", req.query.min_salary],
+    ["j.salary_period =", req.query.salary_period],
+  ];
+  for (const [column, value] of filters) {
+    if (typeof value === "string" && value !== "") {
+      querySting += ` AND ${column} $${paramIndex++}`;
+      values.push(value);
+    }
+  }
+  if (typeof req.query.skill === "string" && req.query.skill.trim()) {
+    querySting += ` AND EXISTS (SELECT 1 FROM unnest(j.required_skills) skill WHERE skill ILIKE $${paramIndex++})`;
+    values.push(`%${req.query.skill.trim()}%`);
+  }
+
   const limit = Math.min(Math.max(Number(req.query.limit) || 100, 1), 100);
   const page = Math.max(Number(req.query.page) || 1, 1);
 
-  querySting += ` ORDER BY j.created_at DESC LIMIT $${paramIndex} OFFSET $${
+  querySting += ` ORDER BY (j.featured_until > now()) DESC NULLS LAST, j.created_at DESC LIMIT $${paramIndex} OFFSET $${
     paramIndex + 1
   }`;
   values.push(limit, (page - 1) * limit);
@@ -449,8 +481,12 @@ export const updateApplication = TryCatch(
       throw new ErrorHandler(403, "Forbidden you are not allowed");
     }
 
+    const note = req.body.recruiter_note;
+    if (note !== undefined && (typeof note !== "string" || note.length > 4000)) {
+      throw new ErrorHandler(400, "Notes must be at most 4000 characters");
+    }
     const [updatedApplication] =
-      await sql`UPDATE applications SET status = ${req.body.status} WHERE application_id = ${id} RETURNING *`;
+      await sql`UPDATE applications SET status = ${req.body.status}, recruiter_note = COALESCE(${req.body.recruiter_note ?? null}, recruiter_note) WHERE application_id = ${id} RETURNING *`;
 
     const message = {
       to: application.applicant_email,
@@ -458,7 +494,7 @@ export const updateApplication = TryCatch(
       html: applicationStatusUpdateTemplate(job.title),
     };
 
-    publishToTopic("send-mail", message).catch((error) => {
+    if (application.status !== req.body.status) publishToTopic("send-mail", message).catch((error) => {
       console.error("Failed to publish message to kafka", error);
     });
 
@@ -469,3 +505,10 @@ export const updateApplication = TryCatch(
     });
   }
 );
+
+function validateRequirements(body: any) {
+  if (body.required_skills !== undefined && (!Array.isArray(body.required_skills) || body.required_skills.length > 30 || body.required_skills.some((s: unknown) => typeof s !== "string" || !s.trim() || s.length > 80))) throw new ErrorHandler(400, "Add up to 30 skills, each at most 80 characters");
+  if (body.experience_years !== undefined && (!Number.isInteger(Number(body.experience_years)) || Number(body.experience_years) < 0 || Number(body.experience_years) > 50)) throw new ErrorHandler(400, "Experience must be 0–50 years");
+  if (body.graduation_year !== undefined && body.graduation_year !== null && (!Number.isInteger(Number(body.graduation_year)) || Number(body.graduation_year)<2000 || Number(body.graduation_year)>2100)) throw new ErrorHandler(400, "Enter a valid graduation year");
+  if (body.salary_period !== undefined && !["annual","monthly"].includes(body.salary_period)) throw new ErrorHandler(400, "Select annual salary or monthly stipend");
+}

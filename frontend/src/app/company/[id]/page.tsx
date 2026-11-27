@@ -88,9 +88,14 @@ const CompanyPage = () => {
   const [openings, setopenings] = useState("");
   const [job_type, setjob_type] = useState("");
   const [work_location, setwork_location] = useState("");
+  const [requiredSkills, setRequiredSkills] = useState("");
+  const [experience, setExperience] = useState("0");
+  const [graduation, setGraduation] = useState("");
+  const [salaryPeriod, setSalaryPeriod] = useState("annual");
   const [is_active, setis_active] = useState(true);
 
   const clearInput = () => {
+    setRequiredSkills(""); setExperience("0"); setGraduation(""); setSalaryPeriod("annual");
     settitle("");
     setdescription("");
     setrole("");
@@ -110,6 +115,10 @@ const CompanyPage = () => {
         description,
         role,
         salary: Number(salary),
+        required_skills: requiredSkills.split(",").map(item => item.trim()).filter(Boolean),
+        experience_years: Number(experience),
+        graduation_year: graduation ? Number(graduation) : null,
+        salary_period: salaryPeriod,
         location,
         openings: Number(openings),
         job_type,
@@ -157,6 +166,10 @@ const CompanyPage = () => {
 
   const handleOpenUpdateModal = (job: Job) => {
     setSelectedJob(job);
+    setRequiredSkills((job.required_skills ?? []).join(", "));
+    setExperience(String(job.experience_years ?? 0));
+    setGraduation(job.graduation_year ? String(job.graduation_year) : "");
+    setSalaryPeriod(job.salary_period ?? "annual");
     settitle(job.title);
     setdescription(job.description);
     setrole(job.role);
@@ -185,6 +198,10 @@ const CompanyPage = () => {
         description,
         role,
         salary: Number(salary),
+        required_skills: requiredSkills.split(",").map(item => item.trim()).filter(Boolean),
+        experience_years: Number(experience),
+        graduation_year: graduation ? Number(graduation) : null,
+        salary_period: salaryPeriod,
         location,
         openings: Number(openings),
         job_type,
@@ -337,7 +354,12 @@ const CompanyPage = () => {
                         />
                       </div>
 
-                      <div className="space-y-2">
+                      <div className="workspace-form">
+  <label>Required skills, separated by commas<input value={requiredSkills} onChange={event => setRequiredSkills(event.target.value)} placeholder="React, TypeScript, SQL" /></label>
+  <label>Minimum experience in years<input type="number" min="0" max="50" value={experience} onChange={event => setExperience(event.target.value)} /></label>
+  <label>Graduation year, optional<input type="number" min="2000" max="2100" value={graduation} onChange={event => setGraduation(event.target.value)} /></label>
+  <label>Pay period<select value={salaryPeriod} onChange={event => setSalaryPeriod(event.target.value)}><option value="annual">Annual salary</option><option value="monthly">Monthly stipend / salary</option></select></label>
+</div><div className="space-y-2">
                         <Label
                           htmlFor="salary"
                           className="text-sm font-medium flex items-center gap-2"
@@ -627,7 +649,12 @@ const CompanyPage = () => {
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="workspace-form">
+  <label>Required skills, separated by commas<input value={requiredSkills} onChange={event => setRequiredSkills(event.target.value)} placeholder="React, TypeScript, SQL" /></label>
+  <label>Minimum experience in years<input type="number" min="0" max="50" value={experience} onChange={event => setExperience(event.target.value)} /></label>
+  <label>Graduation year, optional<input type="number" min="2000" max="2100" value={graduation} onChange={event => setGraduation(event.target.value)} /></label>
+  <label>Pay period<select value={salaryPeriod} onChange={event => setSalaryPeriod(event.target.value)}><option value="annual">Annual salary</option><option value="monthly">Monthly stipend / salary</option></select></label>
+</div><div className="space-y-2">
                   <Label
                     htmlFor="salary"
                     className="text-sm font-medium flex items-center gap-2"

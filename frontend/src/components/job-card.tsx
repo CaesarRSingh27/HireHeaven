@@ -1,6 +1,8 @@
 "use client";
 import { useAppData } from "@/context/AppContext";
 import { Job } from "@/type";
+import toast from "react-hot-toast";
+import { workspaceApi, errorMessage } from "@/lib/workspace";
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import {
@@ -25,6 +27,16 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
     applyJob(id);
   };
 
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  useEffect(() => {
+    if (user?.role === "jobseeker") workspaceApi("/saved").then(result => setSaved(result.data.includes(job.job_id))).catch(() => {});
+  }, [user?.user_id, job.job_id]);
+  async function toggleSave() {
+    setSaving(true);
+    try { await workspaceApi(`/saved/${job.job_id}`, "PUT", { saved: !saved }); setSaved(!saved); }
+    catch (error) { toast.error(errorMessage(error)); } finally { setSaving(false); }
+  }
   const [applied, setApplied] = useState(false);
 
   useEffect(() => {
@@ -37,6 +49,7 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
 
   return (
     <Card className="w-full max-w-[380px] transition-all duration-300 border-2 hover:border-primary/60 hover:-translate-y-1 group">
+      {job.featured_until && new Date(job.featured_until) > new Date() && <span className="workspace-sponsored">Sponsored opening</span>}
       <CardHeader className="space-y-4 pb-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
@@ -70,11 +83,12 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
 
           <div className="flex items-center gap-2 text-base font-semibold">
             <DollarSign size={18} className="text-green-600" />
-            <span>₹ {job.salary} P.A</span>
+            <span>₹ {job.salary} {job.salary_period === "monthly" ? "/ month" : "P.A"}</span>
           </div>
         </div>
       </CardHeader>
 
+      <div className="px-6 workspace-tags"><span className="workspace-chip">{job.job_type}</span><span className="workspace-chip">{job.work_location}</span>{job.experience_years === 0 && <span className="workspace-chip">Freshers welcome</span>}{user?.role === "jobseeker" && <button type="button" disabled={saving} onClick={() => void toggleSave()} className="workspace-save">{saved ? "Saved ✓" : "Save job"}</button>}</div>
       <CardContent className="flex flex-col gap-3 pt-4 border-t">
         <div className="flex w-full gap-2">
           <Link href={`/jobs/${job.job_id}`} className="flex-1">

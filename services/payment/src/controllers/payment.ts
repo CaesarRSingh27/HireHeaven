@@ -5,187 +5,180 @@ import { sql } from "../utils/db.js";
 import { instance } from "../utils/razorpay.js";
 import crypto from "crypto";
 
-const PRICE_INR = Number(process.env.SUBSCRIPTION_PRICE_INR || 119);
-const SUBSCRIPTION_DAYS = 30;
-
+export const plans = [
+  {
+    id: "career",
+    name: "Career Plus",
+    price: 199,
+    days: 30,
+    role: "jobseeker",
+    features: [
+      "100 job comparisons per month",
+      "100 interview questions with feedback per month",
+      "Custom portfolio URL and editorial theme",
+    ],
+  },
+  {
+    id: "recruiter",
+    name: "Recruiter Pro",
+    price: 1499,
+    days: 30,
+    role: "recruiter",
+    features: [
+      "12-week application analytics",
+      "Returning applicant engagement",
+      "Listing views and conversion metrics",
+    ],
+  },
+  {
+    id: "featured",
+    name: "Featured job",
+    price: 299,
+    days: 7,
+    role: "recruiter",
+    features: [
+      "Seven days of sponsored placement",
+      "Clearly labelled in search results",
+    ],
+  },
+  {
+    id: "college",
+    name: "Campus",
+    price: 2999,
+    days: 30,
+    role: "recruiter",
+    features: [
+      "Organise placement drives",
+      "Student registration and placement tracking",
+      "Export placement reports",
+    ],
+  },
+];
+export const getPlans = TryCatch(async (_req, res) => {
+  res.json(plans);
+});
 const safeEqual = (a: string, b: string) => {
-  const bufA = Buffer.from(a);
-  const bufB = Buffer.from(b);
-  return bufA.length === bufB.length && crypto.timingSafeEqual(bufA, bufB);
+  const first = Buffer.from(a),
+    second = Buffer.from(b);
+  return (
+    first.length === second.length && crypto.timingSafeEqual(first, second)
+  );
 };
 
-/**
- * Marks an order as paid AND extends the user's subscription in ONE statement,
- * so it is atomic and idempotent: an order can only be redeemed once, no matter
- * how many times the verify endpoint or the webhook fires.
- *
- * Returns the (safe) user row, or undefined if the order was not redeemable.
- */
+// Claim the order and activate its entitlement in one atomic statement.
 async function redeemOrder(
   orderId: string,
   paymentId: string,
-  userId?: number
+  userId?: number,
 ) {
   const rows = await sql`
     WITH paid AS (
-      UPDATE payment_orders
-      SET status = 'paid', payment_id = ${paymentId}, paid_at = CURRENT_TIMESTAMP
-      WHERE order_id = ${orderId}
-        AND status = 'created'
-        AND (${userId ?? null}::int IS NULL OR user_id = ${userId ?? null}::int)
+      UPDATE payment_orders SET status='paid',payment_id=${paymentId},paid_at=now()
+      WHERE order_id=${orderId} AND status='created'
+        AND (${userId ?? null}::int IS NULL OR user_id=${userId ?? null}::int)
+      RETURNING user_id,plan,job_id
+    ), entitlement AS (
+      INSERT INTO growth_entitlements(user_id,plan,expires_at)
+      SELECT user_id,plan,now()+interval '30 days' FROM paid WHERE plan IN ('career','recruiter','college')
+      ON CONFLICT(user_id,plan) DO UPDATE SET expires_at=GREATEST(growth_entitlements.expires_at,now())+interval '30 days'
       RETURNING user_id
-    )
-    UPDATE users u
-    SET subscription = GREATEST(COALESCE(u.subscription, CURRENT_TIMESTAMP), CURRENT_TIMESTAMP)
-                       + make_interval(days => ${SUBSCRIPTION_DAYS}::int)
-    FROM paid
-    WHERE u.user_id = paid.user_id
-    RETURNING u.user_id, u.name, u.email, u.phone_number, u.role, u.bio,
-              u.resume, u.resume_public_id, u.profile_pic,
-              u.profile_pic_public_id, u.subscription
-  `;
+    ), promotion AS (
+      UPDATE jobs j SET featured_until=GREATEST(COALESCE(j.featured_until,now()),now())+interval '7 days'
+      FROM paid WHERE paid.plan='featured' AND j.job_id=paid.job_id RETURNING j.job_id
+    ), legacy AS (
+      UPDATE users u SET subscription=GREATEST(COALESCE(u.subscription,now()),now())+interval '30 days'
+      FROM paid WHERE u.user_id=paid.user_id AND paid.plan IN ('legacy','career') RETURNING u.user_id
+    ) SELECT user_id FROM paid`;
   return rows[0];
 }
 
 export const checkOut = TryCatch(async (req: AuthenticatedRequest, res) => {
-  if (!req.user) {
-    throw new ErrorHandler(401, "No valid User");
+  if (!req.user) throw new ErrorHandler(401, "Sign in to purchase a plan");
+  const planId = req.body?.plan ?? "legacy";
+  const plan = plans.find((item) => item.id === planId);
+  if (!plan && planId !== "legacy") throw new ErrorHandler(400, "Unknown plan");
+  if (plan && req.user.role !== plan.role)
+    throw new ErrorHandler(
+      403,
+      "This plan requires a " + plan.role + " account",
+    );
+  const jobId = planId === "featured" ? Number(req.body.job_id) : null;
+  if (planId === "featured") {
+    if (!Number.isSafeInteger(jobId) || Number(jobId) < 1)
+      throw new ErrorHandler(400, "Select a job to promote");
+    const [job] =
+      await sql`SELECT job_id FROM jobs WHERE job_id=${jobId} AND posted_by_recuriter_id=${req.user.user_id} AND is_active=true`;
+    if (!job) throw new ErrorHandler(404, "Choose one of your active jobs");
   }
-
-  const user_id = req.user.user_id;
-
-  const [user] =
-    await sql`SELECT subscription FROM users WHERE user_id = ${user_id}`;
-
-  const subTime = user?.subscription
-    ? new Date(user.subscription).getTime()
-    : 0;
-
-  if (subTime > Date.now()) {
-    throw new ErrorHandler(400, "You already have a subscription");
-  }
-
-  const amount = Math.round(PRICE_INR * 100); // paise
-
+  const amount = Math.round(
+    (plan?.price ?? Number(process.env.SUBSCRIPTION_PRICE_INR || 119)) * 100,
+  );
   const order = await instance.orders.create({
     amount,
     currency: "INR",
-    notes: { user_id: user_id.toString() },
+    notes: { user_id: String(req.user.user_id), plan: planId },
   });
-
-  await sql`
-    INSERT INTO payment_orders (order_id, user_id, amount, currency)
-    VALUES (${order.id}, ${user_id}, ${amount}, 'INR')
-  `;
-
+  await sql`INSERT INTO payment_orders(order_id,user_id,amount,currency,plan,job_id)
+    VALUES(${order.id},${req.user.user_id},${amount},'INR',${planId},${jobId})`;
   res.status(201).json({ order });
 });
 
 export const paymentVerification = TryCatch(
   async (req: AuthenticatedRequest, res) => {
-    const user = req.user;
-
-    if (!user) {
-      throw new ErrorHandler(401, "No valid User");
-    }
-
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
-      req.body ?? {};
-
+    if (!req.user) throw new ErrorHandler(401, "Sign in to verify payment");
+    const {
+      razorpay_order_id: orderId,
+      razorpay_payment_id: paymentId,
+      razorpay_signature: signature,
+    } = req.body ?? {};
     if (
-      typeof razorpay_order_id !== "string" ||
-      typeof razorpay_payment_id !== "string" ||
-      typeof razorpay_signature !== "string"
-    ) {
+      typeof orderId !== "string" ||
+      typeof paymentId !== "string" ||
+      typeof signature !== "string"
+    )
       throw new ErrorHandler(400, "Missing payment details");
-    }
-
-    const expectedSignature = crypto
+    const expected = crypto
       .createHmac("sha256", process.env.Razorpay_Secret as string)
-      .update(razorpay_order_id + "|" + razorpay_payment_id)
+      .update(orderId + "|" + paymentId)
       .digest("hex");
-
-    if (!safeEqual(expectedSignature, razorpay_signature)) {
-      return res.status(400).json({ message: "Payment Failed" });
+    if (!safeEqual(expected, signature))
+      throw new ErrorHandler(400, "Invalid payment signature");
+    const redeemed = await redeemOrder(orderId, paymentId, req.user.user_id);
+    if (!redeemed) {
+      const [order] =
+        await sql`SELECT * FROM payment_orders WHERE order_id=${orderId}`;
+      if (
+        !order ||
+        order.user_id !== req.user.user_id ||
+        order.status !== "paid" ||
+        order.payment_id !== paymentId
+      )
+        throw new ErrorHandler(400, "Unknown or already used order");
     }
-
-    const updatedUser = await redeemOrder(
-      razorpay_order_id,
-      razorpay_payment_id,
-      user.user_id
-    );
-
-    if (updatedUser) {
-      return res.json({
-        message: "Subscription Purchased Successfully",
-        updatedUser,
-      });
-    }
-
-    // Not redeemable now. Distinguish a harmless client retry (already paid with
-    // this same payment id) from an unknown order / replay.
-    const [order] = await sql`
-      SELECT user_id, status, payment_id FROM payment_orders
-      WHERE order_id = ${razorpay_order_id}
-    `;
-
-    if (
-      order &&
-      order.user_id === user.user_id &&
-      order.status === "paid" &&
-      order.payment_id === razorpay_payment_id
-    ) {
-      return res.json({
-        message: "Subscription Purchased Successfully",
-        updatedUser: user,
-      });
-    }
-
-    throw new ErrorHandler(400, "Unknown or already used order");
-  }
+    const [updatedUser] =
+      await sql`SELECT user_id,name,email,phone_number,role,bio,resume,resume_public_id,profile_pic,profile_pic_public_id,subscription,
+    ARRAY(SELECT s.name FROM user_skills us JOIN skills s USING(skill_id) WHERE us.user_id=users.user_id) AS skills FROM users WHERE user_id=${req.user.user_id}`;
+    res.json({ message: "Purchase activated successfully", updatedUser });
+  },
 );
 
-/**
- * Razorpay webhook: grants the subscription even if the user closed the browser
- * before the client-side verify call. Configure in the Razorpay dashboard:
- *   URL:    https://<your-domain>/api/payment/webhook
- *   Events: payment.captured (and/or order.paid)
- *   Secret: same value as Razorpay_Webhook_Secret
- */
 export const razorpayWebhook = TryCatch(async (req, res) => {
   const secret = process.env.Razorpay_Webhook_Secret;
-
-  if (!secret) {
-    throw new ErrorHandler(503, "Webhook is not configured");
-  }
-
+  if (!secret) throw new ErrorHandler(503, "Webhook is not configured");
   const signature = req.headers["x-razorpay-signature"];
-  const rawBody = req.body;
-
-  if (typeof signature !== "string" || !Buffer.isBuffer(rawBody)) {
+  if (typeof signature !== "string" || !Buffer.isBuffer(req.body))
     throw new ErrorHandler(400, "Invalid webhook request");
-  }
-
   const expected = crypto
     .createHmac("sha256", secret)
-    .update(rawBody)
+    .update(req.body)
     .digest("hex");
-
-  if (!safeEqual(expected, signature)) {
+  if (!safeEqual(expected, signature))
     throw new ErrorHandler(400, "Invalid signature");
-  }
-
-  const event = JSON.parse(rawBody.toString("utf8"));
-
+  const event = JSON.parse(req.body.toString("utf8"));
   if (event.event === "payment.captured" || event.event === "order.paid") {
     const payment = event.payload?.payment?.entity;
-    const orderId = payment?.order_id ?? event.payload?.order?.entity?.id;
-
-    if (orderId && payment?.id) {
-      await redeemOrder(orderId, payment.id);
-    }
+    if (payment?.order_id && payment?.id)
+      await redeemOrder(payment.order_id, payment.id);
   }
-
-  // Always 200 for a correctly signed event so Razorpay stops retrying
   res.json({ received: true });
 });

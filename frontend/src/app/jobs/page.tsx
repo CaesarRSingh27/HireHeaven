@@ -23,7 +23,7 @@ import { Input } from "@/components/ui/input";
 const locations: string[] = [
   "Delhi",
   "Mumbai",
-  "Banglore",
+  "Bengaluru",
   "Hyderabad",
   "Pune",
   "Kolkata",
@@ -34,17 +34,23 @@ const locations: string[] = [
 const JobsPage = () => {
   const [loading, setLoading] = useState(true);
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [extra, setExtra] = useState({ job_type: "", work_location: "", experience: "", graduation_year: "", skill: "", min_salary: "", salary_period: "" });
+  const [page, setPage] = useState(1);
+  const [error, setError] = useState("");
+  const [hasMore, setHasMore] = useState(false);
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
 
   const token = Cookies.get("token");
+  const requestId = useRef(0);
   const ref = useRef<HTMLButtonElement>(null);
 
   async function fetchJobs() {
+    const currentRequest = ++requestId.current;
     setLoading(true);
     try {
       const { data } = await axios.get(
-        `${job_service}/api/job/all?title=${title}&location=${location}`,
+        `${job_service}/api/job/all?${new URLSearchParams({ title, location, ...extra, limit: "12", page: String(page) })}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -52,17 +58,20 @@ const JobsPage = () => {
         }
       );
 
-      setJobs(data);
+      if (currentRequest !== requestId.current) return;
+      setJobs(data); setHasMore(data.length === 12); setError("");
     } catch (error) {
-      console.log(error);
+      if (currentRequest !== requestId.current) return;
+      setError("Jobs could not be loaded. Please try again.");
     } finally {
-      setLoading(false);
+      if (currentRequest === requestId.current) setLoading(false);
     }
   }
 
   useEffect(() => {
     fetchJobs();
-  }, [title, location]);
+  }, [title, location, extra, page]);
+  useEffect(() => { setPage(1); }, [title, location, extra]);
 
   const clickEvent = () => {
     ref.current?.click();
@@ -71,11 +80,13 @@ const JobsPage = () => {
   const clearFilter = () => {
     setTitle("");
     setLocation("");
+    setExtra({ job_type: "", work_location: "", experience: "", graduation_year: "", skill: "", min_salary: "", salary_period: "" });
+    setPage(1);
     fetchJobs();
     ref.current?.click();
   };
 
-  const hasActiveFilters = title || location;
+  const hasActiveFilters = title || location || Object.values(extra).some(Boolean);
   return (
     <div className="min-h-screen bg-secondary/30">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -147,6 +158,8 @@ const JobsPage = () => {
             <span className="jobs-guide-spark jobs-guide-spark-two" aria-hidden="true">✧</span>
           </section>
 
+          <section className="workspace-card mb-6"><div className="workspace-links"><button type="button" onClick={() => setExtra({ ...extra, experience: "0", job_type: "" })}>Freshers welcome</button><button type="button" onClick={() => setExtra({ ...extra, job_type: "Internship", salary_period: "monthly" })}>Paid internships</button><button type="button" onClick={() => setExtra({ ...extra, work_location: "Remote" })}>Remote work</button><a href="/workspace">Saved jobs & alerts →</a></div></section>
+          {error && <p role="alert">{error}<button onClick={() => void fetchJobs()}>Retry</button></p>}
           {loading ? (
             <Loading />
           ) : (
@@ -173,6 +186,7 @@ const JobsPage = () => {
 
         </div>
 
+        <div className="workspace-pagination"><Button variant="outline" disabled={page === 1 || loading} onClick={() => setPage(page - 1)}>Previous</Button><span>Page {page}</span><Button variant="outline" disabled={!hasMore || loading} onClick={() => setPage(page + 1)}>Next</Button></div>
         <Dialog>
           <DialogTrigger asChild>
             <Button ref={ref} className="hidden"></Button>
@@ -186,7 +200,16 @@ const JobsPage = () => {
               </DialogTitle>
             </DialogHeader>
 
-            <div className="space-y-5 py-4">
+            <div className="space-y-5 py-4 max-h-[65vh] overflow-auto">
+              <div className="workspace-form">
+                <label>Job type<select value={extra.job_type} onChange={event => setExtra({ ...extra, job_type: event.target.value })}><option value="">Any type</option>{["Full-time","Part-time","Contract","Internship"].map(item => <option key={item}>{item}</option>)}</select></label>
+                <label>Work arrangement<select value={extra.work_location} onChange={event => setExtra({ ...extra, work_location: event.target.value })}><option value="">Any arrangement</option>{["On-site","Remote","Hybrid"].map(item => <option key={item}>{item}</option>)}</select></label>
+                <label>Your experience in years<input type="number" min="0" max="50" value={extra.experience} onChange={event => setExtra({ ...extra, experience: event.target.value })} placeholder="0 for fresher roles" /></label>
+                <label>Graduation year<input type="number" min="2000" max="2100" value={extra.graduation_year} onChange={event => setExtra({ ...extra, graduation_year: event.target.value })} /></label>
+                <label>Required skill<input value={extra.skill} onChange={event => setExtra({ ...extra, skill: event.target.value })} placeholder="React, Python…" /></label>
+                <label>Pay period<select value={extra.salary_period} onChange={event => setExtra({ ...extra, salary_period: event.target.value })}><option value="">Any period</option><option value="annual">Annual salary</option><option value="monthly">Monthly stipend / salary</option></select></label>
+                <label>Minimum pay in INR<input type="number" min="0" value={extra.min_salary} onChange={event => setExtra({ ...extra, min_salary: event.target.value })} /></label>
+              </div>
               <div className="space-y-2">
                 <Label
                   htmlFor="title"

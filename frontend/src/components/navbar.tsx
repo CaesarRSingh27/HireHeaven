@@ -25,6 +25,8 @@ import { useAppData } from "@/context/AppContext";
 const navigation = [
   { href: "/", label: "Home", icon: Home },
   { href: "/jobs", label: "Find a job", icon: BriefcaseBusiness },
+  { href: "/workspace", label: "Workspace", icon: Building2 },
+  { href: "/subscribe", label: "Plans", icon: BriefcaseBusiness },
   { href: "/about", label: "About", icon: Info },
   { href: "/contact", label: "Contact", icon: Mail },
 ];
