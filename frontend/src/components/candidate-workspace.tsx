@@ -13,6 +13,7 @@ import {
   type Portfolio,
   type Interview,
 } from "@/lib/workspace";
+import CalendarActions from "@/components/calendar-actions";
 
 export default function CandidateWorkspace({
   data,
@@ -38,6 +39,13 @@ export default function CandidateWorkspace({
   );
   const [answer, setAnswer] = useState(session?.answer ?? "");
   const paid = data.entitlements.some((plan) => plan.plan === "career");
+  const profileSteps = [
+    { label: "Add a short professional introduction", done: Boolean(user?.bio?.trim()), href: "/account" },
+    { label: "List at least three skills", done: (user?.skills?.length ?? 0) >= 3, href: "/account" },
+    { label: "Upload a current resume", done: Boolean(user?.resume), href: "/account" },
+    { label: "Add a project or portfolio link", done: Boolean(data.portfolio?.projects?.length || data.portfolio?.github?.trim()), href: "/workspace#portfolio" },
+  ];
+  const profileProgress = Math.round(profileSteps.filter((step) => step.done).length / profileSteps.length * 100);
 
   async function savePortfolio(event: FormEvent) {
     event.preventDefault();
@@ -137,6 +145,12 @@ export default function CandidateWorkspace({
           <Link href="/subscribe">Explore plans →</Link>
         </div>
       </div>
+      <section className="workspace-card profile-completion-card">
+        <div className="workspace-row"><div><span className="workspace-kicker">Candidate profile guide</span><h2>Make your strengths easy to spot.</h2></div><strong>{profileProgress}% complete</strong></div>
+        <p>A complete profile gives hiring teams a clearer picture of your experience.</p>
+        <div className="profile-progress-track" role="progressbar" aria-label="Profile completion" aria-valuemin={0} aria-valuemax={100} aria-valuenow={profileProgress}><span style={{ width: `${profileProgress}%` }} /></div>
+        <ul className="profile-checklist">{profileSteps.map((step) => <li key={step.label}><span aria-hidden="true">{step.done ? "✓" : "○"}</span><Link href={step.href} className={step.done ? "is-complete" : ""}>{step.label}</Link>{!step.done && <Link href={step.href} className="profile-step-action">Add →</Link>}</li>)}</ul>
+      </section>
       <div className="workspace-grid">
         <section className="workspace-card">
           <h2>Your shortlist.</h2>
@@ -237,7 +251,7 @@ export default function CandidateWorkspace({
               <strong>{update.title}</strong>
               <span className="workspace-chip">{update.status}</span>
             </div>
-            <small>Applied {new Date(update.applied_at).toLocaleDateString()}</small>
+            <small>Applied {new Date(update.applied_at).toLocaleDateString()} · Last updated {new Date(update.updated_at || update.applied_at).toLocaleDateString()}</small>
             <ol className="workspace-timeline">
               {update.timeline.map((event, index) => (
                 <li key={`${event.created_at}-${index}`}>
@@ -260,6 +274,7 @@ export default function CandidateWorkspace({
             <div><strong>{meeting.job_title}</strong><small>{meeting.recruiter_name ? `With ${meeting.recruiter_name} · ` : ""}{new Date(meeting.scheduled_at).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</small><span className="workspace-chip">{meeting.status}</span></div>
             <div className="workspace-meeting-actions">
               {meeting.meeting_url && <a href={meeting.meeting_url} target="_blank" rel="noreferrer">Open meeting ↗</a>}
+              {(meeting.status === "Proposed" || meeting.status === "Accepted") && <CalendarActions meeting={meeting} />}
               {meeting.status === "Proposed" && <><button type="button" onClick={() => void respondToMeeting(meeting.id, true, reload)}>Accept</button><button type="button" onClick={() => void respondToMeeting(meeting.id, false, reload)}>Decline</button></>}
             </div>
           </article>

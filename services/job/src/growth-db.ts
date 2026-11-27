@@ -4,6 +4,24 @@ export async function initGrowthDb() {
   await sql`ALTER TYPE application_status ADD VALUE IF NOT EXISTS 'Shortlisted'`;
   await sql`ALTER TYPE application_status ADD VALUE IF NOT EXISTS 'Interview'`;
   await sql`ALTER TABLE applications ADD COLUMN IF NOT EXISTS recruiter_note TEXT NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE applications ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now()`;
+  await sql`ALTER TABLE companies ADD COLUMN IF NOT EXISTS is_verified BOOLEAN NOT NULL DEFAULT false`;
+  await sql`ALTER TABLE companies ADD COLUMN IF NOT EXISTS verified_at TIMESTAMPTZ`;
+  await sql`ALTER TABLE companies ADD COLUMN IF NOT EXISTS verified_by INTEGER REFERENCES users(user_id) ON DELETE SET NULL`;
+  await sql`ALTER TABLE jobs ADD COLUMN IF NOT EXISTS moderation_note TEXT NOT NULL DEFAULT ''`;
+  await sql`CREATE TABLE IF NOT EXISTS job_reports (
+    id BIGSERIAL PRIMARY KEY,
+    job_id INTEGER NOT NULL REFERENCES jobs(job_id) ON DELETE CASCADE,
+    reporter_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    reason TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'Pending' CHECK(status IN ('Pending','Reviewed','Dismissed')),
+    review_note TEXT NOT NULL DEFAULT '',
+    reviewed_by INTEGER REFERENCES users(user_id) ON DELETE SET NULL,
+    reviewed_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`;
+  await sql`CREATE UNIQUE INDEX IF NOT EXISTS job_reports_one_pending_per_reporter ON job_reports(job_id,reporter_id) WHERE status='Pending'`;
+  await sql`CREATE INDEX IF NOT EXISTS job_reports_status_created ON job_reports(status,created_at DESC)`;
   await sql`CREATE TABLE IF NOT EXISTS application_events (
     id BIGSERIAL PRIMARY KEY,
     application_id INTEGER NOT NULL REFERENCES applications(application_id) ON DELETE CASCADE,

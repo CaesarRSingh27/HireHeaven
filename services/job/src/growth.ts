@@ -27,6 +27,10 @@ const candidate = (req: AuthenticatedRequest) => {
   if (req.user?.role !== "jobseeker")
     throw new ErrorHandler(403, "Candidate access required");
 };
+const admin = (req: AuthenticatedRequest) => {
+  if (req.user?.role !== "admin")
+    throw new ErrorHandler(403, "Administrator access required");
+};
 const html = (value: string) => value.replace(/[&<>"']/g, (char) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
 })[char]!);
@@ -111,6 +115,95 @@ router.get(
 
 router.use(isAuth);
 
+router.post("/reports/:jobId", handle(async (req, res) => {
+  const jobId = id(req.params.jobId);
+  const reason = text(req.body.reason, 1000);
+  if (reason.length < 10) throw new ErrorHandler(400, "Please describe the concern in at least 10 characters");
+  const [job] = await sql`SELECT job_id FROM jobs WHERE job_id=${jobId}`;
+  if (!job) throw new ErrorHandler(404, "Job listing not found");
+  const [existing] = await sql`SELECT id FROM job_reports WHERE job_id=${jobId} AND reporter_id=${req.user!.user_id} AND status='Pending'`;
+  if (existing) throw new ErrorHandler(409, "You have already reported this listing");
+  const [report] = await sql`INSERT INTO job_reports(job_id,reporter_id,reason)
+    VALUES(${jobId},${req.user!.user_id},${reason}) RETURNING id,status,created_at`;
+  res.status(201).json(report);
+}));
+
+router.get("/admin/overview", handle(async (req, res) => {
+  admin(req);
+  const reports = await sql`SELECT r.id,r.job_id,r.reason,r.status,r.review_note,r.created_at,
+    j.title,j.is_active,j.posted_by_recuriter_id,c.name AS company_name,
+    reporter.name AS reporter_name
+    FROM job_reports r JOIN jobs j USING(job_id) JOIN companies c USING(company_id)
+    JOIN users reporter ON reporter.user_id=r.reporter_id
+    ORDER BY CASE WHEN r.status='Pending' THEN 0 ELSE 1 END,r.created_at DESC LIMIT 200`;
+  const companies = await sql`SELECT c.company_id,c.name,c.website,c.logo,c.created_at,c.is_verified,
+    u.user_id AS recruiter_id,u.name AS recruiter_name,u.email AS recruiter_email,
+    (SELECT count(*)::int FROM jobs j WHERE j.company_id=c.company_id) AS listings
+    FROM companies c JOIN users u ON u.user_id=c.recruiter_id
+    ORDER BY c.is_verified,c.created_at DESC LIMIT 200`;
+  const users = await sql`SELECT user_id,name,email,role,is_suspended,suspension_note,created_at
+    FROM users WHERE role<>'admin' ORDER BY created_at DESC LIMIT 300`;
+  const jobs = await sql`SELECT j.job_id,j.title,j.is_active,j.moderation_note,j.created_at,c.name AS company_name
+    FROM jobs j JOIN companies c USING(company_id) ORDER BY j.created_at DESC LIMIT 200`;
+  res.json({ reports, companies, users, jobs });
+}));
+
+router.put("/admin/reports/:reportId", handle(async (req, res) => {
+  admin(req);
+  const reportId = id(req.params.reportId);
+  const status = req.body.status;
+  if (!(["Reviewed", "Dismissed"] as unknown[]).includes(status))
+    throw new ErrorHandler(400, "Choose Reviewed or Dismissed");
+  const note = text(req.body.review_note, 500);
+  const [report] = await sql`UPDATE job_reports SET status=${status},review_note=${note},
+    reviewed_by=${req.user!.user_id},reviewed_at=now() WHERE id=${reportId}
+    RETURNING id,status,review_note,reviewed_at`;
+  if (!report) throw new ErrorHandler(404, "Report not found");
+  res.json(report);
+}));
+
+router.put("/admin/companies/:companyId/verify", handle(async (req, res) => {
+  admin(req);
+  const companyId = id(req.params.companyId);
+  if (typeof req.body.verified !== "boolean") throw new ErrorHandler(400, "Choose whether to verify this company");
+  const [company] = await sql`UPDATE companies SET is_verified=${req.body.verified},
+    verified_at=CASE WHEN ${req.body.verified} THEN now() ELSE NULL END,
+    verified_by=CASE WHEN ${req.body.verified} THEN ${req.user!.user_id} ELSE NULL END
+    WHERE company_id=${companyId} RETURNING company_id,is_verified,verified_at`;
+  if (!company) throw new ErrorHandler(404, "Company not found");
+  res.json(company);
+}));
+
+router.put("/admin/users/:userId/suspension", handle(async (req, res) => {
+  admin(req);
+  const userId = id(req.params.userId);
+  const suspended = req.body.suspended;
+  if (typeof suspended !== "boolean") throw new ErrorHandler(400, "Choose whether to suspend this account");
+  if (userId === req.user!.user_id) throw new ErrorHandler(400, "You cannot suspend your own admin account");
+  const note = suspended ? text(req.body.note, 500) : "";
+  if (suspended && note.length < 5) throw new ErrorHandler(400, "Add a short reason before suspending this account");
+  const [account] = await sql`UPDATE users SET is_suspended=${suspended},suspension_note=${note},
+    suspended_at=CASE WHEN ${suspended} THEN now() ELSE NULL END,
+    suspended_by=CASE WHEN ${suspended} THEN ${req.user!.user_id} ELSE NULL END
+    WHERE user_id=${userId} AND role<>'admin'
+    RETURNING user_id,name,is_suspended,suspension_note`;
+  if (!account) throw new ErrorHandler(404, "Non-admin account not found");
+  res.json(account);
+}));
+
+router.put("/admin/jobs/:jobId/suspension", handle(async (req, res) => {
+  admin(req);
+  const jobId = id(req.params.jobId);
+  const suspended = req.body.suspended;
+  if (typeof suspended !== "boolean") throw new ErrorHandler(400, "Choose whether to pause this listing");
+  const note = suspended ? text(req.body.note, 500) : "";
+  if (suspended && note.length < 5) throw new ErrorHandler(400, "Add a short reason before pausing this listing");
+  const [job] = await sql`UPDATE jobs SET is_active=${!suspended},moderation_note=${note}
+    WHERE job_id=${jobId} RETURNING job_id,title,is_active,moderation_note`;
+  if (!job) throw new ErrorHandler(404, "Listing not found");
+  res.json(job);
+}));
+
 router.get(
   "/saved",
   handle(async (req, res) => {
@@ -138,8 +231,8 @@ router.get(
     JOIN jobs j ON j.is_active=true AND j.created_at>=a.created_at AND j.title ILIKE '%'||a.title||'%'
       AND COALESCE(j.location,'') ILIKE '%'||a.location||'%'
     JOIN companies c USING(company_id) WHERE a.user_id=${userId} ORDER BY j.created_at DESC LIMIT 50`;
-    const updates =
-      await sql`SELECT a.application_id,a.status,j.title,a.applied_at,
+  const updates =
+      await sql`SELECT a.application_id,a.status,j.title,a.applied_at,a.updated_at,
         COALESCE((SELECT json_agg(json_build_object('status',e.status,'note',e.note,'created_at',e.created_at) ORDER BY e.created_at)
           FROM application_events e WHERE e.application_id=a.application_id), '[]'::json) AS timeline
         FROM applications a JOIN jobs j USING(job_id)
@@ -468,7 +561,7 @@ router.post("/meetings", handle(async (req, res) => {
   if (pendingMeeting) throw new ErrorHandler(409, "Cancel or resolve the current interview invite first");
   const [meeting] = await sql`INSERT INTO interview_meetings(application_id,recruiter_id,candidate_id,scheduled_at,meeting_url)
     VALUES(${applicationId},${req.user!.user_id},${application.applicant_id},${scheduledAt.toISOString()},${meetingUrl}) RETURNING id,application_id,scheduled_at,status,meeting_url`;
-  const [updated] = await sql`UPDATE applications SET status='Interview' WHERE application_id=${applicationId} AND status IN ('Submitted','Shortlisted') RETURNING status`;
+  const [updated] = await sql`UPDATE applications SET status='Interview',updated_at=now() WHERE application_id=${applicationId} AND status IN ('Submitted','Shortlisted') RETURNING status`;
   if (updated) await sql`INSERT INTO application_events(application_id,status,note)
     VALUES(${applicationId},'Interview','Interview time proposed by the hiring team')`;
   await mail(application.applicant_email, `Interview invitation · ${application.title}`, "An interview has been proposed", `The hiring team has proposed <strong>${html(scheduledAt.toLocaleString("en-IN", { dateStyle: "full", timeStyle: "short", timeZone: "Asia/Kolkata" }))}</strong> for <strong>${html(application.title)}</strong>. Open your workspace to accept or decline.${meetingUrl ? `<br><br><a href="${html(meetingUrl)}">Open meeting link</a>` : ""}`);

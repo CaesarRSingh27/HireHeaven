@@ -22,6 +22,7 @@ Free candidates get five comparisons and three interview questions with feedback
 | Register / sign in, `/register` and `/login` | Use email and password or Google, LinkedIn, and GitHub through Clerk |
 | Contact us, `/contact` | Find contact details and prepare a message in WhatsApp |
 | Workspace, `/workspace` | Track applications, receive job digests, manage portfolios, practise or schedule interviews, manage hiring, or organise campus placements |
+| Admin, `/admin` | Review listing reports, verify companies, and suspend accounts or listings |
 | Public portfolios, `/talent/[slug]` | View a candidate’s opted-in projects, skills, and profile |
 | Subscription, `/subscribe` | Access the Razorpay subscription checkout |
 
@@ -36,6 +37,12 @@ The frontend sends up to 12 recent messages to `POST /api/utils/chat`. For signe
 ### Application timelines, interview calendar, and email alerts
 
 Candidates can follow a timeline for every application, accept or decline recruiter-proposed interview times, and optionally get daily or weekly matching-job email digests. Recruiters can propose an interview appointment with an optional HTTPS meeting link from an applicant card. Both sides receive interview invitations/response notices and a reminder about 24 hours before the appointment. These messages use the existing SMTP/Kafka service; configure valid SMTP credentials to deliver them. Alert emails are opt-in.
+
+Interview invitations include a Google Calendar link and a downloadable `.ics` file. Candidate profiles show a completion checklist for introductions, skills, resumes, and portfolios. Recruiter pipelines show when each application was last updated and flag submitted applications waiting at least seven days.
+
+### Administration and moderation
+
+An initial administrator can be provisioned by setting `ADMIN_EMAIL`, `ADMIN_NAME`, and `ADMIN_PASSWORD` in the ignored root `.env` file before starting the auth service. The password is hashed by the auth service and is never stored in source control. Public registration cannot assign the admin role. Administrators can review reported listings, verify company profiles, pause suspicious job listings, and suspend or reinstate non-admin accounts. Suspended accounts are blocked from authenticated service APIs.
 
 ### Contact messages
 

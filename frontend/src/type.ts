@@ -56,7 +56,7 @@ export interface User {
   name: string;
   email: string;
   phone_number: string | null;
-  role: "jobseeker" | "recruiter";
+  role: "jobseeker" | "recruiter" | "admin";
   bio: string | null;
   resume: string | null;
   resume_public_id: string | null;
@@ -110,6 +110,7 @@ export interface Job {
   company_id: number;
   company_name: string;
   company_logo: string;
+  company_verified?: boolean;
   posted_by_recuriter_id: number;
   created_at: string;
   is_active: boolean;
@@ -142,6 +143,7 @@ export interface Application {
   status: ApplicationStatus;
   resume: string;
   applied_at: string;
+  updated_at?: string;
   subscribed: boolean;
   job_title: string;
   job_salary: number;

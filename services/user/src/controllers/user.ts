@@ -351,7 +351,7 @@ export const applyForJob = TryCatch(async (req: AuthenticatedRequest, res) => {
 export const getAllaplications = TryCatch(
   async (req: AuthenticatedRequest, res) => {
     const applications = await sql`
-    SELECT a.application_id,a.job_id,a.applicant_id,a.applicant_email,a.status,a.resume,a.applied_at,a.subscribed, j.title AS job_title, j.salary AS job_salary, j.location AS job_location FROM applications a JOIN jobs j ON a.job_id = j.job_id WHERE a.applicant_id = ${req.user?.user_id}
+    SELECT a.application_id,a.job_id,a.applicant_id,a.applicant_email,a.status,a.resume,a.applied_at,a.updated_at,a.subscribed, j.title AS job_title, j.salary AS job_salary, j.location AS job_location FROM applications a JOIN jobs j ON a.job_id = j.job_id WHERE a.applicant_id = ${req.user?.user_id}
   `;
 
     res.json(applications);

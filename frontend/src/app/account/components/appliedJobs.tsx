@@ -99,6 +99,7 @@ const AppliedJobs: React.FC<AppliedJobsProps> = ({ applications }) => {
                             </span>
                           </div>
                         </div>
+                        <p className="mt-3 text-sm text-muted-foreground">Last updated {new Date(a.updated_at || a.applied_at).toLocaleDateString()}</p>
                       </div>
 
                       <Link

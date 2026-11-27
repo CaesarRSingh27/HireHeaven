@@ -12,6 +12,7 @@ import {
   type Applicant,
   type HiringData,
 } from "@/lib/workspace";
+import CalendarActions from "@/components/calendar-actions";
 
 const stages = ["Submitted", "Shortlisted", "Interview", "Hired", "Rejected"];
 export default function HiringWorkspace() {
@@ -137,6 +138,8 @@ export default function HiringWorkspace() {
                         <strong>{applicant.applicant_name}</strong>
                       </Link>
                       <small>{applicant.job_title}</small>
+                      <small className="application-response-age">Last updated {new Date(applicant.updated_at || applicant.applied_at).toLocaleDateString()}</small>
+                      {applicant.status === "Submitted" && Math.floor((Date.now() - new Date(applicant.updated_at || applicant.applied_at).getTime()) / 86400000) >= 7 && <span className="workspace-chip response-overdue">Waiting {Math.floor((Date.now() - new Date(applicant.updated_at || applicant.applied_at).getTime()) / 86400000)} days · Consider an update</span>}
                       <p>
                         {applicant.skills.join(" · ") || "No skills listed"}
                       </p>
@@ -187,6 +190,7 @@ export default function HiringWorkspace() {
             <div><strong>{meeting.job_title}</strong><small>{meeting.candidate_name} · {new Date(meeting.scheduled_at).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</small><span className="workspace-chip">{meeting.status}</span></div>
             <div className="workspace-meeting-actions">
               {meeting.meeting_url && <a href={meeting.meeting_url} target="_blank" rel="noreferrer">Open meeting ↗</a>}
+              {(meeting.status === "Proposed" || meeting.status === "Accepted") && <CalendarActions meeting={meeting} />}
               {meeting.status === "Proposed" || meeting.status === "Accepted" ? <button type="button" onClick={async () => {
                 try { await workspaceApi(`/meetings/${meeting.id}/cancel`, "POST"); toast.success("Interview cancelled"); await load(); }
                 catch (error) { toast.error(errorMessage(error)); }

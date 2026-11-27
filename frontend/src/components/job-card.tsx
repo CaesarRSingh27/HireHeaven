@@ -38,6 +38,9 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
     catch (error) { toast.error(errorMessage(error)); } finally { setSaving(false); }
   }
   const [applied, setApplied] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [reportBusy, setReportBusy] = useState(false);
 
   useEffect(() => {
     if (applications && job.job_id) {
@@ -46,6 +49,21 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
       });
     }
   }, [applications, job.job_id]);
+
+  async function reportListing(event: React.FormEvent) {
+    event.preventDefault();
+    setReportBusy(true);
+    try {
+      await workspaceApi(`/reports/${job.job_id}`, "POST", { reason: reportReason });
+      toast.success("Thanks. Our team will review this listing.");
+      setReportOpen(false);
+      setReportReason("");
+    } catch (error) {
+      toast.error(errorMessage(error));
+    } finally {
+      setReportBusy(false);
+    }
+  }
 
   return (
     <Card className="w-full max-w-[380px] transition-all duration-300 border-2 hover:border-primary/60 hover:-translate-y-1 group">
@@ -58,7 +76,7 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
             </h3>
             <div className="flex items-center gap-2 text-sm opacity-70">
               <Building2 size={16} />
-              <span>{job.company_name}</span>
+              <span>{job.company_name}</span>{job.company_verified && <span className="verified-company-badge"><CheckCircle size={13} /> Verified</span>}
             </div>
           </div>
 
@@ -125,6 +143,7 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
             </>
           )}
         </div>
+        {(user?.role === "jobseeker" || user?.role === "recruiter") && <div className="job-report-area"><button type="button" className="job-report-toggle" onClick={() => setReportOpen((open) => !open)}>{reportOpen ? "Cancel report" : "Report listing"}</button>{reportOpen && <form className="job-report-form" onSubmit={reportListing}><label htmlFor={`report-${job.job_id}`}>Tell us what looks wrong</label><textarea id={`report-${job.job_id}`} value={reportReason} onChange={(event) => setReportReason(event.target.value)} minLength={10} maxLength={1000} required placeholder="For example, misleading details or a suspicious request" /><button disabled={reportBusy || reportReason.trim().length < 10}>{reportBusy ? "Sending…" : "Submit report"}</button></form>}</div>}
 
         {job.is_active === false && (
           <div className="w-full text-center text-sm text-red-600 bg-red-100 dark:bg-red-900/30 rounded-md px-3 py-2 font-medium">

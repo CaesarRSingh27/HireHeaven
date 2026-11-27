@@ -5,7 +5,7 @@
 
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role') THEN
-    CREATE TYPE user_role AS ENUM ('jobseeker', 'recruiter');
+    CREATE TYPE user_role AS ENUM ('jobseeker', 'recruiter', 'admin');
   END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'job_type') THEN
     CREATE TYPE job_type AS ENUM ('Full-time', 'Part-time', 'Contract', 'Internship');
@@ -33,6 +33,10 @@ CREATE TABLE IF NOT EXISTS users (
   profile_pic_public_id VARCHAR(255),
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   subscription TIMESTAMPTZ
+  ,is_suspended BOOLEAN NOT NULL DEFAULT false
+  ,suspension_note TEXT NOT NULL DEFAULT ''
+  ,suspended_at TIMESTAMPTZ
+  ,suspended_by INTEGER REFERENCES users(user_id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS oauth_identities (
@@ -64,6 +68,9 @@ CREATE TABLE IF NOT EXISTS companies (
   logo VARCHAR(255) NOT NULL,
   logo_public_id VARCHAR(255) NOT NULL,
   recruiter_id INTEGER NOT NULL,
+  is_verified BOOLEAN NOT NULL DEFAULT false,
+  verified_at TIMESTAMPTZ,
+  verified_by INTEGER REFERENCES users(user_id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -92,8 +99,22 @@ CREATE TABLE IF NOT EXISTS applications (
   resume VARCHAR(255) NOT NULL,
   applied_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   subscribed BOOLEAN,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   UNIQUE (job_id, applicant_id)
 );
+
+CREATE TABLE IF NOT EXISTS job_reports (
+  id BIGSERIAL PRIMARY KEY,
+  job_id INTEGER NOT NULL REFERENCES jobs(job_id) ON DELETE CASCADE,
+  reporter_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+  reason TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'Pending' CHECK(status IN ('Pending','Reviewed','Dismissed')),
+  review_note TEXT NOT NULL DEFAULT '',
+  reviewed_by INTEGER REFERENCES users(user_id) ON DELETE SET NULL,
+  reviewed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE UNIQUE INDEX IF NOT EXISTS job_reports_one_pending_per_reporter ON job_reports(job_id,reporter_id) WHERE status = 'Pending';
 
 CREATE TABLE IF NOT EXISTS application_events (
   id BIGSERIAL PRIMARY KEY,

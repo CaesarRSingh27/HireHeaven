@@ -82,6 +82,9 @@ services:
       UPLOAD_SERVICE: http://utils:5001
       INTERNAL_API_KEY: ${INTERNAL_API_KEY}
       JWT_SEC: ${JWT_SEC:?set JWT_SEC in .env}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_NAME: ${ADMIN_NAME:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
       Kafka_Broker: kafka:9092
       Redis_url: redis://redis:6379
       Frontend_Url: ${PUBLIC_URL:-http://localhost}

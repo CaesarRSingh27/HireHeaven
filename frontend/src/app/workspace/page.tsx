@@ -37,6 +37,7 @@ export default function WorkspacePage() {
             : "Keep your opportunities, preparation, and story in one place."}
         </p>
         <div className="workspace-links">
+          {user?.role === "admin" && <Link href="/admin">Open admin dashboard →</Link>}
           <Link href="/jobs">Explore jobs →</Link>
           <Link href="/account">Manage profile →</Link>
           <Link href="/subscribe">Plans →</Link>

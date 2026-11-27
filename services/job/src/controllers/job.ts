@@ -348,7 +348,7 @@ export const getAllActiveJobs = TryCatch(async (req, res) => {
     const value = req.query[name];
     if (value !== undefined && value !== "" && (typeof value !== "string" || !Number.isFinite(Number(value)) || Number(value)<0 || (name !== "min_salary" && !Number.isInteger(Number(value))))) throw new ErrorHandler(400, "Enter a valid numeric filter");
   }
-  let querySting = `SELECT j.job_id, j.title, j.description, j.salary, j.location, j.job_type, j.role, j.work_location, j.created_at, j.is_active, j.required_skills, j.experience_years, j.graduation_year, j.salary_period, j.featured_until, c.name AS company_name, c.logo AS company_logo, c.company_id AS company_id FROM jobs j JOIN companies c ON j.company_id = c.company_id WHERE j.is_active = true`;
+  let querySting = `SELECT j.job_id, j.title, j.description, j.salary, j.location, j.job_type, j.role, j.work_location, j.created_at, j.is_active, j.required_skills, j.experience_years, j.graduation_year, j.salary_period, j.featured_until, c.name AS company_name, c.logo AS company_logo, c.company_id AS company_id, c.is_verified AS company_verified FROM jobs j JOIN companies c ON j.company_id = c.company_id WHERE j.is_active = true`;
 
   const values = [];
 
@@ -486,7 +486,7 @@ export const updateApplication = TryCatch(
       throw new ErrorHandler(400, "Notes must be at most 4000 characters");
     }
     const [updatedApplication] =
-      await sql`UPDATE applications SET status = ${req.body.status}, recruiter_note = COALESCE(${req.body.recruiter_note ?? null}, recruiter_note) WHERE application_id = ${id} RETURNING *`;
+      await sql`UPDATE applications SET status = ${req.body.status}, recruiter_note = COALESCE(${req.body.recruiter_note ?? null}, recruiter_note), updated_at=now() WHERE application_id = ${id} RETURNING *`;
 
     if (application.status !== req.body.status) {
       await sql`INSERT INTO application_events(application_id,status,note)

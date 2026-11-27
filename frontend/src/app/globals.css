@@ -2064,3 +2064,34 @@ label,
 .talent-editorial .workspace-project { border-left: 4px solid var(--primary); }
 .talent-headline { font-size: 1.25rem; }
 @media(max-width: 600px) { .workspace-summary { grid-template-columns: repeat(2,minmax(0,1fr)); } .workspace-heading { margin-bottom: 2rem; } .workspace-row { flex-wrap: wrap; } .workspace-pipeline { grid-auto-columns: 260px; } }
+.profile-completion-card { display: grid; gap: 1rem; }
+.profile-completion-card h2 { margin: .3rem 0; }
+.profile-progress-track { height: 9px; overflow: hidden; border-radius: 999px; background: color-mix(in srgb, var(--primary) 13%, transparent); }
+.profile-progress-track span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #7357e8, #b681e9); transition: width .45s ease; }
+.profile-checklist { display: grid; gap: .65rem; padding: 0; margin: 0; list-style: none; }
+.profile-checklist li { display: flex; align-items: center; gap: .7rem; }
+.profile-checklist li > span { color: var(--primary); font-weight: 800; }
+.profile-checklist a.is-complete { opacity: .65; text-decoration: line-through; }
+.profile-step-action { margin-left: auto; font-weight: 700; color: var(--primary); }
+.verified-company-badge { display: inline-flex; align-items: center; gap: .25rem; margin-left: .35rem; border-radius: 999px; padding: .2rem .45rem; color: #16856a; background: color-mix(in srgb, #41b99c 12%, transparent); font-size: .72rem; font-weight: 750; }
+.job-report-area { border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent); padding-top: .65rem; }
+.job-report-toggle { font-size: .8rem; opacity: .7; text-decoration: underline; text-underline-offset: 3px; }
+.job-report-form { display: grid; gap: .5rem; padding-top: .7rem; }
+.job-report-form label, .admin-row-actions textarea { font-size: .82rem; }
+.job-report-form textarea, .admin-row-actions textarea { min-height: 75px; width: 100%; border: 1px solid color-mix(in srgb, currentColor 20%, transparent); border-radius: 12px; background: var(--background); padding: .7rem; color: inherit; }
+.job-report-form > button, .admin-review-row > button, .admin-row-actions > button { border: 1px solid color-mix(in srgb, currentColor 18%, transparent); border-radius: 999px; padding: .55rem .9rem; font-size: .82rem; font-weight: 750; }
+.job-report-form > button:disabled, .admin-review-row > button:disabled, .admin-row-actions > button:disabled { opacity: .5; cursor: not-allowed; }
+.admin-page { max-width: 1180px; }
+.admin-access-card { max-width: 680px; margin: 5rem auto; }
+.admin-section { display: grid; gap: 1rem; }
+.admin-section-heading, .admin-review-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+.admin-section-heading h2 { margin: .3rem 0 0; }
+.admin-review-row { border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent); padding-top: 1rem; }
+.admin-review-copy { display: grid; gap: .3rem; min-width: 0; }
+.admin-review-copy p { margin: .15rem 0; overflow-wrap: anywhere; }
+.admin-review-copy small { opacity: .72; overflow-wrap: anywhere; }
+.admin-row-actions { display: grid; flex: 0 1 230px; gap: .5rem; }
+.admin-secondary-action { opacity: .75; }
+.response-overdue { color: #a54c22; background: color-mix(in srgb, #ff9c6e 18%, transparent); }
+.application-response-age { opacity: .72; }
+@media (max-width: 640px) { .admin-section-heading, .admin-review-row { flex-direction: column; } .admin-row-actions { width: 100%; flex-basis: auto; } }

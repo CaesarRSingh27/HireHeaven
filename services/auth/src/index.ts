@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 import { sql } from "./utils/db.js";
 import { connectRedis, redisClient } from "./utils/redis.js";
 import { disconnectKafka } from "./producer.js";
+import bcrypt from "bcrypt";
+import { isStrongPassword, isValidEmail } from "./utils/validate.js";
 
 dotenv.config();
 
@@ -18,6 +20,8 @@ async function initDb() {
        END IF;
     END$$;
     `;
+
+    await sql`ALTER TYPE user_role ADD VALUE IF NOT EXISTS 'admin'`;
 
     await sql`
       CREATE TABLE IF NOT EXISTS users (
@@ -42,6 +46,10 @@ async function initDb() {
     await sql`ALTER TABLE users ALTER COLUMN password DROP NOT NULL`;
     await sql`ALTER TABLE users ALTER COLUMN phone_number DROP NOT NULL`;
     await sql`ALTER TABLE users ALTER COLUMN role SET DEFAULT 'jobseeker'`;
+    await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_suspended BOOLEAN NOT NULL DEFAULT false`;
+    await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS suspension_note TEXT NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS suspended_at TIMESTAMPTZ`;
+    await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS suspended_by INTEGER REFERENCES users(user_id) ON DELETE SET NULL`;
     await sql`
       CREATE TABLE IF NOT EXISTS oauth_identities (
         provider VARCHAR(32) NOT NULL,
@@ -61,6 +69,19 @@ async function initDb() {
     `;
 
     await sql`ALTER TABLE skills ALTER COLUMN name TYPE VARCHAR(255)`;
+
+    const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+    const adminName = process.env.ADMIN_NAME?.trim();
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    if (adminEmail || adminName || adminPassword) {
+      if (!adminEmail || !adminName || !adminPassword || !isValidEmail(adminEmail) || !isStrongPassword(adminPassword)) {
+        throw new Error("ADMIN_EMAIL, ADMIN_NAME, and a strong ADMIN_PASSWORD must all be configured together");
+      }
+      const passwordHash = await bcrypt.hash(adminPassword, 12);
+      await sql`INSERT INTO users(name,email,password,role)
+        VALUES(${adminName},${adminEmail},${passwordHash},'admin')
+        ON CONFLICT(email) DO UPDATE SET name=EXCLUDED.name,password=EXCLUDED.password,role='admin',is_suspended=false,suspension_note='',suspended_at=NULL,suspended_by=NULL`;
+    }
 
     await sql`
     CREATE TABLE IF NOT EXISTS user_skills(

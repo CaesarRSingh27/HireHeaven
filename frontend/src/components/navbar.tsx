@@ -26,6 +26,7 @@ const navigation = [
   { href: "/", label: "Home", icon: Home },
   { href: "/jobs", label: "Find a job", icon: BriefcaseBusiness },
   { href: "/workspace", label: "Workspace", icon: Building2 },
+  { href: "/admin", label: "Admin", icon: Building2, adminOnly: true },
   { href: "/subscribe", label: "Plans", icon: BriefcaseBusiness },
   { href: "/about", label: "About", icon: Info },
   { href: "/contact", label: "Contact", icon: Mail },
@@ -50,7 +51,7 @@ const NavBar = () => {
         </Link>
 
         <div className="site-nav-links">
-          {navigation.map(({ href, label }) => {
+          {navigation.filter((item) => !item.adminOnly || user?.role === "admin").map(({ href, label }) => {
             const isActive = pathname === href || (href !== "/" && pathname.startsWith(href));
             return (
               <Link
@@ -127,13 +128,14 @@ const NavBar = () => {
 
       {isOpen && (
         <div className="mobile-nav-panel">
-          {navigation.map(({ href, label, icon: Icon }) => (
+          {navigation.filter((item) => !item.adminOnly || user?.role === "admin").map(({ href, label, icon: Icon }) => (
             <Link href={href} key={href} onClick={closeMenu}>
               <Icon size={18} /> {label}
             </Link>
           ))}
           {isAuth ? (
             <>
+              {user?.role === "admin" && <Link href="/admin" onClick={closeMenu}><Building2 size={18} /> Admin dashboard</Link>}
               <Link href="/account" onClick={closeMenu}><UserRound size={18} /> My profile</Link>
               {user?.role === "recruiter" && (
                 <Link href="/account" onClick={closeMenu}><Building2 size={18} /> Hiring dashboard</Link>

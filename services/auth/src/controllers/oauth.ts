@@ -225,6 +225,12 @@ export const oauthCallback = TryCatch(async (req: Request, res: Response) => {
       userId = accountId;
     }
 
+    const [accountState] = await sql`SELECT is_suspended FROM users WHERE user_id=${userId}`;
+    if (!accountState || accountState.is_suspended) {
+      res.redirect(302, getFailureRedirect("account_suspended"));
+      return;
+    }
+
     const token = jwt.sign({ id: userId }, process.env.JWT_SEC as string, {
       expiresIn: "15d",
     });

@@ -104,7 +104,7 @@ export const loginUser = TryCatch(async (req, res, next) => {
   }
 
   const user = await sql`
-  SELECT u.user_id, u.name, u.email, u.password, u.phone_number, u.role, u.bio, u.resume, u.profile_pic, u.subscription, ARRAY_AGG(s.name) FILTER (WHERE s.name IS NOT NULL) as skills FROM users u LEFT JOIN user_skills us ON u.user_id = us.user_id
+  SELECT u.user_id, u.name, u.email, u.password, u.phone_number, u.role, u.bio, u.resume, u.profile_pic, u.subscription, u.is_suspended, ARRAY_AGG(s.name) FILTER (WHERE s.name IS NOT NULL) as skills FROM users u LEFT JOIN user_skills us ON u.user_id = us.user_id
   LEFT JOIN skills s ON us.skill_id = s.skill_id
   WHERE u.email = ${email} GROUP BY u.user_id;
   `;
@@ -114,6 +114,10 @@ export const loginUser = TryCatch(async (req, res, next) => {
   }
 
   const userObject = user[0];
+
+  if (userObject.is_suspended) {
+    throw new ErrorHandler(403, "This account is suspended. Contact support for help.");
+  }
 
   const matchPassword = userObject.password
     ? await bcrypt.compare(password, userObject.password)
@@ -126,6 +130,7 @@ export const loginUser = TryCatch(async (req, res, next) => {
   userObject.skills = userObject.skills || [];
 
   delete userObject.password;
+  delete userObject.is_suspended;
 
   const token = jwt.sign(
     { id: userObject?.user_id },

@@ -40,7 +40,7 @@ export interface Overview {
   saved: Job[];
   alerts: { id: number; title: string; location: string; email_enabled: boolean; frequency: "daily" | "weekly" }[];
   matches: { job_id: number; title: string; company_name: string }[];
-  updates: { application_id: number; status: string; title: string; applied_at: string; timeline: { status: string; note: string; created_at: string }[] }[];
+  updates: { application_id: number; status: string; title: string; applied_at: string; updated_at: string; timeline: { status: string; note: string; created_at: string }[] }[];
   portfolio: Portfolio | null;
   interviews: Interview[];
   meetings: { id: number; application_id: number; scheduled_at: string; status: string; meeting_url: string; job_title: string; recruiter_name?: string; candidate_name?: string }[];
@@ -68,6 +68,8 @@ export interface Applicant {
   job_id: number;
   job_title: string;
   status: string;
+  applied_at: string;
+  updated_at: string;
   recruiter_note: string;
   resume: string;
   skills: string[];
