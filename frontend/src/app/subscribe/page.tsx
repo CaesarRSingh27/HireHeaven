@@ -10,6 +10,7 @@ import { payment_service, useAppData } from "@/context/AppContext";
 import { workspaceApi, errorMessage } from "@/lib/workspace";
 import type { Job } from "@/type";
 import MotionCard from "@/components/motion-card";
+import MotionReveal from "@/components/motion-reveal";
 
 interface Plan {
   id: string;
@@ -97,7 +98,7 @@ export default function SubscriptionPage() {
   }
   return (
     <main className="workspace-page">
-      <header className="workspace-heading">
+      <MotionReveal className="workspace-heading">
         <span className="workspace-kicker">A little more possibility</span>
         <h1>
           Find your pace.
@@ -106,7 +107,7 @@ export default function SubscriptionPage() {
         </h1>
         <p>Start free, then add the tools that suit your next move.</p>
         <Link href="/workspace">Open your workspace →</Link>
-      </header>
+      </MotionReveal>
       {error && <p role="alert">{error}</p>}
       <div className="workspace-pricing">
         <MotionCard as="section" className="workspace-card" delay={0}>

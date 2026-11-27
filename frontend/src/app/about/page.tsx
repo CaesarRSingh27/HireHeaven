@@ -4,6 +4,7 @@ import Link from "next/link";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import MotionCard from "@/components/motion-card";
+import MotionReveal from "@/components/motion-reveal";
 
 const values = [
   {
@@ -97,11 +98,11 @@ const About = () => (
     </section>
 
     <section className="about-journey" aria-labelledby="about-journey-title">
-      <div className="about-section-heading">
+      <MotionReveal className="about-section-heading">
           <span className="about-eyebrow"><Compass size={15} /> The HireHeaven Experience</span>
           <h2 id="about-journey-title">Three thoughtful steps to <em>what’s next.</em></h2>
           <p>From first search to a confident next move, we make the journey feel clear and human.</p>
-      </div>
+      </MotionReveal>
       <div className="about-journey-grid">
           {journey.map(({ icon: Icon, title, text, action, href }, index) => (
           <MotionCard className="about-journey-card" key={title} delay={index * 90}>
@@ -114,11 +115,11 @@ const About = () => (
     </section>
 
     <section className="about-values" aria-labelledby="about-values-title">
-      <div className="about-section-heading">
+      <MotionReveal className="about-section-heading">
         <span className="about-eyebrow"><HeartHandshake size={15} /> What We Believe</span>
         <h2 id="about-values-title">Built for people.<br /><em>Built for possibility.</em></h2>
         <p>Good work begins with people. These are the principles behind every connection we make.</p>
-      </div>
+      </MotionReveal>
       <div className="about-values-grid">
         {values.map(({ icon: Icon, title, description, tone }) => (
           <MotionCard className={`about-value-card ${tone}`} key={title} delay={values.findIndex((item) => item.title === title) * 90}>

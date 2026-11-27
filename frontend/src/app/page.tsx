@@ -10,6 +10,7 @@ import Link from "next/link";
 import React from "react";
 import MotionCard from "@/components/motion-card";
 import CompanyOrbit from "@/components/company-orbit";
+import MotionReveal from "@/components/motion-reveal";
 
 const journeySteps = [
   { label: "DISCOVER", icon: Search, title: "Find work that fits.", text: "Explore openings by role and location, and find opportunities that match your strengths and ambitions.", action: "Explore open roles", href: "/jobs" },
@@ -25,11 +26,11 @@ const Home = () => {
       <Hero />
       <CompanyOrbit />
       <section className="home-journey" aria-labelledby="home-journey-title">
-        <div className="home-section-heading">
+        <MotionReveal className="home-section-heading">
           <span className="about-eyebrow"><Sparkles size={15} /> Your Next Chapter Starts Here</span>
           <h2 id="home-journey-title">Make your next move <em>matter.</em></h2>
           <p>From the first search to a confident next step, find the tools and support to move your career forward.</p>
-        </div>
+        </MotionReveal>
         <div className="home-journey-grid">
           {journeySteps.map(({ label, icon: Icon, title, text, action, href }) => (
             <MotionCard className="home-journey-card" key={label} delay={journeySteps.findIndex((step) => step.label === label) * 90}>

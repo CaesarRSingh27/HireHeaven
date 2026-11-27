@@ -49,8 +49,8 @@ const Hero = () => (
           Find work that moves you forward
         </div>
         <h1 className="hero-title">
-          Good work finds
-          <span className="hero-title-accent">its people.</span>
+          <span className="hero-title-line"><span>Good work</span> <span>finds</span></span>
+          <span className="hero-title-accent"><span>its people.</span></span>
         </h1>
         <p className="hero-description">
           Explore roles that fit your ambition, meet teams building what’s next,
