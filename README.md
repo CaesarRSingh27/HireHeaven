@@ -16,17 +16,21 @@ Free candidates get five comparisons and three interview questions with feedback
 |---|---|
 | Home, `/` | Explore the platform and open AI career guidance and resume analysis |
 | About, `/about` | Learn about HireHeaven's mission, candidate journey, and values |
-| Find a job, `/jobs` | Browse and filter openings, open job details, and apply |
-| Account, `/account` | Manage your profile, resume, skills, and applications, or access recruiter tools |
-| Company, `/company/[id]` | View a company's details |
+| Find a job, `/jobs` | Filter openings by verified employer, check deadlines and recruiter confirmations, and apply |
+| Account, `/account` | Manage your profile and skills, download your private resume, and review applications |
+| Company, `/company/[id]` | View a company and its openings. Recruiters can set deadlines and confirm that their listings are still open |
 | Register / sign in, `/register` and `/login` | Use email and password or Google, LinkedIn, and GitHub through Clerk |
 | Contact us, `/contact` | Find contact details and prepare a message in WhatsApp |
-| Workspace, `/workspace` | Track applications, receive job digests, manage portfolios, practise or schedule interviews, manage hiring, or organise campus placements |
+| Workspace, `/workspace` | Track applications, manage interviews and hiring, or record campus attendance and review placement outcomes |
 | Admin, `/admin` | Review listing reports, verify companies, and suspend accounts or listings |
 | Public portfolios, `/talent/[slug]` | View a candidate’s opted-in projects, skills, and profile |
 | Subscription, `/subscribe` | Access the Razorpay subscription checkout |
 
 Recruiters can create company profiles, post jobs, and review applicants through the account area. Social registration lets users start with a minimal profile and add the remaining details later.
+
+- **Listing freshness.** Candidates can filter for verified employers and see each listing’s last recruiter confirmation. Optional deadlines run through the listed day in India Standard Time. Expired listings close automatically.
+- **Campus placement dashboard.** Organisers can mark attendance, review placement rates by drive and across unique students, follow student progress, and export filtered registrations as CSV.
+- **Private resumes.** Candidates can download their own resumes. Recruiters can download the resume submitted to a job they posted. An application keeps its original resume when the candidate updates their profile. See [private resume downloads](#private-resume-downloads) for migration details.
 
 ### Reze assistant
 
@@ -52,6 +56,16 @@ The contact page uses **caesarkrish@gmail.com** and **+91 7376433661** for Whats
 
 The interface supports light and dark themes, responsive layouts, custom typography, and illustrated character accents. The three journey cards on the About page use text and icons. The HireHeaven emblem is stored in `frontend/public/hireheaven-mark.svg` and is also used as the browser icon.
 
+### UI roadmap
+
+1. **Shared design system.** Define theme tokens for color, typography, spacing, and elevation. Reuse page headers, cards, status badges, and form fields across both themes.
+2. **Find a Job redesign.** Put employer, location, pay, and deadline in a consistent order. Keep active filters visible and give mobile users a filter sheet with a clear **Show results** action.
+3. **Workspace layouts.** Use a sidebar on desktop and compact tabs on mobile. Bring upcoming interviews and recent updates forward for candidates. Give recruiters board and table views with consistent stage colors.
+4. **Typography and motion.** Keep handwritten accents on selected marketing headings. Add a pause control to the company logo orbit and provide static layouts when visitors prefer reduced motion.
+5. **Loading, empty, and error states.** Add skeletons that match the page layout, actionable empty states, and inline validation and retry controls.
+
+## Architecture
+
 ```
 Browser --> nginx :80/:443 --+--> frontend (Next.js)      :3000
                              +--> /api/auth     auth      :5000  --> Postgres, Redis, Kafka(producer)
@@ -61,8 +75,7 @@ Browser --> nginx :80/:443 --+--> frontend (Next.js)      :3000
                              +--> /api/payment  payment   :5004  --> Postgres, Razorpay
 ```
 
-`/api/utils/upload` and `/api/utils/delete` are **internal only**: backend services call them with the shared
-`INTERNAL_API_KEY`, and nginx returns 404 for them from outside.
+The media upload, delete, and private resume routes under `/api/utils` require the shared `INTERNAL_API_KEY`. nginx blocks external requests to those routes. The user service handles authenticated resume downloads.
 
 ## Run everything with Docker (recommended)
 
@@ -187,7 +200,7 @@ If your database predates this version run `db/migrations/001_openings_integer.s
 ## Security notes
 
 - Never commit `.env`. If any real keys were ever shared (zips, chats, screenshots), rotate them: Neon password, Razorpay secret, Cloudinary secret, Gmail app password, Gemini key, JWT secret.
-- Auth routes are rate limited; passwords need 8+ chars with a letter and a number; file uploads support PDF/PNG/JPEG/WEBP up to 25 MB.
+- Auth routes are rate limited. Passwords require at least eight characters, including a letter and a number. Resume uploads require a PDF up to 25 MB.
 - Public AI endpoints (`/career`, `/resume-analyser`) are rate limited per IP (5/min) to protect the Gemini quota.
 
 ## Known limitations / ideas
